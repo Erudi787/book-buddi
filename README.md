@@ -138,7 +138,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-Project Link: [https://github.com/yourusername/book-buddi](https://github.com/yourusername/book-buddi)
+Project Link: [https://github.com/Erudi787/book-buddi](https://github.com/Erudi787/book-buddi)
 
 ## Acknowledgments
 
