@@ -115,7 +115,9 @@ dotnet run
 book-buddi/
 ├── Pages/              # Razor Pages
 ├── Models/             # Data models
+├── Interfaces/         # Interfaces
 ├── Data/               # Database context and migrations
+├── Documentation/      # Documentation Files
 ├── Services/           # Business logic services
 ├── wwwroot/            # Static files (CSS, JS, images)
 ├── appsettings.json    # Configuration
