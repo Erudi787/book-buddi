@@ -124,15 +124,97 @@ book-buddi/
 └── Program.cs          # Application entry point
 ```
 
-## Contributing
+## 🔄 Development Workflow
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We follow a **lightweight Gitflow-inspired workflow** for teamwork, accountability, and clean code.
 
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1. **Issues** → Every task/feature/bug should have a GitHub Issue.
+2. **Branches** → Branch from `develop`, keep changes focused.
+3. **Pull Requests (PRs)** → Open into `develop`. Require at least 1 peer review.
+4. **Integration** → Test locally, then merge into `develop`.
+5. **Release** → Only merge `develop` → `main` when stable.
+
+---
+
+### 🌱 Branching Strategy
+
+* **main** → production-ready, stable code
+* **develop** → active development branch
+* **feature/** → new features (`feature/raboy-landing-page`)
+* **fix/** → bug fixes (`fix/mactual-navbar-bug`)
+* **chore/** → configs, setup, maintenance
+
+```bash
+git checkout -b feature/<lastname>-<short-description>
+```
+
+**Examples:**
+
+* `feature/denampo-borrow-book`
+* `fix/denampo-auth-bug`
+
+**Rules:**
+
+* Use **lowercase** (except names).
+* Keep names short and descriptive.
+* Use **hyphens (-)**, not spaces.
+
+---
+
+### 📝 Commit Guidelines
+
+Format:
+
+```bash
+<prefix>(<scope>): <message> - <name>
+```
+
+**Examples:**
+
+* `feat(borrow): implement book borrowing - Denampo`
+* `fix(auth): resolve auth JWT bug - Denampo`
+* `docs(readme): update commit guidelines - Denampo`
+
+**Rules:**
+
+* Prefix must follow the table below.
+* Use **lowercase** (except names).
+* Keep messages concise.
+* Scope is optional, but recommended.
+
+#### 📌 Commit Prefixes
+
+| Prefix        | Meaning                                          |
+| ------------- | ------------------------------------------------ |
+| **feat:**     | A new feature                                    |
+| **fix:**      | A bug fix                                        |
+| **docs:**     | Documentation only changes                       |
+| **style:**    | Code style changes (formatting, no logic change) |
+| **refactor:** | Refactoring code (not a fix or feature)          |
+| **test:**     | Adding or fixing tests                           |
+| **chore:**    | Maintenance tasks (build, deps, configs, etc.)   |
+
+---
+
+## 🤝 Contributing & Git Workflow
+
+1. Pull the latest code
+
+   ```bash
+   git pull origin main
+   ```
+2. Create a new branch
+
+   ```bash
+   git checkout -b feature/<lastname>-<short-description>
+   ```
+3. Commit changes using the [Commit Guidelines](#-commit-guidelines).
+4. Push your branch
+
+   ```bash
+   git push origin feature/<lastname>-<short-description>
+   ```
+5. Open a Pull Request → target `develop`.
 
 ## License
 
