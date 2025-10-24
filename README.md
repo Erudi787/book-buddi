@@ -140,8 +140,8 @@ We follow a **lightweight Gitflow-inspired workflow** for teamwork, accountabili
 
 * **main** → production-ready, stable code
 * **develop** → active development branch
-* **feature/** → new features (`feature/raboy-landing-page`)
-* **fix/** → bug fixes (`fix/mactual-navbar-bug`)
+* **feature/** → new features (`feature/denampo-borrow-book`)
+* **fix/** → bug fixes (`fix/denampo-auth-bug`)
 * **chore/** → configs, setup, maintenance
 
 ```bash
