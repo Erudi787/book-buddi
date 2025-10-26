@@ -67,24 +67,37 @@ Book Buddi is designed for both general users and administrators, providing a co
 
 ## Getting Started
 
+### 🚀 Quick Setup for Team Members
+
+👉 **[Team Setup Instructions](Documentation/SETUP-FOR-TEAM.md)** 👈
+
+This guide includes:
+- Complete prerequisites checklist
+- Step-by-step installation
+- Database setup with `dotnet ef database update`
+- Troubleshooting common issues
+- Team collaboration workflow
+
 ### Prerequisites
 
 Before you begin, ensure you have the following installed:
-- [.NET SDK](https://dotnet.microsoft.com/download) (version 8.0 or later recommended)
+- [.NET SDK](https://dotnet.microsoft.com/download) (version 9.0 or later)
 - [Visual Studio Code](https://code.visualstudio.com/)
 - [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (Express edition or higher)
+- [SQL Server Management Studio (SSMS)](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms)
 - [C# Dev Kit extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) for VS Code
 
-### Installation
+### Quick Installation
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/book-buddi.git
+git clone https://github.com/Erudi787/book-buddi.git
 cd book-buddi
 ```
 
-2. Restore dependencies
+2. Navigate to project folder and restore dependencies
 ```bash
+cd BookBuddi
 dotnet restore
 ```
 
@@ -92,22 +105,35 @@ dotnet restore
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=BookBuddi;Trusted_Connection=True;TrustServerCertificate=True"
+    "DefaultConnection": "Server=(local);Database=BookBuddiDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
   }
 }
 ```
+> **Note**: Replace `(local)` with your SQL Server instance name. Common values: `(local)`, `.\SQLEXPRESS`, `localhost`
 
-4. Apply database migrations
+4. Install EF Core tools (if not already installed)
+```bash
+dotnet tool install --global dotnet-ef
+```
+
+5. Create the database and apply migrations
 ```bash
 dotnet ef database update
 ```
+> This creates the `BookBuddiDb` database with all tables and seed data
 
-5. Run the application
+6. Run the application
 ```bash
 dotnet run
 ```
 
-6. Open your browser and navigate to `https://localhost:5001` (or the port shown in the console)
+7. Open your browser and navigate to `https://localhost:5001` (or the port shown in the console)
+
+### Default Credentials
+
+**Admin Access** (when implemented):
+- Email: `admin@bookbuddi.com`
+- Password: `Admin@123`
 
 ## Project Structure
 
@@ -214,7 +240,7 @@ Format:
    ```bash
    git push origin feature/<lastname>-<short-description>
    ```
-5. Open a Pull Request → target `develop`.
+5. Open a Pull Request → target `development`.
 
 ## License
 
