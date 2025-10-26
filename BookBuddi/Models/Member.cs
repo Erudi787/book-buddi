@@ -49,6 +49,8 @@ namespace BookBuddi.Models
 
         public virtual ICollection<BookRequest> BookRequests { get; set; } = new List<BookRequest>();
 
+        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+
         public virtual ICollection<Fine> Fines { get; set; } = new List<Fine>();
     }
 }
