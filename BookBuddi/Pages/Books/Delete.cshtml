@@ -1,0 +1,29 @@
+@page
+@model BookBuddi.Pages.Books.DeleteModel
+@{
+    ViewData["Title"] = "Delete Book";
+}
+
+<h1>Delete Book</h1>
+
+<h3>Are you sure you want to delete this book?</h3>
+@if (Model.Book != null)
+{
+    <dl>
+        <dt>Title</dt>
+        <dd>@Model.Book.BookTitle</dd>
+        <dt>ISBN</dt>
+        <dd>@Model.Book.ISBN</dd>
+    </dl>
+
+    <form method="post">
+        <input type="hidden" asp-for="Book.BookId" />
+        <button type="submit">Delete</button>
+        <a href="/Books/Index">Cancel</a>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <p style="color: red;">@Model.ErrorMessage</p>
+    }
+}

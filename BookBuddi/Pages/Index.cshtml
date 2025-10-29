@@ -1,10 +1,87 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "BookBuddi - Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h1>BookBuddi - Library Management System</h1>
+
+@{
+    var userRole = HttpContext.Session.GetString("UserRole");
+    var memberName = HttpContext.Session.GetString("MemberName");
+    var adminName = HttpContext.Session.GetString("AdminName");
+}
+
+<div style="text-align: right; margin-bottom: 20px;">
+    @if (string.IsNullOrEmpty(userRole))
+    {
+        <a href="/Account/Login">Login / Register</a>
+    }
+    else if (userRole == "Admin")
+    {
+        <text><span>Logged in as: <strong>Admin - @adminName</strong></span> | </text>
+        <a href="/Account/Logout">Logout</a>
+    }
+    else
+    {
+        <text><span>Logged in as: <strong>@memberName</strong></span> | </text>
+        <a href="/Account/Logout">Logout</a>
+    }
 </div>
+
+@if (userRole == "Member")
+{
+    <h2>Member Features</h2>
+    <ul>
+        <li><a href="/Books/Index">Browse Books</a></li>
+        <li><a href="/Borrowing/Index">My Borrowing</a></li>
+        <li><a href="/BookRequests/Index">Request a Book</a></li>
+        <li><a href="/Fines/Index">My Fines</a></li>
+        <li><a href="/Notifications/Index">My Notifications</a></li>
+    </ul>
+}
+else if (userRole == "Admin")
+{
+    <h2>Library Management</h2>
+    <ul>
+        <li><a href="/Books/Index">Books Management</a></li>
+        <li><a href="/Members/Index">Members Management</a></li>
+        <li><a href="/Borrowing/Index">Borrowing Transactions</a></li>
+        <li><a href="/BookRequests/Index">Book Requests</a></li>
+        <li><a href="/Fines/Index">Fines Management</a></li>
+        <li><a href="/Notifications/Index">Notifications</a></li>
+        <li><a href="/Reports/Index">Reports & Analytics</a></li>
+    </ul>
+
+    <h2>Catalog Management</h2>
+    <ul>
+        <li><a href="/Authors/Index">Authors</a></li>
+        <li><a href="/Categories/Index">Categories</a></li>
+        <li><a href="/Genres/Index">Genres</a></li>
+    </ul>
+}
+else
+{
+    <h2>Welcome to BookBuddi</h2>
+    <p>Please <a href="/Account/Login">login or register</a> to access library features.</p>
+    <p>Browse our extensive collection of books and manage your reading journey!</p>
+}
+
+@if (!string.IsNullOrEmpty(userRole))
+{
+    @if (userRole == "Admin")
+    {
+        <h2>Quick Stats</h2>
+        <p>Total Books: @Model.TotalBooks</p>
+        <p>Available Books: @Model.AvailableBooks</p>
+        <p>Total Members: @Model.TotalMembers</p>
+        <p>Active Transactions: @Model.ActiveTransactions</p>
+        <p>Unpaid Fines: @Model.UnpaidFines</p>
+    }
+    else
+    {
+        <h2>My Library Status</h2>
+        <p>Available Books to Browse: @Model.AvailableBooks</p>
+        <p>Total Books in Library: @Model.TotalBooks</p>
+    }
+}

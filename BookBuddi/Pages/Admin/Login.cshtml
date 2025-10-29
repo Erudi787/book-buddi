@@ -1,0 +1,32 @@
+@page
+@model BookBuddi.Pages.Admin.LoginModel
+@{
+    ViewData["Title"] = "Admin Login";
+}
+
+<h1>Admin Login</h1>
+
+<form method="post">
+    <div>
+        <label>Email:</label><br/>
+        <input type="email" asp-for="Input.Email" required />
+    </div>
+    <div>
+        <label>Password:</label><br/>
+        <input type="password" asp-for="Input.Password" required />
+    </div>
+    <br/>
+    <button type="submit">Login</button>
+    <a href="/">Cancel</a>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p style="color: red;">@Model.ErrorMessage</p>
+}
+
+<p><strong>Default Admin Credentials:</strong></p>
+<p>Email: admin@bookbuddi.com</p>
+<p>Password: Admin@123</p>
+
+<p><a href="/Account/Login">Member Login</a></p>

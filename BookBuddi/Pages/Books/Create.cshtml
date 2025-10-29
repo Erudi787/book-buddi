@@ -1,0 +1,66 @@
+@page
+@model BookBuddi.Pages.Books.CreateModel
+@{
+    ViewData["Title"] = "Create Book";
+}
+
+<h1>Create New Book</h1>
+
+<form method="post">
+    <div>
+        <label>Title:</label><br/>
+        <input type="text" asp-for="Book.BookTitle" required />
+    </div>
+    <div>
+        <label>ISBN:</label><br/>
+        <input type="text" asp-for="Book.ISBN" required />
+    </div>
+    <div>
+        <label>Publisher:</label><br/>
+        <input type="text" asp-for="Book.Publisher" />
+    </div>
+    <div>
+        <label>Publication Date:</label><br/>
+        <input type="date" asp-for="Book.PublicationDate" />
+    </div>
+    <div>
+        <label>Description:</label><br/>
+        <textarea asp-for="Book.Description" rows="4" cols="50"></textarea>
+    </div>
+    <div>
+        <label>Page Count:</label><br/>
+        <input type="number" asp-for="Book.PageCount" />
+    </div>
+    <div>
+        <label>Available Copies:</label><br/>
+        <input type="number" asp-for="Book.AvailableCopies" required />
+    </div>
+    <div>
+        <label>Category:</label><br/>
+        <select asp-for="Book.CategoryId" required>
+            <option value="">-- Select Category --</option>
+            @foreach (var category in Model.Categories)
+            {
+                <option value="@category.CategoryId">@category.CategoryName</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label>Genre:</label><br/>
+        <select asp-for="Book.GenreId" required>
+            <option value="">-- Select Genre --</option>
+            @foreach (var genre in Model.Genres)
+            {
+                <option value="@genre.GenreId">@genre.GenreName</option>
+            }
+        </select>
+    </div>
+    <br/>
+    <button type="submit">Create</button>
+    <a href="/Books/Index">Cancel</a>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p style="color: red;">@Model.ErrorMessage</p>
+}

@@ -1,0 +1,45 @@
+@page
+@model BookBuddi.Pages.Authors.IndexModel
+@{
+    ViewData["Title"] = "Authors Management";
+    var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
+}
+
+<h1>Authors Management</h1>
+
+@if (!isAdmin)
+{
+    <p style="color: red;">Admin access required to manage authors.</p>
+    <p><a href="/Admin/Login">Login as Admin</a></p>
+}
+else
+{
+    <p><a href="/Authors/Create">Add New Author</a></p>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Biography</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var author in Model.Authors)
+            {
+                <tr>
+                    <td>@author.AuthorId</td>
+                    <td>@author.FirstName @author.LastName</td>
+                    <td>@(author.Biography != null && author.Biography.Length > 100 ? author.Biography.Substring(0, 100) + "..." : author.Biography)</td>
+                    <td>
+                        <a href="/Authors/Edit?id=@author.AuthorId">Edit</a> |
+                        <a href="/Authors/Delete?id=@author.AuthorId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<p><a href="/">Back to Home</a></p>

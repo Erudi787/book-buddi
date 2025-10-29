@@ -1,0 +1,73 @@
+@page
+@model BookBuddi.Pages.Reports.IndexModel
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<h1>Reports & Analytics</h1>
+
+<h2>Inventory Reports</h2>
+<table border="1">
+    <tr>
+        <td><strong>Total Books:</strong></td>
+        <td>@Model.TotalBooks</td>
+    </tr>
+    <tr>
+        <td><strong>Available Books:</strong></td>
+        <td>@Model.AvailableBooks</td>
+    </tr>
+    <tr>
+        <td><strong>Borrowed Books:</strong></td>
+        <td>@Model.BorrowedBooks</td>
+    </tr>
+</table>
+
+<h2>Member Reports</h2>
+<table border="1">
+    <tr>
+        <td><strong>Total Members:</strong></td>
+        <td>@Model.TotalMembers</td>
+    </tr>
+    <tr>
+        <td><strong>Active Members:</strong></td>
+        <td>@Model.ActiveMembers</td>
+    </tr>
+</table>
+
+<h2>Borrowing Activity</h2>
+<table border="1">
+    <tr>
+        <td><strong>Active Transactions:</strong></td>
+        <td>@Model.ActiveTransactions</td>
+    </tr>
+    <tr>
+        <td><strong>Overdue Transactions:</strong></td>
+        <td>@Model.OverdueTransactions</td>
+    </tr>
+</table>
+
+<h2>Financial Reports</h2>
+<table border="1">
+    <tr>
+        <td><strong>Total Unpaid Fines:</strong></td>
+        <td>$@Model.UnpaidFinesAmount.ToString("F2")</td>
+    </tr>
+    <tr>
+        <td><strong>Number of Unpaid Fines:</strong></td>
+        <td>@Model.UnpaidFinesCount</td>
+    </tr>
+</table>
+
+<h2>Book Request Reports</h2>
+<table border="1">
+    <tr>
+        <td><strong>Pending Requests:</strong></td>
+        <td>@Model.PendingRequests</td>
+    </tr>
+    <tr>
+        <td><strong>Total Requests:</strong></td>
+        <td>@Model.TotalRequests</td>
+    </tr>
+</table>
+
+<p><a href="/">Back to Home</a></p>

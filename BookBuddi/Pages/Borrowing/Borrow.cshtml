@@ -1,0 +1,47 @@
+@page
+@model BookBuddi.Pages.Borrowing.BorrowModel
+@{
+    ViewData["Title"] = "Borrow Book";
+}
+
+<h1>Borrow Book</h1>
+
+<form method="post">
+    <div>
+        <label>Member:</label><br/>
+        <select name="memberId" required>
+            <option value="">-- Select Member --</option>
+            @foreach (var member in Model.Members)
+            {
+                <option value="@member.MemberId">@member.FirstName @member.LastName (@member.Email)</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label>Book:</label><br/>
+        <select name="bookId" required>
+            <option value="">-- Select Book --</option>
+            @foreach (var book in Model.AvailableBooks)
+            {
+                <option value="@book.BookId">@book.BookTitle (ISBN: @book.ISBN) - Available: @book.AvailableCopies</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label>Borrow Days:</label><br/>
+        <input type="number" name="borrowDays" value="14" min="1" max="90" required />
+    </div>
+    <br/>
+    <button type="submit">Borrow</button>
+    <a href="/Borrowing/Index">Cancel</a>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p style="color: red;">@Model.ErrorMessage</p>
+}
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <p style="color: green;">@Model.SuccessMessage</p>
+}

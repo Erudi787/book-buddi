@@ -1,0 +1,21 @@
+@page
+@model BookBuddi.Pages.Members.ReactivateModel
+@{
+    ViewData["Title"] = "Reactivate Member";
+}
+
+<h1>Reactivate Member</h1>
+
+<p>Are you sure you want to reactivate this member?</p>
+<p><strong>@Model.MemberName</strong></p>
+
+<form method="post">
+    <input type="hidden" name="id" value="@Model.MemberId" />
+    <button type="submit">Reactivate</button>
+    <a href="/Members/Index">Cancel</a>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p style="color: red;">@Model.ErrorMessage</p>
+}

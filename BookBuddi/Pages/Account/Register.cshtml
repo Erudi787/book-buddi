@@ -1,0 +1,58 @@
+@page
+@model BookBuddi.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1>Register as a Member</h1>
+
+<form method="post">
+    <div>
+        <label>First Name:</label><br/>
+        <input type="text" name="firstName" required />
+    </div>
+    <div>
+        <label>Last Name:</label><br/>
+        <input type="text" name="lastName" required />
+    </div>
+    <div>
+        <label>Email:</label><br/>
+        <input type="email" name="email" required />
+    </div>
+    <div>
+        <label>Password:</label><br/>
+        <input type="password" name="password" required minlength="8" />
+        <br/><small>Must be at least 8 characters with uppercase, lowercase, digit, and special character</small>
+    </div>
+    <div>
+        <label>Confirm Password:</label><br/>
+        <input type="password" name="confirmPassword" required />
+    </div>
+    <div>
+        <label>Phone:</label><br/>
+        <input type="tel" name="phone" />
+    </div>
+    <div>
+        <label>Address:</label><br/>
+        <textarea name="address" rows="3" cols="50"></textarea>
+    </div>
+    <div>
+        <label>Date of Birth:</label><br/>
+        <input type="date" name="dateOfBirth" />
+    </div>
+    <br/>
+    <button type="submit">Register</button>
+    <a href="/">Cancel</a>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p style="color: red;">@Model.ErrorMessage</p>
+}
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <p style="color: green;">@Model.SuccessMessage</p>
+}
+
+<p>Already have an account? <a href="/Account/Login">Login here</a></p>

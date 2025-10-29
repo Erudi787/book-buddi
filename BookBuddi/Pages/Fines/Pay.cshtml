@@ -1,0 +1,37 @@
+@page
+@model BookBuddi.Pages.Fines.PayModel
+@{
+    ViewData["Title"] = "Pay Fine";
+}
+
+<h1>Pay Fine</h1>
+
+@if (Model.Fine != null)
+{
+    <p>Are you sure you want to mark this fine as paid?</p>
+
+    <dl>
+        <dt>Member</dt>
+        <dd>@Model.Fine.Member?.FirstName @Model.Fine.Member?.LastName</dd>
+
+        <dt>Amount</dt>
+        <dd>$@Model.Fine.Amount.ToString("F2")</dd>
+
+        <dt>Reason</dt>
+        <dd>@Model.Fine.Reason</dd>
+
+        <dt>Issue Date</dt>
+        <dd>@Model.Fine.IssueDate.ToString("yyyy-MM-dd")</dd>
+    </dl>
+
+    <form method="post">
+        <input type="hidden" name="id" value="@Model.Fine.FineId" />
+        <button type="submit">Mark as Paid</button>
+        <a href="/Fines/Index">Cancel</a>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <p style="color: red;">@Model.ErrorMessage</p>
+    }
+}

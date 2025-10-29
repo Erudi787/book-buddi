@@ -1,0 +1,44 @@
+@page
+@model BookBuddi.Pages.BookRequests.CreateModel
+@{
+    ViewData["Title"] = "Request Book";
+}
+
+<h1>Request a Book</h1>
+
+<form method="post">
+    <div>
+        <label>Member:</label><br/>
+        <select name="memberId" required>
+            <option value="">-- Select Member --</option>
+            @foreach (var member in Model.Members)
+            {
+                <option value="@member.MemberId">@member.FirstName @member.LastName (@member.Email)</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label>Book Title:</label><br/>
+        <input type="text" name="bookTitle" required />
+    </div>
+    <div>
+        <label>Author:</label><br/>
+        <input type="text" name="author" />
+    </div>
+    <div>
+        <label>ISBN (if known):</label><br/>
+        <input type="text" name="isbn" />
+    </div>
+    <div>
+        <label>Notes:</label><br/>
+        <textarea name="notes" rows="3" cols="50"></textarea>
+    </div>
+    <br/>
+    <button type="submit">Submit Request</button>
+    <a href="/BookRequests/Index">Cancel</a>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p style="color: red;">@Model.ErrorMessage</p>
+}

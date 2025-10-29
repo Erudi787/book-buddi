@@ -10,6 +10,8 @@ namespace BookBuddi.Interfaces
         Task<IEnumerable<BorrowTransaction>> GetTransactionsByMemberIdAsync(int memberId);
         Task<IEnumerable<BorrowTransaction>> GetTransactionsByBookIdAsync(int bookId);
         Task<IEnumerable<BorrowTransaction>> GetTransactionsByStatusAsync(TransactionStatus status);
+        Task<IEnumerable<BorrowTransaction>> GetActiveTransactionsAsync();
+        Task<IEnumerable<BorrowTransaction>> GetOverdueTransactionsAsync();
 
         Task<BorrowTransaction> AddTransactionAsync(BorrowTransaction transaction);
         Task UpdateTransactionAsync(BorrowTransaction transaction);

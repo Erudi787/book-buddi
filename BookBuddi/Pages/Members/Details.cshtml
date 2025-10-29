@@ -1,0 +1,53 @@
+@page
+@model BookBuddi.Pages.Members.DetailsModel
+@{
+    ViewData["Title"] = "Member Details";
+}
+
+<h1>Member Details</h1>
+
+@if (Model.Member == null)
+{
+    <p>Member not found.</p>
+}
+else
+{
+    <dl>
+        <dt>ID</dt>
+        <dd>@Model.Member.MemberId</dd>
+
+        <dt>Name</dt>
+        <dd>@Model.Member.FirstName @Model.Member.LastName</dd>
+
+        <dt>Email</dt>
+        <dd>@Model.Member.Email</dd>
+
+        <dt>Phone</dt>
+        <dd>@Model.Member.Phone</dd>
+
+        <dt>Address</dt>
+        <dd>@Model.Member.Address</dd>
+
+        <dt>Date of Birth</dt>
+        <dd>@Model.Member.DateOfBirth?.ToString("yyyy-MM-dd")</dd>
+
+        <dt>Status</dt>
+        <dd>@Model.Member.Status</dd>
+
+        <dt>Borrowing Limit</dt>
+        <dd>@Model.Member.BorrowingLimit</dd>
+
+        <dt>Current Borrowed Count</dt>
+        <dd>@Model.Member.CurrentBorrowedCount</dd>
+
+        <dt>Membership Date</dt>
+        <dd>@Model.Member.MembershipDate.ToString("yyyy-MM-dd")</dd>
+
+        <dt>Membership Expiry Date</dt>
+        <dd>@Model.Member.MembershipExpiryDate.ToString("yyyy-MM-dd")</dd>
+    </dl>
+
+    <p>
+        <a href="/Members/Index">Back to List</a>
+    </p>
+}

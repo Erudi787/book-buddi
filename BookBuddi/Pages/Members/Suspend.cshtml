@@ -1,0 +1,26 @@
+@page
+@model BookBuddi.Pages.Members.SuspendModel
+@{
+    ViewData["Title"] = "Suspend Member";
+}
+
+<h1>Suspend Member</h1>
+
+<p>Are you sure you want to suspend this member?</p>
+<p><strong>@Model.MemberName</strong></p>
+
+<form method="post">
+    <input type="hidden" name="id" value="@Model.MemberId" />
+    <div>
+        <label>Reason:</label><br/>
+        <textarea name="reason" rows="3" cols="50" required></textarea>
+    </div>
+    <br/>
+    <button type="submit">Suspend</button>
+    <a href="/Members/Index">Cancel</a>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p style="color: red;">@Model.ErrorMessage</p>
+}

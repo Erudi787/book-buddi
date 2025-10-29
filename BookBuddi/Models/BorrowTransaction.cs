@@ -26,7 +26,6 @@ namespace BookBuddi.Models
         [Required]
         public DateTime BorrowDate { get; set; } = DateTime.Now;
 
-        [Required]
         public DateTime? ReturnDate { get; set; }
 
         [Required]

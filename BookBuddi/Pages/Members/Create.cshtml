@@ -1,0 +1,46 @@
+@page
+@model BookBuddi.Pages.Members.CreateModel
+@{
+    ViewData["Title"] = "Register Member";
+}
+
+<h1>Register New Member</h1>
+
+<form method="post">
+    <div>
+        <label>First Name:</label><br/>
+        <input type="text" asp-for="Member.FirstName" required />
+    </div>
+    <div>
+        <label>Last Name:</label><br/>
+        <input type="text" asp-for="Member.LastName" required />
+    </div>
+    <div>
+        <label>Email:</label><br/>
+        <input type="email" asp-for="Member.Email" required />
+    </div>
+    <div>
+        <label>Phone:</label><br/>
+        <input type="tel" asp-for="Member.Phone" />
+    </div>
+    <div>
+        <label>Address:</label><br/>
+        <textarea asp-for="Member.Address" rows="3" cols="50"></textarea>
+    </div>
+    <div>
+        <label>Date of Birth:</label><br/>
+        <input type="date" asp-for="Member.DateOfBirth" />
+    </div>
+    <div>
+        <label>Membership Expiry Date:</label><br/>
+        <input type="date" asp-for="Member.MembershipExpiryDate" required />
+    </div>
+    <br/>
+    <button type="submit">Register</button>
+    <a href="/Members/Index">Cancel</a>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p style="color: red;">@Model.ErrorMessage</p>
+}

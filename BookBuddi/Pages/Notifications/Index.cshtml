@@ -1,0 +1,60 @@
+@page
+@model BookBuddi.Pages.Notifications.IndexModel
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<h1>Notifications</h1>
+
+<p>
+    <label>Member:</label>
+    <select onchange="window.location.href='/Notifications/Index?memberId=' + this.value">
+        <option value="">-- Select Member --</option>
+        @foreach (var member in Model.Members)
+        {
+            <option value="@member.MemberId" selected="@(member.MemberId == Model.SelectedMemberId)">
+                @member.FirstName @member.LastName
+            </option>
+        }
+    </select>
+</p>
+
+@if (Model.SelectedMemberId > 0)
+{
+    <p><a href="/Notifications/MarkAllRead?memberId=@Model.SelectedMemberId">Mark All as Read</a></p>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>Read</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var notification in Model.Notifications)
+            {
+                <tr style="@(!notification.IsRead ? "background-color: #e6f3ff;" : "")">
+                    <td>@notification.NotificationId</td>
+                    <td>@notification.Type</td>
+                    <td>@notification.Title</td>
+                    <td>@notification.Message</td>
+                    <td>@notification.DateCreated.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@(notification.IsRead ? "Yes" : "No")</td>
+                    <td>
+                        @if (!notification.IsRead)
+                        {
+                            <a href="/Notifications/MarkRead?id=@notification.NotificationId&memberId=@Model.SelectedMemberId">Mark Read</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<p><a href="/">Back to Home</a></p>

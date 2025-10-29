@@ -1,0 +1,39 @@
+@page
+@model BookBuddi.Pages.Authors.CreateModel
+@{
+    ViewData["Title"] = "Add Author";
+    var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
+}
+
+<h1>Add New Author</h1>
+
+@if (!isAdmin)
+{
+    <p style="color: red;">Admin access required.</p>
+    <p><a href="/Admin/Login">Login as Admin</a></p>
+}
+else
+{
+    <form method="post">
+        <div>
+            <label>First Name:</label><br/>
+            <input type="text" name="firstName" required />
+        </div>
+        <div>
+            <label>Last Name:</label><br/>
+            <input type="text" name="lastName" required />
+        </div>
+        <div>
+            <label>Biography:</label><br/>
+            <textarea name="biography" rows="5" cols="50"></textarea>
+        </div>
+        <br/>
+        <button type="submit">Create</button>
+        <a href="/Authors/Index">Cancel</a>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <p style="color: red;">@Model.ErrorMessage</p>
+    }
+}

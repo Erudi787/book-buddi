@@ -6,7 +6,7 @@ namespace BookBuddi.Interfaces
     public interface IBookRequestRepository
     {
         Task<IEnumerable<BookRequest>> GetAllRequestsAsync();
-        Task<BookRequest?> GetRequesByIdAsync(int requestId);
+        Task<BookRequest?> GetRequestByIdAsync(int requestId);
         Task<IEnumerable<BookRequest>> GetRequestsByMemberIdAsync(int memberId);
         Task<IEnumerable<BookRequest>> GetRequestsByStatusAsync(RequestStatus status);
         Task<IEnumerable<BookRequest>> GetPendingRequestsAsync();

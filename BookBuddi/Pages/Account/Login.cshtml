@@ -1,0 +1,106 @@
+@page
+@model BookBuddi.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Login / Register";
+}
+
+<h1>Login / Register</h1>
+
+<style>
+    .tabs { margin-bottom: 20px; }
+    .tabs button { padding: 10px 20px; margin-right: 5px; cursor: pointer; border: 1px solid #ccc; background: #f5f5f5; }
+    .tabs button.active { background: #007bff; color: white; border-color: #007bff; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+</style>
+
+<div class="tabs">
+    <button type="button" onclick="showTab('login')" id="loginTab" class="active">Login</button>
+    <button type="button" onclick="showTab('register')" id="registerTab">Register</button>
+</div>
+
+<div id="loginContent" class="tab-content active">
+    <h2>Login</h2>
+    <form method="post" asp-page-handler="Login">
+        <div>
+            <label>Email:</label><br/>
+            <input type="email" name="email" required />
+        </div>
+        <div>
+            <label>Password:</label><br/>
+            <input type="password" name="password" required />
+        </div>
+        <br/>
+        <button type="submit">Login</button>
+        <a href="/">Cancel</a>
+    </form>
+</div>
+
+<div id="registerContent" class="tab-content">
+    <h2>Register as a New Member</h2>
+    <form method="post" asp-page-handler="Register">
+        <div>
+            <label>First Name:</label><br/>
+            <input type="text" name="firstName" required />
+        </div>
+        <div>
+            <label>Last Name:</label><br/>
+            <input type="text" name="lastName" required />
+        </div>
+        <div>
+            <label>Email:</label><br/>
+            <input type="email" name="email" required />
+        </div>
+        <div>
+            <label>Password:</label><br/>
+            <input type="password" name="password" required minlength="8" />
+            <br/><small>Must be at least 8 characters with uppercase, lowercase, digit, and special character</small>
+        </div>
+        <div>
+            <label>Confirm Password:</label><br/>
+            <input type="password" name="confirmPassword" required />
+        </div>
+        <div>
+            <label>Phone:</label><br/>
+            <input type="tel" name="phone" />
+        </div>
+        <div>
+            <label>Address:</label><br/>
+            <textarea name="address" rows="3" cols="50"></textarea>
+        </div>
+        <div>
+            <label>Date of Birth:</label><br/>
+            <input type="date" name="dateOfBirth" />
+        </div>
+        <br/>
+        <button type="submit">Register</button>
+        <a href="/">Cancel</a>
+    </form>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p style="color: red;">@Model.ErrorMessage</p>
+}
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <p style="color: green;">@Model.SuccessMessage</p>
+}
+
+<script>
+    function showTab(tab) {
+        document.getElementById('loginContent').classList.remove('active');
+        document.getElementById('registerContent').classList.remove('active');
+        document.getElementById('loginTab').classList.remove('active');
+        document.getElementById('registerTab').classList.remove('active');
+
+        if (tab === 'login') {
+            document.getElementById('loginContent').classList.add('active');
+            document.getElementById('loginTab').classList.add('active');
+        } else {
+            document.getElementById('registerContent').classList.add('active');
+            document.getElementById('registerTab').classList.add('active');
+        }
+    }
+</script>

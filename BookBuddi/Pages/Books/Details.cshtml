@@ -1,0 +1,74 @@
+@page
+@model BookBuddi.Pages.Books.DetailsModel
+@{
+    ViewData["Title"] = "Book Details";
+}
+
+<h1>Book Details</h1>
+
+@if (Model.Book == null)
+{
+    <p>Book not found.</p>
+}
+else
+{
+    <dl>
+        <dt>ID</dt>
+        <dd>@Model.Book.BookId</dd>
+
+        <dt>Title</dt>
+        <dd>@Model.Book.BookTitle</dd>
+
+        <dt>ISBN</dt>
+        <dd>@Model.Book.ISBN</dd>
+
+        <dt>Publisher</dt>
+        <dd>@Model.Book.Publisher</dd>
+
+        <dt>Publication Date</dt>
+        <dd>@Model.Book.PublicationDate?.ToString("yyyy-MM-dd")</dd>
+
+        <dt>Description</dt>
+        <dd>@Model.Book.Description</dd>
+
+        <dt>Page Count</dt>
+        <dd>@Model.Book.PageCount</dd>
+
+        <dt>Category</dt>
+        <dd>@Model.Book.Category?.CategoryName</dd>
+
+        <dt>Genre</dt>
+        <dd>@Model.Book.Genre?.GenreName</dd>
+
+        <dt>Available Copies</dt>
+        <dd>@Model.Book.AvailableCopies</dd>
+
+        <dt>Status</dt>
+        <dd>@Model.Book.Status</dd>
+
+        <dt>Date Added</dt>
+        <dd>@Model.Book.DateAdded.ToString("yyyy-MM-dd")</dd>
+
+        <dt>Authors</dt>
+        <dd>
+            @if (Model.Book.BookAuthors.Any())
+            {
+                <ul>
+                    @foreach (var ba in Model.Book.BookAuthors)
+                    {
+                        <li>@ba.Author.FirstName @ba.Author.LastName</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <text>No authors assigned</text>
+            }
+        </dd>
+    </dl>
+
+    <p>
+        <a href="/Books/Edit?id=@Model.Book.BookId">Edit</a> |
+        <a href="/Books/Index">Back to List</a>
+    </p>
+}

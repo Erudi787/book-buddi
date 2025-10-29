@@ -1,0 +1,51 @@
+@page
+@model BookBuddi.Pages.Members.IndexModel
+@{
+    ViewData["Title"] = "Members";
+}
+
+<h1>Members Management</h1>
+
+<p><a href="/Members/Create">Add New Member</a></p>
+
+<form method="get">
+    <input type="text" name="searchTerm" placeholder="Search members..." value="@Model.SearchTerm" />
+    <button type="submit">Search</button>
+    <a href="/Members/Index">Clear</a>
+</form>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Borrowed Books</th>
+            <th>Borrowing Limit</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var member in Model.Members)
+        {
+            <tr>
+                <td>@member.MemberId</td>
+                <td>@member.FirstName @member.LastName</td>
+                <td>@member.Email</td>
+                <td>@member.Phone</td>
+                <td>@member.Status</td>
+                <td>@member.CurrentBorrowedCount</td>
+                <td>@member.BorrowingLimit</td>
+                <td>
+                    <a href="/Members/Details?id=@member.MemberId">Details</a> |
+                    <a href="/Members/Suspend?id=@member.MemberId">Suspend</a> |
+                    <a href="/Members/Reactivate?id=@member.MemberId">Reactivate</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p><a href="/">Back to Home</a></p>
