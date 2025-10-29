@@ -42,23 +42,17 @@ Common SQL Server instance names:
 
 ### Step 3: Restore NuGet Packages
 
-Navigate to the BookBuddi project folder:
-
-```bash
-cd BookBuddi
-```
-
-Restore all required packages:
+Restore all required packages for all projects (BookBuddi, BookBuddi.Data, BookBuddi.Services, BookBuddi.Resources):
 
 ```bash
 dotnet restore
 ```
 
-You should see output indicating packages are being restored.
+You should see output indicating packages are being restored for multiple projects.
 
 ### Step 4: Update Connection String
 
-**Open the file**: `BookBuddi/appsettings.json`
+**Open the file**: `BookBuddi.WebApp/appsettings.json`
 
 Update the `Server=` part with YOUR SQL Server instance name from Step 2:
 
@@ -111,26 +105,30 @@ You should see the version number (9.0.x or similar).
 
 This is the **magic step** that creates the entire database structure!
 
-Run this command:
+Navigate to the Data project folder and run the migration:
 
 ```bash
-dotnet ef database update
+cd BookBuddi.Data
+dotnet ef database update --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp.csproj
 ```
 
 **What this does**:
-- Reads all the migration files in the `Migrations` folder
+- Reads all the migration files in the `BookBuddi.Data/Migrations` folder
 - Creates the `BookBuddiDb` database on your SQL Server
-- Creates all tables (Books, Authors, Members, etc.)
+- Creates all tables (Books, Authors, Members, Categories, Genres, etc.)
+- Adds audit trail columns (CreatedBy, CreatedTime, UpdatedBy, UpdatedTime) to all tables
 - Sets up all relationships and constraints
-- Populates seed data (sample books, categories, members, etc.)
+- Populates seed data (10 books, 5 categories, 10 genres, 5 members, sample transactions, etc.)
 
 **Expected output**:
 ```
 Build started...
 Build succeeded.
-Applying migration 'XXXXXX_InitialCreate'.
+Applying migration '20251029181455_AddAuditTrailColumns'.
 Done.
 ```
+
+**Note**: The `--startup-project` flag is required because the migration is in the Data project but needs configuration from the main BookBuddi.WebApp project.
 
 ### Step 7: Verify Database Creation
 
@@ -141,11 +139,18 @@ Done.
 4. You should see **BookBuddiDb**
 5. Expand it → Expand **Tables**
 6. You should see tables like:
+   - dbo.AspNetUsers (Admin accounts)
+   - dbo.AspNetRoles
    - dbo.Books
    - dbo.Authors
+   - dbo.BookAuthors (junction table)
    - dbo.Members
    - dbo.Categories
    - dbo.Genres
+   - dbo.BorrowTransactions
+   - dbo.Fines
+   - dbo.BookRequests
+   - dbo.Notifications
    - And more...
 
 **Option B: Using SQL Query**
@@ -166,19 +171,30 @@ ORDER BY TABLE_NAME;
 SELECT COUNT(*) AS BookCount FROM Books;
 SELECT COUNT(*) AS MemberCount FROM Members;
 SELECT COUNT(*) AS CategoryCount FROM Categories;
+SELECT COUNT(*) AS GenreCount FROM Genres;
+SELECT COUNT(*) AS AuthorCount FROM Authors;
+
+-- Verify audit trail columns were added
+SELECT COLUMN_NAME
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'Books' AND COLUMN_NAME IN ('CreatedBy', 'CreatedTime', 'UpdatedBy', 'UpdatedTime');
 ```
 
 You should see:
-- 10+ tables listed
-- 30+ books
-- 5+ members
-- 5+ categories
+- 12+ tables listed
+- 10 books
+- 5 members
+- 5 categories
+- 10 genres
+- 10 authors
+- 4 audit trail columns for Books table
 
 ### Step 8: Build the Project
 
-Build the project to ensure everything compiles:
+Navigate back to the solution root and build all projects:
 
 ```bash
+cd ..
 dotnet build
 ```
 
@@ -189,11 +205,18 @@ Build succeeded.
     0 Error(s)
 ```
 
+This builds all four projects:
+- BookBuddi.Resources
+- BookBuddi.Data
+- BookBuddi.Services
+- BookBuddi.WebApp (main web application)
+
 ### Step 9: Run the Application
 
-Start the application:
+Navigate to the main application folder and start it:
 
 ```bash
+cd BookBuddi.WebApp
 dotnet run
 ```
 
@@ -246,7 +269,18 @@ dotnet tool install --global dotnet-ef
 
 ### Problem: Migration files not found
 
-**Solution**: The migrations should already be in the repository under `BookBuddi/Migrations/` folder. If missing, contact the team lead.
+**Solution**: The migrations should already be in the repository under `BookBuddi.Data/Migrations/` folder. If missing, contact the team lead.
+
+### Problem: "The type or namespace name 'Data' does not exist"
+
+**Solution**: This means the project references aren't restored. Run:
+```bash
+dotnet restore
+```
+Then rebuild:
+```bash
+dotnet build
+```
 
 ---
 
@@ -264,12 +298,20 @@ After completing all steps, you should have:
 
 ---
 
-## Default Admin Credentials
+## Default Credentials
 
-For testing admin features (when implemented):
+For testing the application:
 
+**Admin Account**:
 - **Email**: `admin@bookbuddi.com`
 - **Password**: `Admin@123`
+
+**Member Accounts** (Sample users):
+- **Email**: `john.doe@example.com` | **Password**: `Password123!`
+- **Email**: `jane.smith@example.com` | **Password**: `Password123!`
+- **Email**: `robert.j@example.com` | **Password**: `Password123!`
+- **Email**: `emily.w@example.com` | **Password**: `Password123!` (Suspended status)
+- **Email**: `michael.b@example.com` | **Password**: `Password123!`
 
 ---
 
@@ -287,8 +329,9 @@ The `.gitignore` file should already exclude these, but be aware:
 
 ✅ All `.cs` files (your code)
 ✅ `appsettings.json` (with placeholder connection string)
-✅ `Migrations/` folder (database schema)
-✅ `.csproj` file (project configuration)
+✅ `BookBuddi.Data/Migrations/` folder (database schema)
+✅ All `.csproj` files (project configuration)
+✅ Solution file (`book-buddi.sln`)
 
 ---
 
@@ -296,27 +339,33 @@ The `.gitignore` file should already exclude these, but be aware:
 
 ### If You Add/Modify Entities
 
-If you create new entities or modify existing ones:
+If you create new entities or modify existing ones in `BookBuddi.Data/Models/`:
 
-1. **Create a new migration**:
+1. **Create a new migration** (from the Data project):
    ```bash
-   dotnet ef migrations add YourMigrationName
+   cd BookBuddi.Data
+   dotnet ef migrations add YourMigrationName --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp.csproj
    ```
 
 2. **Apply the migration**:
    ```bash
-   dotnet ef database update
+   dotnet ef database update --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp.csproj
    ```
 
-3. **Commit the migration files** to Git so team members get the changes
+3. **Commit the migration files** (in `BookBuddi.Data/Migrations/`) to Git so team members get the changes
 
 ### If Someone Else Added a Migration
 
 When you pull changes from Git and there are new migrations:
 
-1. **Update your database**:
+1. **Navigate to the Data project**:
    ```bash
-   dotnet ef database update
+   cd BookBuddi.Data
+   ```
+
+2. **Update your database**:
+   ```bash
+   dotnet ef database update --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp.csproj
    ```
 
 This applies any new migrations to your local database.
@@ -329,14 +378,19 @@ If you need to start fresh:
 
 **Option 1: Drop and Recreate (Recommended)**
 ```bash
-dotnet ef database drop
-dotnet ef database update
+cd BookBuddi.Data
+dotnet ef database drop --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp.csproj
+dotnet ef database update --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp.csproj
 ```
 
 **Option 2: Manual Delete (Using SSMS)**
 1. Open SSMS
 2. Right-click `BookBuddiDb` → Delete
-3. Run `dotnet ef database update`
+3. Run:
+   ```bash
+   cd BookBuddi.Data
+   dotnet ef database update --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp.csproj
+   ```
 
 ---
 
@@ -354,26 +408,30 @@ If you encounter issues:
 ## Quick Reference Commands
 
 ```bash
-# Navigate to project folder
-cd BookBuddi
+# Navigate to solution root
+cd book-buddi
 
-# Restore packages
+# Restore packages for all projects
 dotnet restore
 
-# Build project
+# Build all projects
 dotnet build
 
-# Create database
-dotnet ef database update
+# Create database (from BookBuddi.Data folder)
+cd BookBuddi.Data
+dotnet ef database update --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp.csproj
 
-# Run application
+# Run application (from BookBuddi.WebApp folder)
+cd ../BookBuddi.WebApp
 dotnet run
 
-# Create new migration (after code changes)
-dotnet ef migrations add MigrationName
+# Create new migration (from BookBuddi.Data folder, after entity changes)
+cd BookBuddi.Data
+dotnet ef migrations add MigrationName --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp.csproj
 
-# Drop database (careful!)
-dotnet ef database drop
+# Drop database (careful! from BookBuddi.Data folder)
+cd BookBuddi.Data
+dotnet ef database drop --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp.csproj
 
 # Check EF Core version
 dotnet ef --version
@@ -390,7 +448,8 @@ dotnet ef --version
 
 2. **After pulling, update your database**:
    ```bash
-   dotnet ef database update
+   cd BookBuddi.Data
+   dotnet ef database update --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp.csproj
    ```
 
 3. **Before committing, build and test**:
@@ -414,7 +473,7 @@ If you have questions about setup:
 
 ---
 
-**Last Updated**: 2025-10-27
-**Version**: 1.0
+**Last Updated**: 2025-10-30
+**Version**: 2.0 - Updated for 3-Tier Architecture Restructure
 
 Good luck! 🚀

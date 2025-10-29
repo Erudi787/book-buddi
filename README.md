@@ -41,10 +41,16 @@ Book Buddi is designed for both general users and administrators, providing a co
 
 ### Backend
 - **Language**: C#
-- **Framework**: ASP.NET Core
+- **Framework**: ASP.NET Core 9.0
+- **Architecture**: Clean 3-Tier N-Layer (ASI Pattern)
+  - **Data Layer**: Entity Framework Core 9.0, Repository Pattern, Unit of Work
+  - **Service Layer**: Business Logic, AutoMapper for DTO mapping
+  - **Presentation Layer**: Razor Pages
 
 ### Database
 - **DBMS**: Microsoft SQL Server
+- **ORM**: Entity Framework Core 9.0
+- **Features**: Audit trails, Identity authentication, Migration-based schema management
 
 ### Development Tools
 - **IDE**: Visual Studio Code
@@ -95,13 +101,12 @@ git clone https://github.com/Erudi787/book-buddi.git
 cd book-buddi
 ```
 
-2. Navigate to project folder and restore dependencies
+2. Restore dependencies for all projects
 ```bash
-cd BookBuddi
 dotnet restore
 ```
 
-3. Update database connection string in `appsettings.json`
+3. Update database connection string in `BookBuddi.WebApp/appsettings.json`
 ```json
 {
   "ConnectionStrings": {
@@ -118,12 +123,14 @@ dotnet tool install --global dotnet-ef
 
 5. Create the database and apply migrations
 ```bash
-dotnet ef database update
+cd BookBuddi.Data
+dotnet ef database update --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp.csproj
 ```
 > This creates the `BookBuddiDb` database with all tables and seed data
 
 6. Run the application
 ```bash
+cd ../BookBuddi.WebApp
 dotnet run
 ```
 
@@ -131,24 +138,63 @@ dotnet run
 
 ### Default Credentials
 
-**Admin Access** (when implemented):
+**Admin Access**:
 - Email: `admin@bookbuddi.com`
 - Password: `Admin@123`
+
+**Member Access** (Sample accounts):
+- Email: `john.doe@example.com` / Password: `Password123!`
+- Email: `jane.smith@example.com` / Password: `Password123!`
 
 ## Project Structure
 
 ```
 book-buddi/
-├── Pages/              # Razor Pages
-├── Models/             # Data models
-├── Interfaces/         # Interfaces
-├── Data/               # Database context and migrations
-├── Documentation/      # Documentation Files
-├── Services/           # Business logic services
-├── wwwroot/            # Static files (CSS, JS, images)
-├── appsettings.json    # Configuration
-└── Program.cs          # Application entry point
+├── BookBuddi.WebApp/             # Main Web Application (Presentation Layer)
+│   ├── Pages/                    # Razor Pages
+│   ├── wwwroot/                  # Static files (CSS, JS, images)
+│   ├── appsettings.json          # Configuration
+│   ├── Program.cs                # Application entry point
+│   └── DbInitializer.cs          # Database seeding
+│
+├── BookBuddi.Data/               # Data Access Layer
+│   ├── Models/                   # Entity models
+│   ├── EntityConfigurations/     # Fluent API configurations
+│   ├── Repositories/             # Repository implementations
+│   ├── Interfaces/               # Repository interfaces
+│   ├── Migrations/               # EF Core migrations
+│   ├── ApplicationDbContext.cs   # Database context
+│   └── UnitOfWork.cs             # Unit of Work pattern
+│
+├── BookBuddi.Services/           # Business Logic Layer
+│   ├── Services/                 # Service implementations
+│   ├── ServiceModels/            # ViewModels/DTOs
+│   ├── Interfaces/               # Service interfaces
+│   ├── Manager/                  # Utility managers (Password, Session)
+│   └── AutoMapperProfile.cs      # AutoMapper configuration
+│
+├── BookBuddi.Resources/          # Shared Resources
+│   └── Constants/                # Application constants (statuses, enums)
+│
+└── Documentation/                # Project documentation
+    └── SETUP-FOR-TEAM.md         # Team setup guide
 ```
+
+### Architecture Pattern
+
+The project follows the **ASI (Abstraction-Service-Interface) Pattern**, a clean 3-tier architecture:
+
+1. **Presentation Layer** (`BookBuddi.WebApp`): Razor Pages, user interface
+2. **Business Logic Layer** (`BookBuddi.Services`): Services with business rules
+3. **Data Access Layer** (`BookBuddi.Data`): Entity Framework, repositories, Unit of Work
+
+**Key Patterns Implemented**:
+- Repository Pattern for data access abstraction
+- Unit of Work Pattern for transaction management
+- Service Layer Pattern for business logic separation
+- Dependency Injection for loose coupling
+- AutoMapper for object-to-object mapping
+- Audit Trail Pattern for tracking changes (CreatedBy, CreatedTime, UpdatedBy, UpdatedTime)
 
 ## 🔄 Development Workflow
 

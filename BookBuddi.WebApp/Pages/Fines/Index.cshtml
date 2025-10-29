@@ -1,0 +1,44 @@
+@page
+@model BookBuddi.Pages.Fines.IndexModel
+@{
+    ViewData["Title"] = "Fines";
+}
+
+<h1>Fines Management</h1>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Member</th>
+            <th>Transaction ID</th>
+            <th>Amount</th>
+            <th>Reason</th>
+            <th>Issue Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Fines)
+        {
+            <tr style="@(item.Fine.Status == BookBuddi.Resources.Constants.FineStatus.Unpaid ? "background-color: #ffffcc;" : "")">
+                <td>@item.Fine.FineId</td>
+                <td>@item.MemberName</td>
+                <td>@item.Fine.TransactionId</td>
+                <td>$@item.Fine.Amount.ToString("F2")</td>
+                <td>@item.Fine.Reason</td>
+                <td>@item.Fine.IssueDate.ToString("yyyy-MM-dd")</td>
+                <td>@item.Fine.Status</td>
+                <td>
+                    @if (item.Fine.Status == BookBuddi.Resources.Constants.FineStatus.Unpaid)
+                    {
+                        <a href="/Fines/Pay?id=@item.Fine.FineId">Pay</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p><a href="/">Back to Home</a></p>

@@ -1,0 +1,53 @@
+@page
+@model BookBuddi.Pages.Borrowing.IndexModel
+@{
+    ViewData["Title"] = "Borrow Transactions";
+    var userRole = HttpContext.Session.GetString("UserRole");
+}
+
+<h1>@(userRole == "Member" ? "My Borrowing" : "Borrowing Transactions")</h1>
+
+<p><a href="/Borrowing/Borrow">Borrow New Book</a></p>
+
+<h2>@(userRole == "Member" ? "My Borrowed Books" : "Active Transactions")</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Book</th>
+            @if (userRole == "Admin")
+            {
+                <th>Member</th>
+            }
+            <th>Borrow Date</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Transactions)
+        {
+            <tr style="@(item.Transaction.Status == BookBuddi.Resources.Constants.TransactionStatus.Overdue ? "background-color: #ffcccc;" : "")">
+                <td>@item.Transaction.TransactionId</td>
+                <td>@item.BookTitle</td>
+                @if (userRole == "Admin")
+                {
+                    <td>@item.MemberName</td>
+                }
+                <td>@item.Transaction.BorrowDate.ToString("yyyy-MM-dd")</td>
+                <td>@item.Transaction.DueDate.ToString("yyyy-MM-dd")</td>
+                <td>@item.Transaction.Status</td>
+                <td>
+                    @if (item.Transaction.Status == BookBuddi.Resources.Constants.TransactionStatus.Active ||
+                         item.Transaction.Status == BookBuddi.Resources.Constants.TransactionStatus.Overdue)
+                    {
+                        <a href="/Borrowing/Return?id=@item.Transaction.TransactionId">Return</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p><a href="/">Back to Home</a></p>

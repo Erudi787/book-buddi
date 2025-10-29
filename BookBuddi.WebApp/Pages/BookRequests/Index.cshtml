@@ -1,0 +1,70 @@
+@page
+@model BookBuddi.Pages.BookRequests.IndexModel
+@{
+    ViewData["Title"] = "Book Requests";
+}
+
+<h1>Book Requests</h1>
+
+<p><a href="/BookRequests/Create">Create New Request</a></p>
+
+<h2>Pending Requests</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Member</th>
+            <th>Book Title</th>
+            <th>Author</th>
+            <th>Request Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Requests.Where(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending))
+        {
+            <tr>
+                <td>@item.Request.RequestId</td>
+                <td>@item.MemberName</td>
+                <td>@item.Request.BookTitle</td>
+                <td>@item.Request.AuthorName</td>
+                <td>@item.Request.RequestDate.ToString("yyyy-MM-dd")</td>
+                <td>@item.Request.Status</td>
+                <td>
+                    <a href="/BookRequests/Approve?id=@item.Request.RequestId">Approve</a> |
+                    <a href="/BookRequests/Reject?id=@item.Request.RequestId">Reject</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>All Requests</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Member</th>
+            <th>Book Title</th>
+            <th>Status</th>
+            <th>Request Date</th>
+            <th>Response Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Requests)
+        {
+            <tr style="@(item.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending ? "background-color: #ffffcc;" : "")">
+                <td>@item.Request.RequestId</td>
+                <td>@item.MemberName</td>
+                <td>@item.Request.BookTitle</td>
+                <td>@item.Request.Status</td>
+                <td>@item.Request.RequestDate.ToString("yyyy-MM-dd")</td>
+                <td>@(item.Request.StatusUpdateDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p><a href="/">Back to Home</a></p>
