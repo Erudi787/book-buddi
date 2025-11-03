@@ -63,7 +63,7 @@ namespace BookBuddi.Pages.Account
                 HttpContext.Session.SetString("MemberName", $"{member.FirstName} {member.LastName}");
                 HttpContext.Session.SetString("UserRole", "Member");
 
-                return RedirectToPage("/Index");
+                return RedirectToPage("/Books/Index");
             }
 
             // Try admin login
