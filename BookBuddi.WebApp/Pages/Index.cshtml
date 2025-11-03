@@ -1,10 +1,8 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "BookBuddi - Home";
+    ViewData["Title"] = "BookBuddi Catalog";
 }
-
-<h1>BookBuddi - Library Management System</h1>
 
 @{
     var userRole = HttpContext.Session.GetString("UserRole");
@@ -12,76 +10,234 @@
     var adminName = HttpContext.Session.GetString("AdminName");
 }
 
-<div style="text-align: right; margin-bottom: 20px;">
-    @if (string.IsNullOrEmpty(userRole))
-    {
-        <a href="/Account/Login">Login / Register</a>
+<style>
+    .hero-section {
+        background: linear-gradient(to bottom, #f8f9fa 0%, #f8f9fa 60%, #FBDB93 60%, #FBDB93 100%);
+        min-height: 500px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin: -20px -12px 0;
+        padding: 60px 20px;
     }
-    else if (userRole == "Admin")
-    {
-        <text><span>Logged in as: <strong>Admin - @adminName</strong></span> | </text>
-        <a href="/Account/Logout">Logout</a>
+
+    .welcome-text {
+        font-size: 8rem;
+        font-weight: 300;
+        letter-spacing: -2px;
+        margin-bottom: 10px;
+        color: #2c2c2c;
     }
-    else
-    {
-        <text><span>Logged in as: <strong>@memberName</strong></span> | </text>
-        <a href="/Account/Logout">Logout</a>
+
+    .welcome-subtext {
+        font-size: 2.5rem;
+        color: #8b3a3a;
+        font-weight: 400;
+        margin-bottom: 60px;
     }
+
+    .search-container {
+        display: flex;
+        gap: 15px;
+        max-width: 900px;
+        width: 100%;
+        align-items: center;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 1px solid #ddd;
+        border-radius: 25px;
+        font-size: 1rem;
+        background: white;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #8b3a3a;
+        box-shadow: 0 0 0 3px rgba(139, 58, 58, 0.1);
+    }
+
+    .filter-dropdown {
+        padding: 15px 25px;
+        border: 1px solid #ddd;
+        border-radius: 25px;
+        background: white;
+        font-size: 1rem;
+        min-width: 150px;
+        cursor: pointer;
+    }
+
+    .book-logo {
+        position: absolute;
+        bottom: 20px;
+        right: 60px;
+        width: 180px;
+        height: 180px;
+        opacity: 0.8;
+    }
+
+    .auth-buttons {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn-signup {
+        background-color: #FBDB93;
+        color: #2c2c2c;
+        padding: 10px 25px;
+        border-radius: 20px;
+        border: none;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-login {
+        background-color: transparent;
+        color: #2c2c2c;
+        padding: 10px 25px;
+        border-radius: 20px;
+        border: none;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-signup:hover, .btn-login:hover {
+        opacity: 0.8;
+        color: #2c2c2c;
+    }
+
+    @@media (max-width: 768px) {
+        .welcome-text {
+            font-size: 4rem;
+        }
+        .welcome-subtext {
+            font-size: 1.5rem;
+        }
+        .search-container {
+            flex-direction: column;
+        }
+        .book-logo {
+            width: 120px;
+            height: 120px;
+            right: 20px;
+        }
+    }
+</style>
+
+<div class="hero-section">
+    <div class="auth-buttons">
+        @if (string.IsNullOrEmpty(userRole))
+        {
+            <a href="/Account/Register" class="btn-signup">sign up</a>
+            <a href="/Account/Login" class="btn-login">log in</a>
+        }
+        else if (userRole == "Admin")
+        {
+            <span style="margin-right: 10px;">Admin - @adminName</span>
+            <a href="/Account/Logout" class="btn-login">Logout</a>
+        }
+        else
+        {
+            <span style="margin-right: 10px;">@memberName</span>
+            <a href="/Account/Logout" class="btn-login">Logout</a>
+        }
+    </div>
+
+    <h1 class="welcome-text">Welcome!</h1>
+    <p class="welcome-subtext">to bookbuddi</p>
+
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Search for books, authors, or subjects..." />
+        <select class="filter-dropdown">
+            <option value="">Genre</option>
+            <option value="fiction">Fiction</option>
+            <option value="non-fiction">Non-Fiction</option>
+            <option value="science">Science</option>
+            <option value="history">History</option>
+        </select>
+        <select class="filter-dropdown">
+            <option value="">Sort by</option>
+            <option value="title">Title</option>
+            <option value="author">Author</option>
+            <option value="date">Date</option>
+        </select>
+    </div>
+
+    <div class="book-logo">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="40" y="30" width="60" height="140" fill="#8b3a3a" rx="5"/>
+            <rect x="60" y="30" width="40" height="140" fill="#a85252" rx="3"/>
+            <rect x="100" y="40" width="60" height="130" fill="#d4a373" rx="5"/>
+            <rect x="120" y="40" width="40" height="130" fill="#e6b88a" rx="3"/>
+        </svg>
+    </div>
 </div>
 
 @if (userRole == "Member")
 {
-    <h2>Member Features</h2>
-    <ul>
-        <li><a href="/Books/Index">Browse Books</a></li>
-        <li><a href="/Borrowing/Index">My Borrowing</a></li>
-        <li><a href="/BookRequests/Index">Request a Book</a></li>
-        <li><a href="/Fines/Index">My Fines</a></li>
-        <li><a href="/Notifications/Index">My Notifications</a></li>
-    </ul>
+    <div class="container mt-5">
+        <h2>Member Features</h2>
+        <ul>
+            <li><a href="/Books/Index">Browse Books</a></li>
+            <li><a href="/Borrowing/Index">My Borrowing</a></li>
+            <li><a href="/BookRequests/Index">Request a Book</a></li>
+            <li><a href="/Fines/Index">My Fines</a></li>
+            <li><a href="/Notifications/Index">My Notifications</a></li>
+        </ul>
+    </div>
 }
 else if (userRole == "Admin")
 {
-    <h2>Library Management</h2>
-    <ul>
-        <li><a href="/Books/Index">Books Management</a></li>
-        <li><a href="/Members/Index">Members Management</a></li>
-        <li><a href="/Borrowing/Index">Borrowing Transactions</a></li>
-        <li><a href="/BookRequests/Index">Book Requests</a></li>
-        <li><a href="/Fines/Index">Fines Management</a></li>
-        <li><a href="/Notifications/Index">Notifications</a></li>
-        <li><a href="/Reports/Index">Reports & Analytics</a></li>
-    </ul>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Library Management</h2>
+                <ul>
+                    <li><a href="/Books/Index">Books Management</a></li>
+                    <li><a href="/Members/Index">Members Management</a></li>
+                    <li><a href="/Borrowing/Index">Borrowing Transactions</a></li>
+                    <li><a href="/BookRequests/Index">Book Requests</a></li>
+                    <li><a href="/Fines/Index">Fines Management</a></li>
+                    <li><a href="/Notifications/Index">Notifications</a></li>
+                    <li><a href="/Reports/Index">Reports & Analytics</a></li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h2>Catalog Management</h2>
+                <ul>
+                    <li><a href="/Authors/Index">Authors</a></li>
+                    <li><a href="/Categories/Index">Categories</a></li>
+                    <li><a href="/Genres/Index">Genres</a></li>
+                </ul>
 
-    <h2>Catalog Management</h2>
-    <ul>
-        <li><a href="/Authors/Index">Authors</a></li>
-        <li><a href="/Categories/Index">Categories</a></li>
-        <li><a href="/Genres/Index">Genres</a></li>
-    </ul>
+                <h2 class="mt-4">Quick Stats</h2>
+                <p>Total Books: @Model.TotalBooks</p>
+                <p>Available Books: @Model.AvailableBooks</p>
+                <p>Total Members: @Model.TotalMembers</p>
+                <p>Active Transactions: @Model.ActiveTransactions</p>
+                <p>Unpaid Fines: @Model.UnpaidFines</p>
+            </div>
+        </div>
+    </div>
 }
 else
 {
-    <h2>Welcome to BookBuddi</h2>
-    <p>Please <a href="/Account/Login">login or register</a> to access library features.</p>
-    <p>Browse our extensive collection of books and manage your reading journey!</p>
-}
-
-@if (!string.IsNullOrEmpty(userRole))
-{
-    @if (userRole == "Admin")
-    {
-        <h2>Quick Stats</h2>
-        <p>Total Books: @Model.TotalBooks</p>
-        <p>Available Books: @Model.AvailableBooks</p>
-        <p>Total Members: @Model.TotalMembers</p>
-        <p>Active Transactions: @Model.ActiveTransactions</p>
-        <p>Unpaid Fines: @Model.UnpaidFines</p>
-    }
-    else
-    {
-        <h2>My Library Status</h2>
-        <p>Available Books to Browse: @Model.AvailableBooks</p>
-        <p>Total Books in Library: @Model.TotalBooks</p>
-    }
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h2>Discover Your Next Great Read</h2>
+                <p class="lead">Browse our extensive collection of @Model.TotalBooks books with @Model.AvailableBooks currently available.</p>
+                <p>Please <a href="/Account/Login">login</a> or <a href="/Account/Register">sign up</a> to start borrowing books and managing your reading journey!</p>
+            </div>
+        </div>
+    </div>
 }

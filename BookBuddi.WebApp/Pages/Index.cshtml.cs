@@ -21,13 +21,22 @@ public class IndexModel : PageModel
     public int ActiveTransactions { get; set; }
     public int UnpaidFines { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
+        // Check if user is logged in as a Member, redirect to Books page
+        var userRole = HttpContext.Session.GetString("UserRole");
+        if (userRole == "Member")
+        {
+            return RedirectToPage("/Books/Index");
+        }
+
         // Directly query the database for dashboard stats
         TotalBooks = await _context.Books.CountAsync();
         AvailableBooks = await _context.Books.CountAsync(b => b.Status == BookStatus.Available);
         TotalMembers = await _context.Members.CountAsync();
         ActiveTransactions = await _context.BorrowTransactions.CountAsync(t => t.Status == TransactionStatus.Active);
         UnpaidFines = await _context.Fines.CountAsync(f => f.Status == FineStatus.Unpaid);
+        
+        return Page();
     }
 }

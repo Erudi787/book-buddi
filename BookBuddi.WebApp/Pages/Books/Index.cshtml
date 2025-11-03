@@ -1,62 +1,772 @@
 @page
 @model BookBuddi.Pages.Books.IndexModel
 @{
-    ViewData["Title"] = "Books";
+    ViewData["Title"] = "Library Catalog - bookBuddi";
     var userRole = HttpContext.Session.GetString("UserRole");
+    var userName = HttpContext.Session.GetString("MemberName") ?? HttpContext.Session.GetString("AdminName");
 }
 
-<h1>@(userRole == "Admin" ? "Books Management" : "Browse Books")</h1>
-
-@if (userRole == "Admin")
-{
-    <p><a href="/Books/Create">Add New Book</a></p>
+@functions {
+    string GetTimeAgo(DateTime dateTime)
+    {
+        var timeSpan = DateTime.Now - dateTime;
+        
+        if (timeSpan.TotalMinutes < 1)
+            return "Just now";
+        if (timeSpan.TotalMinutes < 60)
+            return $"{(int)timeSpan.TotalMinutes} minutes ago";
+        if (timeSpan.TotalHours < 24)
+            return $"{(int)timeSpan.TotalHours} hours ago";
+        if (timeSpan.TotalDays < 7)
+            return $"{(int)timeSpan.TotalDays} days ago";
+        if (timeSpan.TotalDays < 30)
+            return $"{(int)(timeSpan.TotalDays / 7)} weeks ago";
+        if (timeSpan.TotalDays < 365)
+            return $"{(int)(timeSpan.TotalDays / 30)} months ago";
+        
+        return $"{(int)(timeSpan.TotalDays / 365)} years ago";
+    }
 }
 
-<form method="get">
-    <input type="text" name="searchTerm" placeholder="Search books..." value="@Model.SearchTerm" />
-    <button type="submit">Search</button>
-    <a href="/Books/Index">Clear</a>
-</form>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+    }
 
-<table border="1">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>ISBN</th>
-            <th>Category</th>
-            <th>Genre</th>
-            <th>Available Copies</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var book in Model.Books)
+    .catalog-header {
+        background: linear-gradient(135deg, #6d4c41 0%, #8d6e63 100%);
+        color: white;
+        padding: 80px 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .catalog-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url('/images/book-pattern.png');
+        opacity: 0.1;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .featured-book {
+        display: flex;
+        gap: 40px;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .featured-book-cover {
+        width: 300px;
+        height: 450px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        flex-shrink: 0;
+    }
+
+    .featured-book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .featured-info h1 {
+        font-size: 3.5rem;
+        margin: 0 0 10px 0;
+        font-weight: 300;
+    }
+
+    .featured-info .author {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 20px;
+    }
+
+    .featured-info .description {
+        font-size: 1rem;
+        line-height: 1.6;
+        opacity: 0.85;
+        margin-bottom: 20px;
+    }
+
+    .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 40px;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .member-actions {
+        display: flex;
+        gap: 15px;
+        margin-right: 20px;
+    }
+
+    .member-actions a {
+        padding: 8px 16px;
+        border-radius: 20px;
+        text-decoration: none;
+        color: #333;
+        background: #f5f5f5;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .member-actions a:hover {
+        background: #e0e0e0;
+    }
+
+    .notification-bell {
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f5f5f5;
+        transition: background 0.3s;
+    }
+
+    .notification-bell:hover {
+        background: #e0e0e0;
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #dc3545;
+        color: white;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: bold;
+    }
+
+    .notification-dropdown {
+        position: absolute;
+        top: 55px;
+        right: 80px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        width: 360px;
+        max-height: 480px;
+        overflow-y: auto;
+        display: none;
+        z-index: 1000;
+    }
+
+    .notification-dropdown.show {
+        display: block;
+    }
+
+    .notification-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notification-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .notification-header a {
+        font-size: 0.85rem;
+        color: #8B4049;
+        text-decoration: none;
+    }
+
+    .notification-header a:hover {
+        text-decoration: underline;
+    }
+
+    .notification-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .notification-item {
+        padding: 16px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: background 0.2s;
+        text-decoration: none;
+        display: block;
+        color: inherit;
+    }
+
+    .notification-item:hover {
+        background: #f9f9f9;
+    }
+
+    .notification-item.unread {
+        background: #fff8f0;
+    }
+
+    .notification-item.unread::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 8px;
+        height: 8px;
+        background: #FBDB93;
+        border-radius: 50%;
+    }
+
+    .notification-content {
+        margin-left: 16px;
+    }
+
+    .notification-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+        color: #333;
+    }
+
+    .notification-message {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 6px;
+        line-height: 1.4;
+    }
+
+    .notification-time {
+        font-size: 0.75rem;
+        color: #999;
+    }
+
+    .notification-empty {
+        padding: 40px 20px;
+        text-align: center;
+        color: #999;
+    }
+
+    .user-account {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 8px 15px;
+        border-radius: 20px;
+        background: #f5f5f5;
+    }
+
+    .btn-my-books {
+        background-color: #8B4049;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-my-books:hover {
+        background-color: #6d3239;
+        color: white;
+    }
+
+    .search-section {
+        max-width: 1200px;
+        margin: -30px auto 40px;
+        padding: 0 40px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .search-bar {
+        display: flex;
+        gap: 10px;
+        background: white;
+        padding: 10px;
+        border-radius: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .search-bar input {
+        flex: 1;
+        border: none;
+        padding: 12px 20px;
+        font-size: 1rem;
+        border-radius: 20px;
+    }
+
+    .search-bar input:focus {
+        outline: none;
+    }
+
+    .search-bar button {
+        background: #FBDB93;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .nav-tabs {
+        max-width: 1200px;
+        margin: 0 auto 30px;
+        padding: 0 40px;
+        display: flex;
+        gap: 30px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .nav-tabs a {
+        padding: 12px 0;
+        color: #666;
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+    }
+
+    .nav-tabs a.active {
+        color: #333;
+        border-bottom-color: #8B4049;
+    }
+
+    .nav-tabs a:hover {
+        color: #333;
+    }
+
+    .section {
+        max-width: 1200px;
+        margin: 0 auto 50px;
+        padding: 0 40px;
+    }
+
+    .section h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .book-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .book-card {
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+
+    .book-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .book-cover {
+        width: 100%;
+        aspect-ratio: 2/3;
+        background: #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .book-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: #333;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .book-author {
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .scroll-arrows {
+        display: flex;
+        gap: 10px;
+        margin-left: auto;
+    }
+
+    .scroll-arrow {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #f0f0f0;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .scroll-arrow:hover {
+        background: #e0e0e0;
+    }
+
+    .footer {
+        background: #FBDB93;
+        padding: 60px 40px 40px;
+        margin-top: 80px;
+    }
+
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 40px;
+    }
+
+    .footer-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #8B4049;
+        margin-bottom: 15px;
+    }
+
+    .footer-description {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .social-links {
+        display: flex;
+        gap: 15px;
+    }
+
+    .social-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+
+    .social-icon:hover {
+        transform: translateY(-3px);
+    }
+
+    .footer h3 {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .footer a {
+        display: block;
+        color: #666;
+        text-decoration: none;
+        margin-bottom: 10px;
+        transition: color 0.3s;
+    }
+
+    .footer a:hover {
+        color: #8B4049;
+    }
+</style>
+
+<div class="top-nav">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <svg width="30" height="30" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="40" y="30" width="60" height="140" fill="#8b3a3a" rx="5"/>
+            <rect x="60" y="30" width="40" height="140" fill="#a85252" rx="3"/>
+        </svg>
+        <strong>Library Catalog</strong>
+    </div>
+    <div class="nav-right">
+        @if (userRole == "Member")
         {
-            <tr>
-                <td>@book.BookId</td>
-                <td>@book.BookTitle</td>
-                <td>@book.ISBN</td>
-                <td>@(book.CategoryName ?? $"ID: {book.CategoryId}")</td>
-                <td>@(book.GenreName ?? $"ID: {book.GenreId}")</td>
-                <td>@book.AvailableCopies</td>
-                <td>@book.Status</td>
-                <td>
-                    <a href="/Books/Details?id=@book.BookId">Details</a>
-                    @if (userRole == "Admin")
-                    {
-                        <text> | <a href="/Books/Edit?id=@book.BookId">Edit</a></text>
-                        <text> | <a href="/Books/Delete?id=@book.BookId">Delete</a></text>
-                    }
-                    @if (userRole == "Member" && book.AvailableCopies > 0)
-                    {
-                        <text> | <a href="/Borrowing/Borrow?bookId=@book.BookId">Borrow</a></text>
-                    }
-                </td>
-            </tr>
+            <div class="member-actions">
+                <a href="/Books/Index">📚 Browse Books</a>
+                <a href="/Borrowing/Index">📖 My Borrowing</a>
+                <a href="/BookRequests/Index">📝 Request a Book</a>
+                <a href="/Fines/Index">💰 My Fines</a>
+            </div>
         }
-    </tbody>
-</table>
+        @if (userRole == "Member")
+        {
+            <div class="notification-bell" onclick="toggleNotifications()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                @if (Model.UnreadNotificationCount > 0)
+                {
+                    <span class="notification-badge">@Model.UnreadNotificationCount</span>
+                }
+            </div>
+            
+            <div id="notificationDropdown" class="notification-dropdown">
+                <div class="notification-header">
+                    <h3>Notifications</h3>
+                    <a href="/Notifications/Index">View All</a>
+                </div>
+                <div class="notification-list">
+                    @if (Model.RecentNotifications.Any())
+                    {
+                        @foreach (var notification in Model.RecentNotifications)
+                        {
+                            <a href="/Notifications/Details?id=@notification.NotificationId" class="notification-item @(!notification.IsRead ? "unread" : "")">
+                                <div class="notification-content">
+                                    <div class="notification-title">@notification.Title</div>
+                                    <div class="notification-message">@notification.Message</div>
+                                    <div class="notification-time">@GetTimeAgo(notification.DateCreated)</div>
+                                </div>
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <div class="notification-empty">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom: 10px;">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            <p>No notifications yet</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(userName))
+        {
+            <div class="user-account">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>@userName</span>
+            </div>
+        }
+        @if (userRole == "Member")
+        {
+            <a href="/Account/Logout" class="btn-my-books">Logout</a>
+        }
+        else if (userRole == "Admin")
+        {
+            <a href="/Admin/Index" class="btn-my-books">Admin Panel</a>
+        }
+    </div>
+</div>
 
-<p><a href="/">Back to Home</a></p>
+<div class="catalog-header">
+    <div class="featured-book">
+        <div class="featured-book-cover">
+            @if (Model.Books.Any())
+            {
+                var featured = Model.Books.First();
+                @if (!string.IsNullOrEmpty(featured.CoverImageUrl))
+                {
+                    <img src="@featured.CoverImageUrl" alt="@featured.BookTitle" />
+                }
+            }
+        </div>
+        <div class="featured-info">
+            @if (Model.Books.Any())
+            {
+                var featured = Model.Books.First();
+                <h1>@featured.BookTitle</h1>
+                <p class="author">by @(featured.AuthorNames ?? "Unknown Author")</p>
+                <p class="description">@(featured.Description ?? "Discover your next great read in our extensive collection.")</p>
+                <a href="/Books/Details?id=@featured.BookId" class="btn-my-books" style="display: inline-block; text-decoration: none;">See Details</a>
+            }
+            else
+            {
+                <h1>Welcome to Our Library</h1>
+                <p class="description">Discover your next great read in our extensive collection.</p>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="search-section">
+    <form method="get" class="search-bar">
+        <input type="text" name="searchTerm" placeholder="Search for books, authors, or subjects..." value="@Model.SearchTerm" />
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+<div class="nav-tabs">
+    <a href="/Books/Index" class="active">Home</a>
+    <a href="/Books/Index?filter=new">New arrivals</a>
+    <a href="/Books/Index?filter=popular">Popular</a>
+    @if (userRole == "Member")
+    {
+        <a href="/Borrowing/Index">My favorites</a>
+        <a href="/Borrowing/Index">My Next to Read</a>
+    }
+    <a href="/Books/Index?filter=browse">Browse</a>
+</div>
+
+<div class="section">
+    <h2>
+        📚 New Arrivals
+        <div class="scroll-arrows">
+            <button class="scroll-arrow">←</button>
+            <button class="scroll-arrow">→</button>
+        </div>
+    </h2>
+    <div class="book-grid">
+        @foreach (var book in Model.Books.Take(6))
+        {
+            <a href="/Books/Details?id=@book.BookId" class="book-card" style="text-decoration: none;">
+                <div class="book-cover">
+                    @if (!string.IsNullOrEmpty(book.CoverImageUrl))
+                    {
+                        <img src="@book.CoverImageUrl" alt="@book.BookTitle" />
+                    }
+                </div>
+                <div class="book-title">@book.BookTitle</div>
+                <div class="book-author">@(book.AuthorNames ?? "Unknown")</div>
+            </a>
+        }
+    </div>
+</div>
+
+<div class="section">
+    <h2>
+        🔥 Popular Books
+        <div class="scroll-arrows">
+            <button class="scroll-arrow">←</button>
+            <button class="scroll-arrow">→</button>
+        </div>
+    </h2>
+    <div class="book-grid">
+        @foreach (var book in Model.Books.Skip(6).Take(6))
+        {
+            <a href="/Books/Details?id=@book.BookId" class="book-card" style="text-decoration: none;">
+                <div class="book-cover">
+                    @if (!string.IsNullOrEmpty(book.CoverImageUrl))
+                    {
+                        <img src="@book.CoverImageUrl" alt="@book.BookTitle" />
+                    }
+                </div>
+                <div class="book-title">@book.BookTitle</div>
+                <div class="book-author">@(book.AuthorNames ?? "Unknown")</div>
+            </a>
+        }
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div>
+            <div class="footer-logo">
+                <svg width="40" height="40" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="40" y="30" width="60" height="140" fill="#8b3a3a" rx="5"/>
+                    <rect x="60" y="30" width="40" height="140" fill="#a85252" rx="3"/>
+                    <rect x="100" y="40" width="60" height="130" fill="#d4a373" rx="5"/>
+                </svg>
+                <span>Book Buddi</span>
+            </div>
+            <p class="footer-description">Book Buddi is your digital companion for exploring, borrowing, and enjoying an extensive collection of books.</p>
+            <div class="social-links">
+                <div class="social-icon">f</div>
+                <div class="social-icon">t</div>
+                <div class="social-icon">in</div>
+                <div class="social-icon">yt</div>
+            </div>
+        </div>
+        <div>
+            <h3>Quick Links</h3>
+            <a href="/">Home</a>
+            <a href="/Books/Index?filter=new">New Arrivals</a>
+            <a href="/Books/Index?filter=popular">Popular</a>
+            @if (userRole == "Member")
+            {
+                <a href="/Borrowing/Index">My favorites</a>
+                <a href="/BookRequests/Index">My Next to Read</a>
+            }
+            <a href="/Books/Index">Browse</a>
+        </div>
+        <div>
+            <h3>Support</h3>
+            <a href="/Contact">Contact Us</a>
+            <a href="/Help">Guide</a>
+            <a href="/FAQ">FAQ</a>
+            <a href="/Help">Help Desk</a>
+        </div>
+        <div>
+            <h3>Policies</h3>
+            <a href="/Terms">Terms of Use</a>
+            <a href="/Privacy">Privacy Policy</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function toggleNotifications() {
+        const dropdown = document.getElementById('notificationDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const bell = document.querySelector('.notification-bell');
+        const dropdown = document.getElementById('notificationDropdown');
+        
+        if (dropdown && bell && !bell.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+</script>
