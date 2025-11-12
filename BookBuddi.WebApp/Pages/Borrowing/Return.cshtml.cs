@@ -10,18 +10,22 @@ namespace BookBuddi.Pages.Borrowing
         private readonly IBorrowingService _borrowingService;
         private readonly IBookService _bookService;
         private readonly IMemberService _memberService;
+        private readonly INotificationService _notificationService;
 
-        public ReturnModel(IBorrowingService borrowingService, IBookService bookService, IMemberService memberService)
+        public ReturnModel(IBorrowingService borrowingService, IBookService bookService, IMemberService memberService, INotificationService notificationService)
         {
             _borrowingService = borrowingService;
             _bookService = bookService;
             _memberService = memberService;
+            _notificationService = notificationService;
         }
 
         public BorrowTransactionViewModel? Transaction { get; set; }
         public string BookTitle { get; set; } = string.Empty;
         public string MemberName { get; set; } = string.Empty;
         public string? ErrorMessage { get; set; }
+        public IEnumerable<NotificationViewModel> RecentNotifications { get; set; } = new List<NotificationViewModel>();
+        public int UnreadNotificationCount { get; set; }
 
         public IActionResult OnGet(int id)
         {
@@ -44,6 +48,16 @@ namespace BookBuddi.Pages.Borrowing
             if (member != null)
             {
                 MemberName = $"{member.FirstName} {member.LastName}";
+            }
+
+            // Load notifications for members
+            var userRole = HttpContext.Session.GetString("UserRole");
+            var memberId = HttpContext.Session.GetInt32("MemberId");
+            if (userRole == "Member" && memberId.HasValue)
+            {
+                var allNotifications = _notificationService.GetNotificationsByMember(memberId.Value);
+                RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5);
+                UnreadNotificationCount = allNotifications.Count(n => !n.IsRead);
             }
 
             return Page();

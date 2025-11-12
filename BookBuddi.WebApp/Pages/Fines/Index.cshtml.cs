@@ -9,14 +9,18 @@ namespace BookBuddi.Pages.Fines
     {
         private readonly IFineService _fineService;
         private readonly IMemberService _memberService;
+        private readonly INotificationService _notificationService;
 
-        public IndexModel(IFineService fineService, IMemberService memberService)
+        public IndexModel(IFineService fineService, IMemberService memberService, INotificationService notificationService)
         {
             _fineService = fineService;
             _memberService = memberService;
+            _notificationService = notificationService;
         }
 
         public List<FineWithMemberViewModel> Fines { get; set; } = new List<FineWithMemberViewModel>();
+        public IEnumerable<NotificationViewModel> RecentNotifications { get; set; } = new List<NotificationViewModel>();
+        public int UnreadNotificationCount { get; set; }
 
         public IActionResult OnGet()
         {
@@ -37,6 +41,11 @@ namespace BookBuddi.Pages.Fines
                 if (memberId.HasValue)
                 {
                     fineList = _fineService.GetFinesByMember(memberId.Value);
+                    
+                    // Load notifications
+                    var allNotifications = _notificationService.GetNotificationsByMember(memberId.Value);
+                    RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5);
+                    UnreadNotificationCount = allNotifications.Count(n => !n.IsRead);
                 }
                 else
                 {

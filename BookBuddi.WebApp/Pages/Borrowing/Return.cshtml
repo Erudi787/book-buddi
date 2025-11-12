@@ -2,45 +2,530 @@
 @model BookBuddi.Pages.Borrowing.ReturnModel
 @{
     ViewData["Title"] = "Return Book";
+    Layout = "_Layout";
+    var userRole = HttpContext.Session.GetString("UserRole");
+    var userName = HttpContext.Session.GetString("MemberName") ?? HttpContext.Session.GetString("AdminName");
 }
 
-<h1>Return Book</h1>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+    }
 
-@if (Model.Transaction != null)
-{
-    <p>Are you sure you want to return this book?</p>
+    .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 40px;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-    <dl>
-        <dt>Book</dt>
-        <dd>@Model.BookTitle</dd>
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
 
-        <dt>Member</dt>
-        <dd>@Model.MemberName</dd>
+    .member-actions {
+        display: flex;
+        gap: 15px;
+        margin-right: 20px;
+    }
 
-        <dt>Borrow Date</dt>
-        <dd>@Model.Transaction.BorrowDate.ToString("yyyy-MM-dd")</dd>
+    .member-actions a {
+        padding: 8px 16px;
+        border-radius: 20px;
+        text-decoration: none;
+        color: #333;
+        background: #f5f5f5;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
 
-        <dt>Due Date</dt>
-        <dd>@Model.Transaction.DueDate.ToString("yyyy-MM-dd")</dd>
+    .member-actions a:hover,
+    .member-actions a.active {
+        background: #FBDB93;
+    }
 
-        <dt>Status</dt>
-        <dd>@Model.Transaction.Status</dd>
+    .user-account {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 8px 15px;
+        border-radius: 20px;
+        background: #f5f5f5;
+    }
 
-        @if (Model.Transaction.DueDate < DateTime.Now)
-        {
-            <dt style="color: red;">Days Overdue</dt>
-            <dd style="color: red;">@((DateTime.Now - Model.Transaction.DueDate).Days) days</dd>
+    .btn-logout {
+        background-color: #8B4049;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-logout:hover {
+        background-color: #6d3239;
+        color: white;
+    }
+
+    .page-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 0 40px;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #f5f5f5;
+        color: #333;
+        text-decoration: none;
+        border-radius: 20px;
+        font-weight: 500;
+        margin-bottom: 30px;
+        transition: background 0.3s;
+    }
+
+    .back-button:hover {
+        background: #e0e0e0;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        color: #333;
+        margin: 0 0 10px 0;
+        font-weight: 700;
+    }
+
+    .page-header p {
+        font-size: 1.1rem;
+        color: #666;
+        margin: 0;
+    }
+
+    .return-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 40px;
+        margin-bottom: 30px;
+    }
+
+    .confirmation-text {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .confirmation-text svg {
+        color: #FBDB93;
+        margin-bottom: 15px;
+    }
+
+    .confirmation-text h2 {
+        font-size: 1.5rem;
+        color: #333;
+        margin: 0 0 10px 0;
+    }
+
+    .confirmation-text p {
+        font-size: 1rem;
+        color: #666;
+        margin: 0;
+    }
+
+    .book-return-details {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .overdue-warning {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .overdue-warning svg {
+        flex-shrink: 0;
+        color: #8B4049;
+    }
+
+    .overdue-warning-content h3 {
+        font-size: 1.1rem;
+        color: #856404;
+        margin: 0 0 8px 0;
+    }
+
+    .overdue-warning-content p {
+        font-size: 0.95rem;
+        color: #856404;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .overdue-days {
+        display: inline-block;
+        background: #dc3545;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-borrowed {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-overdue {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 35px;
+        justify-content: center;
+    }
+
+    .btn-primary {
+        padding: 14px 40px;
+        background: #FBDB93;
+        color: #333;
+        border: none;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary:hover {
+        background: #f9d073;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-danger {
+        padding: 14px 40px;
+        background: #8B4049;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-danger:hover {
+        background: #6d3239;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-secondary {
+        padding: 14px 40px;
+        background: white;
+        color: #666;
+        border: 2px solid #e0e0e0;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-secondary:hover {
+        border-color: #8B4049;
+        color: #8B4049;
+    }
+
+    .alert {
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+    }
+
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+    }
+
+    .not-found-container {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+    .not-found-container svg {
+        margin-bottom: 20px;
+        color: #ccc;
+    }
+
+    .not-found-container h2 {
+        font-size: 1.8rem;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .not-found-container p {
+        font-size: 1rem;
+        margin-bottom: 25px;
+    }
+
+    @@media (max-width: 768px) {
+        .page-container {
+            padding: 0 20px;
         }
-    </dl>
 
-    <form method="post">
-        <input type="hidden" name="id" value="@Model.Transaction.TransactionId" />
-        <button type="submit">Return Book</button>
-        <a href="/Borrowing/Index">Cancel</a>
-    </form>
+        .return-card {
+            padding: 25px;
+        }
+
+        .detail-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-primary,
+        .btn-danger,
+        .btn-secondary {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="top-nav">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <svg width="30" height="30" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="40" y="30" width="60" height="140" fill="#8b3a3a" rx="5"/>
+            <rect x="60" y="30" width="40" height="140" fill="#a85252" rx="3"/>
+        </svg>
+        <strong>Return a Book</strong>
+    </div>
+    <div class="nav-right">
+        @if (userRole == "Member")
+        {
+            <div class="member-actions">
+                <a href="/Books/Index">Browse Books</a>
+                <a href="/Borrowing/Index" class="active">My Borrowing</a>
+                <a href="/BookRequests/Index">Request a Book</a>
+                <a href="/Fines/Index">My Fines</a>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(userName))
+        {
+            <div class="user-account">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>@userName</span>
+            </div>
+        }
+        @if (userRole == "Member")
+        {
+            <a href="/Account/Logout" class="btn-logout">Logout</a>
+        }
+        else if (userRole == "Admin")
+        {
+            <a href="/Admin/Index" class="btn-logout">Admin Panel</a>
+        }
+    </div>
+</div>
+
+<div class="page-container">
+    <a href="/Borrowing/Index" class="back-button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back to My Borrowing
+    </a>
+
+    <div class="page-header">
+        <h1>Return Book</h1>
+        <p>Confirm book return details</p>
+    </div>
 
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
-        <p style="color: red;">@Model.ErrorMessage</p>
+        <div class="alert alert-error">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            @Model.ErrorMessage
+        </div>
     }
-}
+
+    @if (Model.Transaction == null)
+    {
+        <div class="return-card">
+            <div class="not-found-container">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    <line x1="10" y1="8" x2="16" y2="8"></line>
+                    <line x1="10" y1="12" x2="16" y2="12"></line>
+                </svg>
+                <h2>Transaction Not Found</h2>
+                <p>The borrowing transaction could not be found.</p>
+                <a href="/Borrowing/Index" class="btn-primary">Back to My Borrowing</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        var isOverdue = Model.Transaction.DueDate < DateTime.Now;
+        var daysOverdue = isOverdue ? (DateTime.Now - Model.Transaction.DueDate).Days : 0;
+
+        <div class="return-card">
+            <div class="confirmation-text">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M9 11l3 3L22 4"></path>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+                <h2>Confirm Book Return</h2>
+                <p>Please review the details below before confirming the return</p>
+            </div>
+
+            @if (isOverdue)
+            {
+                <div class="overdue-warning">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <div class="overdue-warning-content">
+                        <h3>Overdue Book</h3>
+                        <p>
+                            This book is <span class="overdue-days">@daysOverdue day@(daysOverdue > 1 ? "s" : "") overdue</span>. 
+                            A late fee may be applied to your account upon return.
+                        </p>
+                    </div>
+                </div>
+            }
+
+            <div class="book-return-details">
+                <div class="detail-row">
+                    <span class="detail-label">Book Title</span>
+                    <span class="detail-value">@Model.BookTitle</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Member</span>
+                    <span class="detail-value">@Model.MemberName</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Borrow Date</span>
+                    <span class="detail-value">@Model.Transaction.BorrowDate.ToString("MMMM dd, yyyy")</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Due Date</span>
+                    <span class="detail-value" style="color: @(isOverdue ? "#dc3545" : "#333")">
+                        @Model.Transaction.DueDate.ToString("MMMM dd, yyyy")
+                        @if (isOverdue)
+                        {
+                            <span> (Overdue)</span>
+                        }
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value">
+                        <span class="status-badge @(isOverdue ? "status-overdue" : "status-borrowed")">
+                            @Model.Transaction.Status
+                        </span>
+                    </span>
+                </div>
+            </div>
+
+            <form method="post">
+                <input type="hidden" name="id" value="@Model.Transaction.TransactionId" />
+                <div class="form-actions">
+                    <button type="submit" class="@(isOverdue ? "btn-danger" : "btn-primary")">
+                        Confirm Return
+                    </button>
+                    <a href="/Borrowing/Index" class="btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    }
+</div>

@@ -1,57 +1,1208 @@
 @page
 @model BookBuddi.Pages.Books.DetailsModel
 @{
-    ViewData["Title"] = "Book Details";
+    ViewData["Title"] = Model.Book?.BookTitle ?? "Book Details";
+    Layout = "_Layout";
+    var userRole = HttpContext.Session.GetString("UserRole");
+    var userName = HttpContext.Session.GetString("MemberName") ?? HttpContext.Session.GetString("AdminName");
 }
 
-<h1>Book Details</h1>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+    }
 
-@if (Model.Book == null)
-{
-    <p>Book not found.</p>
-}
-else
-{
-    <dl>
-        <dt>ID</dt>
-        <dd>@Model.Book.BookId</dd>
+    .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 40px;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-        <dt>Title</dt>
-        <dd>@Model.Book.BookTitle</dd>
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
 
-        <dt>ISBN</dt>
-        <dd>@Model.Book.ISBN</dd>
+    .member-actions {
+        display: flex;
+        gap: 15px;
+        margin-right: 20px;
+    }
 
-        <dt>Publisher</dt>
-        <dd>@Model.Book.Publisher</dd>
+    .member-actions a {
+        padding: 8px 16px;
+        border-radius: 20px;
+        text-decoration: none;
+        color: #333;
+        background: #f5f5f5;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
 
-        <dt>Publication Date</dt>
-        <dd>@Model.Book.PublicationDate?.ToString("yyyy-MM-dd")</dd>
+    .member-actions a:hover,
+    .member-actions a.active {
+        background: #FBDB93;
+    }
 
-        <dt>Description</dt>
-        <dd>@Model.Book.Description</dd>
+    .user-account {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 8px 15px;
+        border-radius: 20px;
+        background: #f5f5f5;
+    }
 
-        <dt>Page Count</dt>
-        <dd>@Model.Book.PageCount</dd>
+    .btn-logout {
+        background-color: #8B4049;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+    }
 
-        <dt>Category</dt>
-        <dd>@(Model.Book.CategoryName ?? $"ID: {Model.Book.CategoryId}")</dd>
+    .btn-logout:hover {
+        background-color: #6d3239;
+        color: white;
+    }
 
-        <dt>Genre</dt>
-        <dd>@(Model.Book.GenreName ?? $"ID: {Model.Book.GenreId}")</dd>
+    .notification-bell {
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f5f5f5;
+        transition: background 0.3s;
+    }
 
-        <dt>Available Copies</dt>
-        <dd>@Model.Book.AvailableCopies</dd>
+    .notification-bell:hover {
+        background: #e0e0e0;
+    }
 
-        <dt>Status</dt>
-        <dd>@Model.Book.Status</dd>
+    .notification-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #dc3545;
+        color: white;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: bold;
+    }
 
-        <dt>Authors</dt>
-        <dd>@(Model.Book.AuthorNames ?? "No authors assigned")</dd>
-    </dl>
+    .notification-dropdown {
+        display: none;
+        position: absolute;
+        top: 45px;
+        right: 0;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        width: 480px;
+        max-height: 600px;
+        z-index: 1000;
+        animation: slideDown 0.3s ease;
+        overflow: hidden;
+    }
 
-    <p>
-        <a href="/Books/Edit?id=@Model.Book.BookId">Edit</a> |
-        <a href="/Books/Index">Back to List</a>
-    </p>
-}
+    .notification-dropdown.show {
+        display: block;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .notification-header {
+        padding: 20px 24px 16px;
+        border-bottom: 1px solid #e8e8e8;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fafafa;
+    }
+
+    .notification-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+
+    .mark-all-read-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        color: #8B4049;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 6px 12px;
+        border-radius: 6px;
+        transition: background 0.2s;
+        font-weight: 500;
+    }
+
+    .mark-all-read-btn:hover {
+        background: #f0f0f0;
+    }
+
+    .notification-tabs {
+        display: flex;
+        padding: 0 24px;
+        background: white;
+        border-bottom: 2px solid #f0f0f0;
+        gap: 8px;
+    }
+
+    .notification-tab {
+        padding: 12px 16px;
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 500;
+        transition: all 0.2s;
+        position: relative;
+    }
+
+    .notification-tab:hover {
+        color: #333;
+        background: #f9f9f9;
+    }
+
+    .notification-tab.active {
+        color: #8B4049;
+        border-bottom-color: #8B4049;
+    }
+
+    .tab-badge {
+        display: inline-block;
+        background: #8B4049;
+        color: white;
+        font-size: 0.75rem;
+        padding: 2px 7px;
+        border-radius: 10px;
+        margin-left: 6px;
+        font-weight: 600;
+    }
+
+    .notification-list {
+        max-height: 440px;
+        overflow-y: auto;
+    }
+
+    .notification-footer {
+        padding: 16px 20px;
+        border-top: 1px solid #e0e0e0;
+        text-align: center;
+        background: #f8f9fa;
+    }
+
+    .btn-view-all-notifications {
+        display: inline-block;
+        padding: 10px 24px;
+        background: #FBDB93;
+        color: #333;
+        text-decoration: none;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+    }
+
+    .btn-view-all-notifications:hover {
+        background: #f9d078;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(251, 219, 147, 0.4);
+    }
+
+    .notification-card {
+        padding: 16px 24px;
+        border-bottom: 1px solid #f5f5f5;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        gap: 12px;
+        align-items: start;
+    }
+
+    .notification-card:hover {
+        background: #fafafa;
+    }
+
+    .notification-card.unread {
+        background: #fffbf5;
+    }
+
+    .notification-card.unread:hover {
+        background: #fff8ed;
+    }
+
+    .notification-indicator {
+        flex-shrink: 0;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-top: 6px;
+    }
+
+    .notification-indicator.unread {
+        background: #FBDB93;
+    }
+
+    .notification-indicator.read {
+        background: transparent;
+    }
+
+    .notification-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .notification-title {
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+        font-size: 0.95rem;
+        line-height: 1.3;
+    }
+
+    .notification-message {
+        color: #666;
+        font-size: 0.875rem;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .notification-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.8rem;
+        color: #999;
+    }
+
+    .notification-time {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .notification-empty {
+        padding: 60px 24px;
+        text-align: center;
+        color: #999;
+    }
+
+    .notification-empty svg {
+        margin-bottom: 12px;
+        opacity: 0.3;
+    }
+
+    .notification-empty p {
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    /* Notification Modal */
+    .notification-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .notification-modal.show {
+        display: flex;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    .notification-modal-content {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        animation: slideUp 0.3s ease;
+    }
+
+    @@keyframes slideUp {
+        from {
+            transform: translateY(50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .notification-modal-header {
+        padding: 24px;
+        border-bottom: 1px solid #e8e8e8;
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+    }
+
+    .notification-modal-header h2 {
+        margin: 0;
+        font-size: 1.3rem;
+        color: #1a1a1a;
+        flex: 1;
+        padding-right: 20px;
+    }
+
+    .close-modal-btn {
+        background: #f5f5f5;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+        flex-shrink: 0;
+    }
+
+    .close-modal-btn:hover {
+        background: #e0e0e0;
+    }
+
+    .notification-modal-body {
+        padding: 24px;
+    }
+
+    .notification-modal-message {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .notification-modal-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .notification-modal-meta-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+    }
+
+    .notification-modal-meta-label {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .notification-modal-meta-value {
+        color: #1a1a1a;
+        font-weight: 600;
+    }
+
+    .notification-modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #e8e8e8;
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .modal-btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .modal-btn-primary {
+        background: #8B4049;
+        color: white;
+    }
+
+    .modal-btn-primary:hover {
+        background: #6d3239;
+    }
+
+    .modal-btn-secondary {
+        background: #f5f5f5;
+        color: #333;
+    }
+
+    .modal-btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #f5f5f5;
+        color: #333;
+        text-decoration: none;
+        border-radius: 20px;
+        font-weight: 500;
+        margin: 20px 40px;
+        transition: background 0.3s;
+    }
+
+    .back-button:hover {
+        background: #e0e0e0;
+    }
+
+    .content-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 40px 60px;
+    }
+
+    .book-details-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .book-header {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 40px;
+        padding: 40px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    .book-cover-large {
+        width: 100%;
+        aspect-ratio: 2/3;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        background: #e0e0e0;
+    }
+
+    .book-cover-large img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .book-main-info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .book-title-section h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin: 0 0 10px 0;
+        line-height: 1.2;
+    }
+
+    .book-authors {
+        font-size: 1.3rem;
+        color: #666;
+        margin-bottom: 15px;
+    }
+
+    .book-meta-badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge-category {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .badge-genre {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .badge-status {
+        background: #e8f5e9;
+        color: #388e3c;
+    }
+
+    .badge-unavailable {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .book-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-top: auto;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 15px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #8B4049;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .book-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .btn-primary {
+        padding: 14px 32px;
+        background: #FBDB93;
+        color: #333;
+        border: none;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+        background: #f9d073;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-secondary {
+        padding: 14px 32px;
+        background: white;
+        color: #8B4049;
+        border: 2px solid #8B4049;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+
+    .btn-secondary:hover {
+        background: #8B4049;
+        color: white;
+    }
+
+    .book-details-content {
+        padding: 40px;
+    }
+
+    .details-section {
+        margin-bottom: 40px;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #FBDB93;
+    }
+
+    .description-text {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: #555;
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 12px;
+        border-left: 4px solid #FBDB93;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .detail-card {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 4px solid #FBDB93;
+    }
+
+    .detail-label {
+        font-size: 0.85rem;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .not-found-container {
+        text-align: center;
+        padding: 100px 20px;
+        color: #999;
+    }
+
+    .not-found-container svg {
+        margin-bottom: 30px;
+    }
+
+    .not-found-container h2 {
+        font-size: 2rem;
+        color: #666;
+        margin-bottom: 15px;
+    }
+
+    .not-found-container p {
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+    }
+
+    @@media (max-width: 768px) {
+        .book-header {
+            grid-template-columns: 1fr;
+        }
+
+        .book-stats {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="top-nav">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <svg width="30" height="30" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="40" y="30" width="60" height="140" fill="#8b3a3a" rx="5"/>
+            <rect x="60" y="30" width="40" height="140" fill="#a85252" rx="3"/>
+        </svg>
+        <strong>Library Catalog</strong>
+    </div>
+    <div class="nav-right">
+        @if (userRole == "Member")
+        {
+            <div class="member-actions">
+                <a href="/Books/Index" class="active">Browse Books</a>
+                <a href="/Borrowing/Index">My Borrowing</a>
+                <a href="/BookRequests/Index">Request a Book</a>
+                <a href="/Fines/Index">My Fines</a>
+            </div>
+        }
+        @if (userRole == "Member")
+        {
+            <div class="notification-bell" onclick="toggleNotifications(event)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                @if (Model.UnreadNotificationCount > 0)
+                {
+                    <span class="notification-badge">@Model.UnreadNotificationCount</span>
+                }
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="notification-header">
+                        <h3>Your Notification</h3>
+                        @if (Model.UnreadNotificationCount > 0)
+                        {
+                            <button class="mark-all-read-btn" onclick="markAllAsRead(event)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                Mark All as read
+                            </button>
+                        }
+                    </div>
+                    
+                    <div class="notification-tabs">
+                        <button class="notification-tab active" data-tab="all" onclick="switchTab(event, 'all')">
+                            View all <span class="tab-badge">@Model.RecentNotifications.Count()</span>
+                        </button>
+                        <button class="notification-tab" data-tab="duedate" onclick="switchTab(event, 'duedate')">
+                            Due date <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type == BookBuddi.Resources.Constants.NotificationType.DueReminder)</span>
+                        </button>
+                        <button class="notification-tab" data-tab="request" onclick="switchTab(event, 'request')">
+                            Request <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type == BookBuddi.Resources.Constants.NotificationType.RequestUpdate)</span>
+                        </button>
+                        <button class="notification-tab" data-tab="system" onclick="switchTab(event, 'system')">
+                            System Alerts <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type == BookBuddi.Resources.Constants.NotificationType.OverdueAlert || n.Type == BookBuddi.Resources.Constants.NotificationType.FineIssued || n.Type == BookBuddi.Resources.Constants.NotificationType.General)</span>
+                        </button>
+                    </div>
+
+                    <div class="notification-list" id="notificationList">
+                        @if (Model.RecentNotifications != null && Model.RecentNotifications.Any())
+                        {
+                            @foreach (var notification in Model.RecentNotifications.OrderByDescending(n => n.DateCreated))
+                            {
+                                var notificationTypeClass = notification.Type == BookBuddi.Resources.Constants.NotificationType.DueReminder ? "duedate" :
+                                                           notification.Type == BookBuddi.Resources.Constants.NotificationType.RequestUpdate ? "request" : "system";
+                                
+                                <div class="notification-card @(!notification.IsRead ? "unread" : "")" 
+                                     data-notification-id="@notification.NotificationId"
+                                     data-notification-type="@notificationTypeClass"
+                                     onclick="openNotificationModal(@notification.NotificationId, '@notification.Title.Replace("'", "\\'")' , '@notification.Message.Replace("'", "\\'")' , '@notification.DateCreated.ToString("MMMM dd, yyyy")', '@notification.DateCreated.ToString("h:mm tt")', @notification.IsRead.ToString().ToLower())">
+                                    <div class="notification-indicator @(!notification.IsRead ? "unread" : "read")"></div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">@notification.Title</div>
+                                        <div class="notification-message">@notification.Message</div>
+                                        <div class="notification-meta">
+                                            <span class="notification-time">@notification.DateCreated.ToString("MMMM dd, yyyy") @notification.DateCreated.ToString("h:mm tt")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="notification-empty">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                                <p>No new notifications</p>
+                            </div>
+                        }
+                    </div>
+                    <div class="notification-footer">
+                        <a href="/Notifications/Index" class="btn-view-all-notifications">View All Notifications</a>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(userName))
+        {
+            <div class="user-account">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>@userName</span>
+            </div>
+        }
+        @if (userRole == "Member")
+        {
+            <a href="/Account/Logout" class="btn-logout">Logout</a>
+        }
+        else if (userRole == "Admin")
+        {
+            <a href="/Admin/Index" class="btn-logout">Admin Panel</a>
+        }
+    </div>
+</div>
+
+<!-- Notification Modal -->
+<div id="notificationModal" class="notification-modal">
+    <div class="notification-modal-content">
+        <div class="notification-modal-header">
+            <h2 id="modalTitle">Notification Title</h2>
+            <button class="modal-close" onclick="closeNotificationModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="notification-modal-body">
+            <p id="modalMessage">Notification message content will appear here.</p>
+            <div class="notification-modal-meta">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span id="modalDate">January 1, 2024</span>
+                <span id="modalTime">12:00 PM</span>
+            </div>
+        </div>
+        <div class="notification-modal-footer">
+            <button class="modal-btn modal-btn-secondary" onclick="closeNotificationModal()">Close</button>
+            <button class="modal-btn modal-btn-primary" onclick="closeNotificationModal()">Mark as Read</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleNotifications(event) {
+        event.stopPropagation();
+        const dropdown = document.getElementById('notificationDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    function switchTab(event, tabName) {
+        event.stopPropagation();
+        
+        // Update active tab
+        const tabs = document.querySelectorAll('.notification-tab');
+        tabs.forEach(tab => {
+            if (tab.getAttribute('data-tab') === tabName) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+
+        // Filter notifications
+        const notifications = document.querySelectorAll('.notification-card');
+        notifications.forEach(notification => {
+            if (tabName === 'all') {
+                notification.style.display = 'flex';
+            } else {
+                const notificationType = notification.getAttribute('data-notification-type');
+                notification.style.display = notificationType === tabName ? 'flex' : 'none';
+            }
+        });
+    }
+
+    function openNotificationModal(id, title, message, date, time, isRead) {
+        const modal = document.getElementById('notificationModal');
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalMessage').textContent = message;
+        document.getElementById('modalDate').textContent = date;
+        document.getElementById('modalTime').textContent = time;
+        
+        // Store notification ID for marking as read
+        modal.setAttribute('data-notification-id', id);
+        
+        modal.style.display = 'flex';
+        
+        // If notification is unread, mark it as read
+        if (!isRead) {
+            fetch(`/Notifications/MarkAsRead?id=${id}`, { method: 'POST' })
+                .then(() => {
+                    const card = document.querySelector(`[data-notification-id="${id}"]`);
+                    if (card) {
+                        card.classList.remove('unread');
+                        const indicator = card.querySelector('.notification-indicator');
+                        if (indicator) {
+                            indicator.classList.remove('unread');
+                            indicator.classList.add('read');
+                        }
+                    }
+                    
+                    // Update badge count
+                    const badge = document.querySelector('.notification-badge');
+                    if (badge) {
+                        let count = parseInt(badge.textContent) - 1;
+                        if (count > 0) {
+                            badge.textContent = count;
+                        } else {
+                            badge.remove();
+                        }
+                    }
+                    
+                    // Update tab badges
+                    updateTabBadges();
+                });
+        }
+    }
+
+    function closeNotificationModal() {
+        const modal = document.getElementById('notificationModal');
+        modal.style.display = 'none';
+    }
+
+    function markAllAsRead(event) {
+        event.stopPropagation();
+        
+        fetch('/Notifications/MarkAllAsRead', { method: 'POST' })
+            .then(() => {
+                // Update UI
+                const cards = document.querySelectorAll('.notification-card.unread');
+                cards.forEach(card => {
+                    card.classList.remove('unread');
+                    const indicator = card.querySelector('.notification-indicator');
+                    if (indicator) {
+                        indicator.classList.remove('unread');
+                        indicator.classList.add('read');
+                    }
+                });
+                
+                // Remove badge
+                const badge = document.querySelector('.notification-badge');
+                if (badge) {
+                    badge.remove();
+                }
+                
+                // Remove mark all as read button
+                const markAllBtn = document.querySelector('.mark-all-read-btn');
+                if (markAllBtn) {
+                    markAllBtn.remove();
+                }
+                
+                // Update tab badges
+                updateTabBadges();
+            });
+    }
+
+    function updateTabBadges() {
+        const allCount = document.querySelectorAll('.notification-card').length;
+        const dueDateCount = document.querySelectorAll('.notification-card[data-notification-type="duedate"]').length;
+        const requestCount = document.querySelectorAll('.notification-card[data-notification-type="request"]').length;
+        const systemCount = document.querySelectorAll('.notification-card[data-notification-type="system"]').length;
+        
+        document.querySelector('[data-tab="all"] .tab-badge').textContent = allCount;
+        document.querySelector('[data-tab="duedate"] .tab-badge').textContent = dueDateCount;
+        document.querySelector('[data-tab="request"] .tab-badge').textContent = requestCount;
+        document.querySelector('[data-tab="system"] .tab-badge').textContent = systemCount;
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const bell = document.querySelector('.notification-bell');
+        const dropdown = document.getElementById('notificationDropdown');
+        
+        if (dropdown && bell && !bell.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('notificationModal');
+        if (event.target === modal) {
+            closeNotificationModal();
+        }
+    }
+
+    // Close modal with escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeNotificationModal();
+        }
+    });
+</script>
+
+<a href="/Books/Index" class="back-button">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Back to Books
+</a>
+
+<div class="content-wrapper">
+    @if (Model.Book == null)
+    {
+        <div class="not-found-container">
+            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                <line x1="10" y1="8" x2="16" y2="8"></line>
+                <line x1="10" y1="12" x2="16" y2="12"></line>
+                <line x1="10" y1="16" x2="14" y2="16"></line>
+            </svg>
+            <h2>Book Not Found</h2>
+            <p>Sorry, we couldn't find the book you're looking for.</p>
+            <a href="/Books/Index" class="btn-primary">Browse All Books</a>
+        </div>
+    }
+    else
+    {
+        <div class="book-details-container">
+            <div class="book-header">
+                <div class="book-cover-large">
+                    @if (!string.IsNullOrEmpty(Model.Book.CoverImageUrl))
+                    {
+                        <img src="@Model.Book.CoverImageUrl" alt="@Model.Book.BookTitle" />
+                    }
+                </div>
+                
+                <div class="book-main-info">
+                    <div class="book-title-section">
+                        <h1>@Model.Book.BookTitle</h1>
+                        <div class="book-authors">
+                            by @(Model.Book.AuthorNames ?? "Unknown Author")
+                        </div>
+                    </div>
+
+                    <div class="book-meta-badges">
+                        @if (!string.IsNullOrEmpty(Model.Book.CategoryName))
+                        {
+                            <span class="badge badge-category">@Model.Book.CategoryName</span>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Book.GenreName))
+                        {
+                            <span class="badge badge-genre">@Model.Book.GenreName</span>
+                        }
+                        @if (Model.Book.Status == BookBuddi.Resources.Constants.BookStatus.Available)
+                        {
+                            <span class="badge badge-status">Available</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-unavailable">Unavailable</span>
+                        }
+                    </div>
+
+                    <div class="book-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">@Model.Book.AvailableCopies</span>
+                            <span class="stat-label">Available Copies</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">@(Model.Book.PageCount ?? 0)</span>
+                            <span class="stat-label">Pages</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">
+                                @if (Model.Book.PublicationDate.HasValue)
+                                {
+                                    @Model.Book.PublicationDate.Value.Year
+                                }
+                                else
+                                {
+                                    <text>N/A</text>
+                                }
+                            </span>
+                            <span class="stat-label">Published</span>
+                        </div>
+                    </div>
+
+                    <div class="book-actions">
+                        @if (userRole == "Member" && Model.Book.Status == BookBuddi.Resources.Constants.BookStatus.Available && Model.Book.AvailableCopies > 0)
+                        {
+                            <a href="/Borrowing/Borrow?bookId=@Model.Book.BookId" class="btn-primary">Borrow This Book</a>
+                        }
+                        @if (userRole == "Admin")
+                        {
+                            <a href="/Books/Edit?id=@Model.Book.BookId" class="btn-secondary">Edit Book</a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="book-details-content">
+                @if (!string.IsNullOrEmpty(Model.Book.Description))
+                {
+                    <div class="details-section">
+                        <h2 class="section-title">Description</h2>
+                        <div class="description-text">
+                            @Model.Book.Description
+                        </div>
+                    </div>
+                }
+
+                <div class="details-section">
+                    <h2 class="section-title">Book Information</h2>
+                    <div class="details-grid">
+                        <div class="detail-card">
+                            <div class="detail-label">ISBN</div>
+                            <div class="detail-value">@Model.Book.ISBN</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.Book.Publisher))
+                        {
+                            <div class="detail-card">
+                                <div class="detail-label">Publisher</div>
+                                <div class="detail-value">@Model.Book.Publisher</div>
+                            </div>
+                        }
+                        @if (Model.Book.PublicationDate.HasValue)
+                        {
+                            <div class="detail-card">
+                                <div class="detail-label">Publication Date</div>
+                                <div class="detail-value">@Model.Book.PublicationDate.Value.ToString("MMMM dd, yyyy")</div>
+                            </div>
+                        }
+                        <div class="detail-card">
+                            <div class="detail-label">Book ID</div>
+                            <div class="detail-value">#@Model.Book.BookId</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
