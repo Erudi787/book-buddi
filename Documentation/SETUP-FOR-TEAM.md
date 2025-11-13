@@ -124,7 +124,7 @@ dotnet ef database update --startup-project ../BookBuddi.WebApp/BookBuddi.WebApp
 ```
 Build started...
 Build succeeded.
-Applying migration '20251029181455_AddAuditTrailColumns'.
+Applying migration '20251113140352_InitialCreate'.
 Done.
 ```
 
