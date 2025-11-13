@@ -9,16 +9,20 @@ namespace BookBuddi.Pages.Fines
     {
         private readonly IFineService _fineService;
         private readonly IMemberService _memberService;
+        private readonly INotificationService _notificationService;
 
-        public PayModel(IFineService fineService, IMemberService memberService)
+        public PayModel(IFineService fineService, IMemberService memberService, INotificationService notificationService)
         {
             _fineService = fineService;
             _memberService = memberService;
+            _notificationService = notificationService;
         }
 
         public FineViewModel? Fine { get; set; }
         public string MemberName { get; set; } = string.Empty;
         public string? ErrorMessage { get; set; }
+        public List<NotificationViewModel> RecentNotifications { get; set; } = new();
+        public int UnreadNotificationCount { get; set; }
 
         public IActionResult OnGet(int id)
         {
@@ -36,6 +40,19 @@ namespace BookBuddi.Pages.Fines
                 MemberName = $"{member.FirstName} {member.LastName}";
             }
 
+            // Load notifications for members
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole == "Member")
+            {
+                var memberId = HttpContext.Session.GetInt32("MemberId");
+                if (memberId.HasValue)
+                {
+                    var allNotifications = _notificationService.GetNotificationsByMember(memberId.Value);
+                    RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5).ToList();
+                    UnreadNotificationCount = _notificationService.GetUnreadCount(memberId.Value);
+                }
+            }
+
             return Page();
         }
 
@@ -51,6 +68,20 @@ namespace BookBuddi.Pages.Fines
             {
                 ErrorMessage = ex.Message;
                 Fine = _fineService.GetFineById(id);
+                
+                // Reload notifications for members
+                var userRole = HttpContext.Session.GetString("UserRole");
+                if (userRole == "Member")
+                {
+                    var memberId = HttpContext.Session.GetInt32("MemberId");
+                    if (memberId.HasValue)
+                    {
+                        var allNotifications = _notificationService.GetNotificationsByMember(memberId.Value);
+                        RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5).ToList();
+                        UnreadNotificationCount = _notificationService.GetUnreadCount(memberId.Value);
+                    }
+                }
+                
                 return Page();
             }
         }

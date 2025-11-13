@@ -19,10 +19,12 @@ namespace BookBuddi.Pages.Books
         public IEnumerable<NotificationViewModel> RecentNotifications { get; set; } = new List<NotificationViewModel>();
         public int UnreadNotificationCount { get; set; }
         public string? SearchTerm { get; set; }
+        public string? Filter { get; set; }
 
-        public void OnGet(string? searchTerm)
+        public void OnGet(string? searchTerm, string? filter)
         {
             SearchTerm = searchTerm;
+            Filter = filter ?? "home";
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -30,7 +32,14 @@ namespace BookBuddi.Pages.Books
             }
             else
             {
-                Books = _bookService.GetAllBooks();
+                var allBooks = _bookService.GetAllBooks().OrderByDescending(b => b.CreatedTime);
+                
+                Books = Filter?.ToLower() switch
+                {
+                    "new" => allBooks.Take(12).ToList(),
+                    "popular" => allBooks.OrderByDescending(b => b.BookId).Take(12).ToList(),
+                    _ => allBooks.Take(24).ToList() // home - show both sections
+                };
             }
 
             // Fetch notifications for logged-in member

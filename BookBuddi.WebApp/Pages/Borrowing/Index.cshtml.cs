@@ -10,15 +10,19 @@ namespace BookBuddi.Pages.Borrowing
         private readonly IBorrowingService _borrowingService;
         private readonly IBookService _bookService;
         private readonly IMemberService _memberService;
+        private readonly INotificationService _notificationService;
 
-        public IndexModel(IBorrowingService borrowingService, IBookService bookService, IMemberService memberService)
+        public IndexModel(IBorrowingService borrowingService, IBookService bookService, IMemberService memberService, INotificationService notificationService)
         {
             _borrowingService = borrowingService;
             _bookService = bookService;
             _memberService = memberService;
+            _notificationService = notificationService;
         }
 
         public List<TransactionWithDetailsViewModel> Transactions { get; set; } = new List<TransactionWithDetailsViewModel>();
+        public IEnumerable<NotificationViewModel> RecentNotifications { get; set; } = new List<NotificationViewModel>();
+        public int UnreadNotificationCount { get; set; }
 
         public IActionResult OnGet()
         {
@@ -39,6 +43,11 @@ namespace BookBuddi.Pages.Borrowing
                 if (memberId.HasValue)
                 {
                     transactionList = _borrowingService.GetTransactionsByMember(memberId.Value);
+                    
+                    // Load notifications
+                    var allNotifications = _notificationService.GetNotificationsByMember(memberId.Value);
+                    RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5);
+                    UnreadNotificationCount = allNotifications.Count(n => !n.IsRead);
                 }
                 else
                 {
@@ -60,6 +69,8 @@ namespace BookBuddi.Pages.Borrowing
                 {
                     Transaction = t,
                     BookTitle = book?.BookTitle ?? "Unknown",
+                    BookAuthor = book?.AuthorNames ?? "Unknown Author",
+                    CoverImageUrl = book?.CoverImageUrl ?? "/images/book-placeholder.jpg",
                     MemberName = member != null ? $"{member.FirstName} {member.LastName}" : "Unknown"
                 };
             }).ToList();
@@ -71,6 +82,8 @@ namespace BookBuddi.Pages.Borrowing
         {
             public BorrowTransactionViewModel Transaction { get; set; } = new BorrowTransactionViewModel();
             public string BookTitle { get; set; } = string.Empty;
+            public string BookAuthor { get; set; } = string.Empty;
+            public string CoverImageUrl { get; set; } = string.Empty;
             public string MemberName { get; set; } = string.Empty;
         }
     }

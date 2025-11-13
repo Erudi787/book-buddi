@@ -13,19 +13,33 @@ namespace BookBuddi.Pages.BookRequests
     {
         private readonly IBookRequestService _requestService;
         private readonly ApplicationDbContext _context;
+        private readonly INotificationService _notificationService;
 
-        public CreateModel(IBookRequestService requestService, ApplicationDbContext context)
+        public CreateModel(IBookRequestService requestService, ApplicationDbContext context, INotificationService notificationService)
         {
             _requestService = requestService;
             _context = context;
+            _notificationService = notificationService;
         }
 
         public List<Member> Members { get; set; } = new List<Member>();
         public string? ErrorMessage { get; set; }
+        public IEnumerable<NotificationViewModel> RecentNotifications { get; set; } = new List<NotificationViewModel>();
+        public int UnreadNotificationCount { get; set; }
 
         public async Task OnGetAsync()
         {
             Members = await _context.Members.Where(m => m.Status == MemberStatus.Active).ToListAsync();
+            
+            // Load notifications for members
+            var userRole = HttpContext.Session.GetString("UserRole");
+            var memberId = HttpContext.Session.GetInt32("MemberId");
+            if (userRole == "Member" && memberId.HasValue)
+            {
+                var allNotifications = _notificationService.GetNotificationsByMember(memberId.Value);
+                RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5);
+                UnreadNotificationCount = allNotifications.Count(n => !n.IsRead);
+            }
         }
 
         public async Task<IActionResult> OnPostAsync(int memberId, string bookTitle, string? author, string? isbn, string? notes)
@@ -51,6 +65,17 @@ namespace BookBuddi.Pages.BookRequests
             {
                 ErrorMessage = ex.Message;
                 Members = await _context.Members.Where(m => m.Status == MemberStatus.Active).ToListAsync();
+                
+                // Reload notifications
+                var userRole = HttpContext.Session.GetString("UserRole");
+                var memberIdSession = HttpContext.Session.GetInt32("MemberId");
+                if (userRole == "Member" && memberIdSession.HasValue)
+                {
+                    var allNotifications = _notificationService.GetNotificationsByMember(memberIdSession.Value);
+                    RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5);
+                    UnreadNotificationCount = allNotifications.Count(n => !n.IsRead);
+                }
+                
                 return Page();
             }
         }

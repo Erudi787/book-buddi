@@ -1,70 +1,1221 @@
 @page
 @model BookBuddi.Pages.BookRequests.IndexModel
 @{
-    ViewData["Title"] = "Book Requests";
+    ViewData["Title"] = "Book Requests - bookBuddi";
+    Layout = "_Layout";
+    var userRole = HttpContext.Session.GetString("UserRole");
+    var userName = HttpContext.Session.GetString("MemberName") ?? HttpContext.Session.GetString("AdminName");
 }
 
-<h1>Book Requests</h1>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+    }
 
-<p><a href="/BookRequests/Create">Create New Request</a></p>
+    .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 40px;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-<h2>Pending Requests</h2>
-<table border="1">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Member</th>
-            <th>Book Title</th>
-            <th>Author</th>
-            <th>Request Date</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Requests.Where(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending))
-        {
-            <tr>
-                <td>@item.Request.RequestId</td>
-                <td>@item.MemberName</td>
-                <td>@item.Request.BookTitle</td>
-                <td>@item.Request.AuthorName</td>
-                <td>@item.Request.RequestDate.ToString("yyyy-MM-dd")</td>
-                <td>@item.Request.Status</td>
-                <td>
-                    <a href="/BookRequests/Approve?id=@item.Request.RequestId">Approve</a> |
-                    <a href="/BookRequests/Reject?id=@item.Request.RequestId">Reject</a>
-                </td>
-            </tr>
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .member-actions {
+        display: flex;
+        gap: 15px;
+        margin-right: 20px;
+    }
+
+    .member-actions a {
+        padding: 8px 16px;
+        border-radius: 20px;
+        text-decoration: none;
+        color: #333;
+        background: #f5f5f5;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .member-actions a:hover,
+    .member-actions a.active {
+        background: #FBDB93;
+    }
+
+    .user-account {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 8px 15px;
+        border-radius: 20px;
+        background: #f5f5f5;
+    }
+
+    .btn-logout {
+        background-color: #8B4049;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-logout:hover {
+        background-color: #6d3239;
+        color: white;
+    }
+
+    /* Notification Bell Styles */
+    .notification-bell {
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f5f5f5;
+        transition: background 0.3s;
+    }
+
+    .notification-bell:hover {
+        background: #e0e0e0;
+    }
+
+    .notification-bell svg {
+        stroke: #8B4049;
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: #dc3545;
+        color: white;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: bold;
+    }
+
+    .notification-dropdown {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        width: 480px;
+        max-height: 600px;
+        display: none;
+        z-index: 1000;
+        overflow: hidden;
+        animation: slideDown 0.3s ease;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
         }
-    </tbody>
-</table>
-
-<h2>All Requests</h2>
-<table border="1">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Member</th>
-            <th>Book Title</th>
-            <th>Status</th>
-            <th>Request Date</th>
-            <th>Response Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Requests)
-        {
-            <tr style="@(item.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending ? "background-color: #ffffcc;" : "")">
-                <td>@item.Request.RequestId</td>
-                <td>@item.MemberName</td>
-                <td>@item.Request.BookTitle</td>
-                <td>@item.Request.Status</td>
-                <td>@item.Request.RequestDate.ToString("yyyy-MM-dd")</td>
-                <td>@(item.Request.StatusUpdateDate?.ToString("yyyy-MM-dd") ?? "-")</td>
-            </tr>
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
-    </tbody>
-</table>
+    }
 
-<p><a href="/">Back to Home</a></p>
+    @@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .notification-dropdown.show {
+        display: block;
+    }
+
+    .notification-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #e8e8e8;
+        background: #fafafa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notification-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .mark-all-read-btn {
+        background: none;
+        border: none;
+        color: #8B4049;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 8px;
+        transition: background 0.2s;
+        font-weight: 500;
+    }
+
+    .mark-all-read-btn:hover {
+        background: rgba(139, 64, 73, 0.08);
+    }
+
+    .mark-all-read-btn svg {
+        stroke: #8B4049;
+    }
+
+    .notification-tabs {
+        display: flex;
+        padding: 0 24px;
+        background: #fafafa;
+        border-bottom: 1px solid #e8e8e8;
+        gap: 4px;
+    }
+
+    .notification-tab {
+        background: none;
+        border: none;
+        padding: 14px 20px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: #666;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+    }
+
+    .notification-tab:hover {
+        color: #333;
+        background: rgba(139, 64, 73, 0.04);
+    }
+
+    .notification-tab.active {
+        color: #8B4049;
+        border-bottom-color: #8B4049;
+    }
+
+    .tab-badge {
+        background: #e8e8e8;
+        color: #666;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        min-width: 24px;
+        text-align: center;
+    }
+
+    .notification-tab.active .tab-badge {
+        background: #8B4049;
+        color: white;
+    }
+
+    .notification-list {
+        max-height: 460px;
+        overflow-y: auto;
+        padding: 8px;
+    }
+
+    .notification-footer {
+        padding: 16px 20px;
+        border-top: 1px solid #e0e0e0;
+        text-align: center;
+        background: #f8f9fa;
+    }
+
+    .btn-view-all-notifications {
+        display: inline-block;
+        padding: 10px 24px;
+        background: #FBDB93;
+        color: #333;
+        text-decoration: none;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+    }
+
+    .btn-view-all-notifications:hover {
+        background: #f9d078;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(251, 219, 147, 0.4);
+    }
+
+    .notification-card {
+        display: flex;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 4px;
+        background: white;
+        border: 1px solid #f0f0f0;
+    }
+
+    .notification-card:hover {
+        background: #fafafa;
+        border-color: #e0e0e0;
+        transform: translateX(4px);
+    }
+
+    .notification-card.unread {
+        background: #fffbf5;
+        border-color: #fef3e2;
+    }
+
+    .notification-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-top: 6px;
+        flex-shrink: 0;
+    }
+
+    .notification-indicator.unread {
+        background: #FBDB93;
+        box-shadow: 0 0 0 3px rgba(251, 219, 147, 0.2);
+    }
+
+    .notification-indicator.read {
+        background: #e0e0e0;
+    }
+
+    .notification-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .notification-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 6px;
+        color: #1a1a1a;
+        line-height: 1.4;
+    }
+
+    .notification-message {
+        font-size: 0.875rem;
+        color: #666;
+        margin-bottom: 8px;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .notification-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.8rem;
+        color: #999;
+    }
+
+    .notification-meta svg {
+        width: 14px;
+        height: 14px;
+        stroke: #999;
+    }
+
+    .notification-time {
+        color: #999;
+    }
+
+    .notification-empty {
+        padding: 60px 20px;
+        text-align: center;
+        color: #999;
+    }
+
+    .notification-empty svg {
+        margin-bottom: 16px;
+        opacity: 0.3;
+    }
+
+    .notification-empty p {
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    /* Notification Modal Styles */
+    .notification-modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.3s ease;
+    }
+
+    .notification-modal-content {
+        background-color: white;
+        margin: 10% auto;
+        padding: 0;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        animation: slideUp 0.3s ease;
+        overflow: hidden;
+    }
+
+    .notification-modal-header {
+        padding: 24px 28px;
+        background: #fafafa;
+        border-bottom: 1px solid #e8e8e8;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notification-modal-header h2 {
+        margin: 0;
+        font-size: 1.3rem;
+        color: #1a1a1a;
+        font-weight: 600;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: background 0.2s;
+    }
+
+    .modal-close:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    .modal-close svg {
+        stroke: #666;
+    }
+
+    .notification-modal-body {
+        padding: 28px;
+    }
+
+    .notification-modal-body p {
+        margin: 0 0 20px 0;
+        line-height: 1.6;
+        color: #333;
+        font-size: 1rem;
+    }
+
+    .notification-modal-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .notification-modal-meta svg {
+        stroke: #8B4049;
+    }
+
+    .notification-modal-footer {
+        padding: 20px 28px;
+        background: #fafafa;
+        border-top: 1px solid #e8e8e8;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    .modal-btn {
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .modal-btn-secondary {
+        background: #e8e8e8;
+        color: #333;
+    }
+
+    .modal-btn-secondary:hover {
+        background: #d0d0d0;
+    }
+
+    .modal-btn-primary {
+        background: #8B4049;
+        color: white;
+    }
+
+    .modal-btn-primary:hover {
+        background: #6d3239;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+        padding: 40px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        color: #333;
+        margin: 0;
+        font-weight: 300;
+    }
+
+    .create-request-btn {
+        background: #FBDB93;
+        color: #333;
+        padding: 12px 24px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .create-request-btn:hover {
+        background: #f9d073;
+    }
+
+    .content-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px 40px;
+    }
+
+    .filters-section {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 12px 20px;
+        border: 1px solid #ddd;
+        border-radius: 25px;
+        font-size: 0.95rem;
+        box-sizing: border-box;
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: #FBDB93;
+    }
+
+    .requests-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .request-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .request-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .request-card.pending {
+        border-left: 5px solid #ffc107;
+    }
+
+    .request-card.approved {
+        border-left: 5px solid #28a745;
+    }
+
+    .request-card.rejected {
+        border-left: 5px solid #dc3545;
+    }
+
+    .request-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+    }
+
+    .book-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 6px;
+    }
+
+    .book-author {
+        font-size: 0.95rem;
+        color: #666;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-approved {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-rejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .request-details {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.95rem;
+    }
+
+    .detail-label {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: #333;
+    }
+
+    .request-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: auto;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 20px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+
+    .approve-btn {
+        background: #28a745;
+        color: white;
+    }
+
+    .approve-btn:hover {
+        background: #218838;
+    }
+
+    .reject-btn {
+        background: #dc3545;
+        color: white;
+    }
+
+    .reject-btn:hover {
+        background: #c82333;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+    .empty-state svg {
+        margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+        font-size: 1.3rem;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+
+    .summary-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .summary-item {
+        text-align: center;
+    }
+
+    .summary-label {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 8px;
+    }
+
+    .summary-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .summary-value.yellow {
+        color: #ffc107;
+    }
+
+    .summary-value.green {
+        color: #28a745;
+    }
+
+    .summary-value.red {
+        color: #dc3545;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        margin: 30px 0 20px;
+    }
+</style>
+
+<div class="top-nav">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <svg width="30" height="30" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect x="40" y="30" width="60" height="140" fill="#8b3a3a" rx="5"/>
+            <rect x="60" y="30" width="40" height="140" fill="#a85252" rx="3"/>
+        </svg>
+        <strong>Library Catalog</strong>
+    </div>
+    <div class="nav-right">
+        @if (userRole == "Member")
+        {
+            <div class="member-actions">
+                <a href="/Books/Index">Browse Books</a>
+                <a href="/Borrowing/Index">My Borrowing</a>
+                <a href="/BookRequests/Index" class="active">Request a Book</a>
+                <a href="/Fines/Index">My Fines</a>
+            </div>
+
+            <!-- Notification Bell -->
+            <div class="notification-bell" onclick="toggleNotifications(event)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                @if (Model.UnreadNotificationCount > 0)
+                {
+                    <span class="notification-badge">@Model.UnreadNotificationCount</span>
+                }
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="notification-header">
+                        <h3>Your Notification</h3>
+                        @if (Model.UnreadNotificationCount > 0)
+                        {
+                            <button class="mark-all-read-btn" onclick="markAllAsRead(event)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                Mark All as read
+                            </button>
+                        }
+                    </div>
+                    
+                    <div class="notification-tabs">
+                        <button class="notification-tab active" data-tab="all" onclick="switchTab(event, 'all')">
+                            View all <span class="tab-badge">@Model.RecentNotifications.Count()</span>
+                        </button>
+                        <button class="notification-tab" data-tab="duedate" onclick="switchTab(event, 'duedate')">
+                            Due date <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type == BookBuddi.Resources.Constants.NotificationType.DueReminder)</span>
+                        </button>
+                        <button class="notification-tab" data-tab="request" onclick="switchTab(event, 'request')">
+                            Request <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type == BookBuddi.Resources.Constants.NotificationType.RequestUpdate)</span>
+                        </button>
+                        <button class="notification-tab" data-tab="system" onclick="switchTab(event, 'system')">
+                            System Alerts <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type == BookBuddi.Resources.Constants.NotificationType.OverdueAlert || n.Type == BookBuddi.Resources.Constants.NotificationType.FineIssued || n.Type == BookBuddi.Resources.Constants.NotificationType.General)</span>
+                        </button>
+                    </div>
+
+                    <div class="notification-list" id="notificationList">
+                        @if (Model.RecentNotifications != null && Model.RecentNotifications.Any())
+                        {
+                            @foreach (var notification in Model.RecentNotifications.OrderByDescending(n => n.DateCreated))
+                            {
+                                var notificationTypeClass = notification.Type == BookBuddi.Resources.Constants.NotificationType.DueReminder ? "duedate" :
+                                                           notification.Type == BookBuddi.Resources.Constants.NotificationType.RequestUpdate ? "request" : "system";
+                                
+                                <div class="notification-card @(!notification.IsRead ? "unread" : "")" 
+                                     data-notification-id="@notification.NotificationId"
+                                     data-notification-type="@notificationTypeClass"
+                                     onclick="openNotificationModal(@notification.NotificationId, '@notification.Title.Replace("'", "\\'")' , '@notification.Message.Replace("'", "\\'")' , '@notification.DateCreated.ToString("MMMM dd, yyyy")', '@notification.DateCreated.ToString("h:mm tt")', @notification.IsRead.ToString().ToLower())">
+                                    <div class="notification-indicator @(!notification.IsRead ? "unread" : "read")"></div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">@notification.Title</div>
+                                        <div class="notification-message">@notification.Message</div>
+                                        <div class="notification-meta">
+                                            <span class="notification-time">@notification.DateCreated.ToString("MMMM dd, yyyy") @notification.DateCreated.ToString("h:mm tt")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="notification-empty">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                                <p>No new notifications</p>
+                            </div>
+                        }
+                    </div>
+                    <div class="notification-footer">
+                        <a href="/Notifications/Index" class="btn-view-all-notifications">View All Notifications</a>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(userName))
+        {
+            <div class="user-account">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>@userName</span>
+            </div>
+        }
+        @if (userRole == "Member")
+        {
+            <a href="/Account/Logout" class="btn-logout">Logout</a>
+        }
+    </div>
+</div>
+
+<div class="page-header">
+    <h1>Book Requests</h1>
+    <a href="/BookRequests/Create" class="create-request-btn">+ New Request</a>
+</div>
+
+<div class="content-wrapper">
+    @if (Model.Requests.Any())
+    {
+        <div class="summary-card">
+            <div class="summary-item">
+                <div class="summary-label">Total Requests</div>
+                <div class="summary-value">@Model.Requests.Count</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Pending</div>
+                <div class="summary-value yellow">@Model.Requests.Count(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending)</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Approved</div>
+                <div class="summary-value green">@Model.Requests.Count(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Approved)</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Rejected</div>
+                <div class="summary-value red">@Model.Requests.Count(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Rejected)</div>
+            </div>
+        </div>
+
+        @if (Model.Requests.Any(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending))
+        {
+            <h2 class="section-title">⏳ Pending Requests</h2>
+            <div class="requests-grid">
+                @foreach (var item in Model.Requests.Where(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending).OrderByDescending(r => r.Request.RequestDate))
+                {
+                    <div class="request-card pending" data-title="@item.Request.BookTitle" data-author="@item.Request.AuthorName" data-member="@item.MemberName">
+                        <div class="request-header">
+                            <div>
+                                <div class="book-title">@item.Request.BookTitle</div>
+                                <div class="book-author">by @(item.Request.AuthorName ?? "Unknown Author")</div>
+                            </div>
+                            <span class="status-badge status-pending">Pending</span>
+                        </div>
+
+                        <div class="request-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Requested by:</span>
+                                <span class="detail-value">@item.MemberName</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Request Date:</span>
+                                <span class="detail-value">@item.Request.RequestDate.ToString("MMM dd, yyyy")</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Request ID:</span>
+                                <span class="detail-value">#@item.Request.RequestId</span>
+                            </div>
+                        </div>
+
+                        @if (userRole == "Admin")
+                        {
+                            <div class="request-actions">
+                                <a href="/BookRequests/Approve?id=@item.Request.RequestId" class="action-btn approve-btn">Approve</a>
+                                <a href="/BookRequests/Reject?id=@item.Request.RequestId" class="action-btn reject-btn">Reject</a>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+
+        @if (Model.Requests.Any(r => r.Request.Status != BookBuddi.Resources.Constants.RequestStatus.Pending))
+        {
+            <h2 class="section-title">All Requests History</h2>
+            <div class="filters-section">
+                <div class="search-box">
+                    <input type="text" placeholder="Search by book title, author, or member..." id="searchInput" onkeyup="filterRequests()" />
+                </div>
+            </div>
+
+            <div class="requests-grid" id="requestsGrid">
+                @foreach (var item in Model.Requests.OrderByDescending(r => r.Request.RequestDate))
+                {
+                    var statusClass = item.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending ? "pending" :
+                                     item.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Approved ? "approved" : "rejected";
+                    var badgeClass = item.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending ? "status-pending" :
+                                    item.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Approved ? "status-approved" : "status-rejected";
+
+                    <div class="request-card @statusClass" data-title="@item.Request.BookTitle" data-author="@item.Request.AuthorName" data-member="@item.MemberName">
+                        <div class="request-header">
+                            <div>
+                                <div class="book-title">@item.Request.BookTitle</div>
+                                <div class="book-author">by @(item.Request.AuthorName ?? "Unknown Author")</div>
+                            </div>
+                            <span class="status-badge @badgeClass">@item.Request.Status</span>
+                        </div>
+
+                        <div class="request-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Requested by:</span>
+                                <span class="detail-value">@item.MemberName</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Request Date:</span>
+                                <span class="detail-value">@item.Request.RequestDate.ToString("MMM dd, yyyy")</span>
+                            </div>
+                            @if (item.Request.StatusUpdateDate.HasValue)
+                            {
+                                <div class="detail-row">
+                                    <span class="detail-label">Response Date:</span>
+                                    <span class="detail-value">@item.Request.StatusUpdateDate.Value.ToString("MMM dd, yyyy")</span>
+                                </div>
+                            }
+                            <div class="detail-row">
+                                <span class="detail-label">Request ID:</span>
+                                <span class="detail-value">#@item.Request.RequestId</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            <h3>No book requests yet</h3>
+            <p>Can't find a book in our collection? Submit a request and we'll consider adding it!</p>
+            <a href="/BookRequests/Create" class="create-request-btn" style="display: inline-block; margin-top: 20px;">Create New Request</a>
+        </div>
+    }
+</div>
+
+<!-- Notification Modal -->
+<div id="notificationModal" class="notification-modal">
+    <div class="notification-modal-content">
+        <div class="notification-modal-header">
+            <h2 id="modalTitle">Notification Title</h2>
+            <button class="modal-close" onclick="closeNotificationModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="notification-modal-body">
+            <p id="modalMessage">Notification message content will appear here.</p>
+            <div class="notification-modal-meta">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span id="modalDate">January 1, 2024</span>
+                <span id="modalTime">12:00 PM</span>
+            </div>
+        </div>
+        <div class="notification-modal-footer">
+            <button class="modal-btn modal-btn-secondary" onclick="closeNotificationModal()">Close</button>
+            <button class="modal-btn modal-btn-primary" onclick="closeNotificationModal()">Mark as Read</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterRequests() {
+        const searchValue = document.getElementById('searchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('#requestsGrid .request-card');
+        
+        cards.forEach(card => {
+            const title = card.getAttribute('data-title').toLowerCase();
+            const author = card.getAttribute('data-author').toLowerCase();
+            const member = card.getAttribute('data-member').toLowerCase();
+            
+            const matchesSearch = title.includes(searchValue) || author.includes(searchValue) || member.includes(searchValue);
+            
+            if (matchesSearch) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // Notification functionality
+    function toggleNotifications(event) {
+        event.stopPropagation();
+        const dropdown = document.getElementById('notificationDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    function switchTab(event, tabName) {
+        event.stopPropagation();
+        
+        // Update active tab
+        const tabs = document.querySelectorAll('.notification-tab');
+        tabs.forEach(tab => {
+            if (tab.getAttribute('data-tab') === tabName) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+
+        // Filter notifications
+        const notifications = document.querySelectorAll('.notification-card');
+        notifications.forEach(notification => {
+            if (tabName === 'all') {
+                notification.style.display = 'flex';
+            } else {
+                const notificationType = notification.getAttribute('data-notification-type');
+                notification.style.display = notificationType === tabName ? 'flex' : 'none';
+            }
+        });
+    }
+
+    function openNotificationModal(id, title, message, date, time, isRead) {
+        const modal = document.getElementById('notificationModal');
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalMessage').textContent = message;
+        document.getElementById('modalDate').textContent = date;
+        document.getElementById('modalTime').textContent = time;
+        
+        // Store notification ID for marking as read
+        modal.setAttribute('data-notification-id', id);
+        
+        modal.style.display = 'flex';
+        
+        // If notification is unread, mark it as read
+        if (!isRead) {
+            fetch(`/Notifications/MarkAsRead?id=${id}`, { method: 'POST' })
+                .then(() => {
+                    const card = document.querySelector(`[data-notification-id="${id}"]`);
+                    if (card) {
+                        card.classList.remove('unread');
+                        const indicator = card.querySelector('.notification-indicator');
+                        if (indicator) {
+                            indicator.classList.remove('unread');
+                            indicator.classList.add('read');
+                        }
+                    }
+                    
+                    // Update badge count
+                    const badge = document.querySelector('.notification-badge');
+                    if (badge) {
+                        let count = parseInt(badge.textContent) - 1;
+                        if (count > 0) {
+                            badge.textContent = count;
+                        } else {
+                            badge.remove();
+                        }
+                    }
+                    
+                    // Update tab badges
+                    updateTabBadges();
+                });
+        }
+    }
+
+    function closeNotificationModal() {
+        const modal = document.getElementById('notificationModal');
+        modal.style.display = 'none';
+    }
+
+    function markAllAsRead(event) {
+        event.stopPropagation();
+        
+        fetch('/Notifications/MarkAllAsRead', { method: 'POST' })
+            .then(() => {
+                // Update UI
+                const cards = document.querySelectorAll('.notification-card.unread');
+                cards.forEach(card => {
+                    card.classList.remove('unread');
+                    const indicator = card.querySelector('.notification-indicator');
+                    if (indicator) {
+                        indicator.classList.remove('unread');
+                        indicator.classList.add('read');
+                    }
+                });
+                
+                // Remove badge
+                const badge = document.querySelector('.notification-badge');
+                if (badge) {
+                    badge.remove();
+                }
+                
+                // Remove mark all as read button
+                const markAllBtn = document.querySelector('.mark-all-read-btn');
+                if (markAllBtn) {
+                    markAllBtn.remove();
+                }
+                
+                // Update tab badges
+                updateTabBadges();
+            });
+    }
+
+    function updateTabBadges() {
+        const allCount = document.querySelectorAll('.notification-card').length;
+        const dueDateCount = document.querySelectorAll('.notification-card[data-notification-type="duedate"]').length;
+        const requestCount = document.querySelectorAll('.notification-card[data-notification-type="request"]').length;
+        const systemCount = document.querySelectorAll('.notification-card[data-notification-type="system"]').length;
+        
+        document.querySelector('[data-tab="all"] .tab-badge').textContent = allCount;
+        document.querySelector('[data-tab="duedate"] .tab-badge').textContent = dueDateCount;
+        document.querySelector('[data-tab="request"] .tab-badge').textContent = requestCount;
+        document.querySelector('[data-tab="system"] .tab-badge').textContent = systemCount;
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('notificationDropdown');
+        const bell = document.querySelector('.notification-bell');
+        
+        if (dropdown && bell && !bell.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('notificationModal');
+        if (event.target === modal) {
+            closeNotificationModal();
+        }
+    }
+
+    // Close modal with escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeNotificationModal();
+        }
+    });
+</script>
