@@ -1,0 +1,293 @@
+@page
+@model BookBuddi.WebApp.Pages.InventoryModel
+@using BookBuddi.Data.Models
+@{
+    ViewData["Title"] = "Inventory Report";
+}
+
+<div class="report-container">
+    <div class="report-header">
+        <h1 class="report-title">Book Report</h1>
+        
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <a href="/Reports/Borrowing" class="tab">Borrowing</a>
+            <a href="/Reports/Inventory" class="tab active">Inventory</a>
+            <a href="/Reports/Members" class="tab">Members</a>
+            <a href="/Reports/Requests" class="tab">Request</a>
+            <a href="/Reports/LostBooks" class="tab">Lost Book</a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+        <div class="summary-card total-books">
+            <div class="card-content">
+                <h2>@Model.TotalBooks</h2>
+                <p>Total Books</p>
+            </div>
+        </div>
+
+        <div class="summary-card available-books">
+            <div class="card-content">
+                <h2>@Model.AvailableBooks</h2>
+                <p>Available</p>
+            </div>
+        </div>
+
+        <div class="summary-card borrowed-books">
+            <div class="card-content">
+                <h2>@Model.CurrentlyBorrowed</h2>
+                <p>Currently Borrowed</p>
+            </div>
+        </div>
+
+        <div class="summary-card reserved-books">
+            <div class="card-content">
+                <h2>@Model.ReservedBooks</h2>
+                <p>Reserved/On Request</p>
+            </div>
+        </div>
+
+        <div class="summary-card lost-books">
+            <div class="card-content">
+                <h2>0</h2>
+                <p>Lost</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-bar">
+        <div class="search-box">
+            <input type="text" placeholder="Search for title, or authors" />
+        </div>
+        
+        <div class="filter-controls">
+            <select class="filter-dropdown">
+                <option>Status</option>
+            </select>
+            <select class="filter-dropdown">
+                <option>Sort date</option>
+            </select>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-export btn-export-primary">Add New Book</button>
+            <button class="btn-export btn-export-secondary">Update Stack</button>
+        </div>
+    </div>
+
+    <!-- Inventory Table -->
+    <div class="table-container">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Book Title</th>
+                    <th>Author</th>
+                    <th>Quantity</th>
+                    <th>Available</th>
+                    <th>Borrowed</th>
+                    <th>Lost</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var b in Model.BookList)
+                {
+                    <tr>
+                        <td>@b.BookTitle</td>
+                        <td>@b.Author</td>
+                        <td>@(b.Available + b.Borrowed)</td>
+                        <td>@b.Available</td>
+                        <td>@b.Borrowed</td>
+                        <td>0</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .report-container {
+        padding: 0;
+        background: #f5f6fa;
+        min-height: 100vh;
+    }
+
+    .report-header {
+        padding: 30px;
+        background: white;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .report-title {
+        font-size: 32px;
+        margin: 0 0 20px 0;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    /* Tab Navigation */
+    .tab-navigation {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .tab {
+        padding: 10px 20px;
+        background: #f0f0f0;
+        border: none;
+        border-radius: 20px;
+        color: #666;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .tab:hover {
+        background: #e0e0e0;
+    }
+
+    .tab.active {
+        background: #8b3a3a;
+        color: white;
+    }
+
+    /* Summary Grid */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 30px;
+        background: white;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .summary-card {
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        border-left: 4px solid #8b3a3a;
+    }
+
+    .card-content {
+        text-align: center;
+    }
+
+    .summary-card h2 {
+        font-size: 36px;
+        margin: 0;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .summary-card p {
+        font-size: 14px;
+        margin: 8px 0 0 0;
+        color: #999;
+    }
+
+    /* Controls Bar */
+    .controls-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 30px;
+        background: white;
+        border-bottom: 1px solid #e0e0e0;
+        flex-wrap: wrap;
+    }
+
+    .search-box input {
+        width: 300px;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .filter-controls {
+        display: flex;
+        gap: 10px;
+    }
+
+    .filter-dropdown {
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-export {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+
+    .btn-export-primary {
+        background: #8b3a3a;
+        color: white;
+    }
+
+    .btn-export-primary:hover {
+        background: #6d2e2e;
+    }
+
+    .btn-export-secondary {
+        background: white;
+        color: #666;
+        border: 1px solid #ddd;
+    }
+
+    .btn-export-secondary:hover {
+        background: #f5f5f5;
+    }
+
+    /* Table */
+    .table-container {
+        padding: 30px;
+        background: white;
+        overflow-x: auto;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .report-table th {
+        background: #f5f5f5;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .report-table td {
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        color: #555;
+    }
+
+    .report-table tr:hover {
+        background: #f9f9f9;
+    }
+</style>
