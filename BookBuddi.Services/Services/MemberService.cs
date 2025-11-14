@@ -5,6 +5,7 @@ using BookBuddi.Resources.Constants;
 using BookBuddi.Services.Interfaces;
 using BookBuddi.Services.Manager;
 using BookBuddi.Services.ServiceModels;
+using System.Security.Cryptography;
 
 namespace BookBuddi.Services.Services
 {
@@ -13,12 +14,14 @@ namespace BookBuddi.Services.Services
         private readonly IMemberRepository _memberRepository;
         private readonly IMapper _mapper;
         private readonly PasswordManager _passwordManager;
+        private readonly Data.ApplicationDbContext _context;
 
-        public MemberService(IMemberRepository memberRepository, IMapper mapper, PasswordManager passwordManager)
+        public MemberService(IMemberRepository memberRepository, IMapper mapper, PasswordManager passwordManager, Data.ApplicationDbContext context)
         {
             _memberRepository = memberRepository;
             _mapper = mapper;
             _passwordManager = passwordManager;
+            _context = context;
         }
 
         public IEnumerable<MemberViewModel> GetAllMembers()
@@ -140,6 +143,73 @@ namespace BookBuddi.Services.Services
         public void UpdateBorrowCount(int memberId, int change)
         {
             _memberRepository.UpdateBorrowCount(memberId, change);
+        }
+
+        public string GeneratePasswordResetToken(string email)
+        {
+            var member = _memberRepository.GetMemberByEmail(email);
+            if (member == null)
+                throw new InvalidOperationException("No account found with this email address.");
+
+            // Generate a secure random token
+            var tokenBytes = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(tokenBytes);
+            }
+            var token = Convert.ToBase64String(tokenBytes).Replace("+", "-").Replace("/", "_").Replace("=", "");
+
+            // Save token to database
+            var resetToken = new PasswordResetToken
+            {
+                MemberId = member.MemberId,
+                Token = token,
+                CreatedTime = DateTime.Now,
+                ExpiryTime = DateTime.Now.AddHours(1), // Token valid for 1 hour
+                IsUsed = false
+            };
+
+            _context.PasswordResetTokens.Add(resetToken);
+            _context.SaveChanges();
+
+            return token;
+        }
+
+        public bool ValidatePasswordResetToken(string token)
+        {
+            var resetToken = _context.PasswordResetTokens
+                .FirstOrDefault(t => t.Token == token && !t.IsUsed && t.ExpiryTime > DateTime.Now);
+
+            return resetToken != null;
+        }
+
+        public void ResetPassword(string token, string newPassword)
+        {
+            var resetToken = _context.PasswordResetTokens
+                .FirstOrDefault(t => t.Token == token && !t.IsUsed && t.ExpiryTime > DateTime.Now);
+
+            if (resetToken == null)
+                throw new InvalidOperationException("Invalid or expired reset token.");
+
+            // Validate password strength
+            var validation = _passwordManager.ValidatePassword(newPassword);
+            if (!validation.IsValid)
+                throw new InvalidOperationException(validation.ErrorMessage);
+
+            // Get member and update password
+            var member = _memberRepository.GetMemberById(resetToken.MemberId);
+            if (member == null)
+                throw new InvalidOperationException("Member not found.");
+
+            member.PasswordHash = _passwordManager.HashPassword(newPassword);
+            member.UpdatedBy = "System";
+            member.UpdatedTime = DateTime.Now;
+
+            // Mark token as used
+            resetToken.IsUsed = true;
+
+            _memberRepository.UpdateMember(member);
+            _context.SaveChanges();
         }
     }
 }

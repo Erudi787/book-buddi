@@ -18,5 +18,10 @@ namespace BookBuddi.Services.Interfaces
         bool ValidateCredentials(string email, string password);
         void ChangePassword(int memberId, string newPassword, string updatedBy);
         void UpdateBorrowCount(int memberId, int change);
+
+        // Password reset methods
+        string GeneratePasswordResetToken(string email);
+        bool ValidatePasswordResetToken(string token);
+        void ResetPassword(string token, string newPassword);
     }
 }

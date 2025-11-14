@@ -20,6 +20,7 @@ namespace BookBuddi.Data
         public virtual DbSet<Fine> Fines { get; set; }
         public virtual DbSet<BookRequest> BookRequests { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +37,7 @@ namespace BookBuddi.Data
             modelBuilder.ApplyConfiguration(new FineConfiguration());
             modelBuilder.ApplyConfiguration(new BookRequestConfiguration());
             modelBuilder.ApplyConfiguration(new NotificationConfiguration());
+            modelBuilder.ApplyConfiguration(new PasswordResetTokenConfiguration());
         }
     }
 }
