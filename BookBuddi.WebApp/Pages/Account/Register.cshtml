@@ -6,117 +6,164 @@
 }
 
 <style>
+    body {
+        background-image: url('/assets/bg1.svg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     .register-container {
         display: flex;
-        min-height: calc(100vh - 80px);
-        margin: 0;
-    }
-
-    .register-left {
-        flex: 1;
-        background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
-        display: flex;
-        flex-direction: column;
         justify-content: center;
-        align-items: flex-start;
-        padding: 80px;
+        align-items: center;
+        min-height: 100vh;
+        padding: 40px 20px;
     }
 
-    .register-left h1 {
-        font-size: 6rem;
-        font-weight: 300;
-        margin: 0;
-        line-height: 1;
-        color: #333;
-    }
-
-    .register-left .subtitle {
-        font-size: 2.5rem;
-        color: #8B4049;
-        margin-top: 10px;
-        font-weight: 300;
-    }
-
-    .register-right {
-        flex: 1;
+    .register-card {
         background: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: 80px;
-        max-width: 600px;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        max-width: 480px;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .register-card-header {
+        background: linear-gradient(135deg, #8B4049 0%, #a85252 100%);
+        padding: 40px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .register-card-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(251, 219, 147, 0.2) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+    }
+
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .register-card-header h1 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin: 0 0 10px 0;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+
+    .register-card-header .subtitle {
+        font-size: 1.1rem;
+        color: #FBDB93;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+        font-weight: 400;
+    }
+
+    .register-card-body {
+        padding: 40px;
     }
 
     .register-form h2 {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         font-weight: 600;
         margin-bottom: 10px;
         color: #333;
+        text-align: center;
     }
 
     .register-form .subtitle-text {
         color: #666;
         margin-bottom: 30px;
         font-size: 0.95rem;
+        text-align: center;
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 24px;
     }
 
     .form-group label {
         display: block;
         margin-bottom: 8px;
         color: #333;
-        font-weight: 500;
-        font-size: 0.95rem;
+        font-weight: 600;
+        font-size: 0.9rem;
     }
 
     .form-group input,
     .form-group textarea {
         width: 100%;
-        padding: 12px 15px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
+        padding: 14px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
         font-size: 0.95rem;
-        transition: border-color 0.3s;
+        transition: all 0.3s;
         box-sizing: border-box;
+        background: #f9f9f9;
     }
 
     .form-group input:focus,
     .form-group textarea:focus {
         outline: none;
-        border-color: #FBDB93;
+        border-color: #8B4049;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(139, 64, 73, 0.1);
     }
 
     .form-group small {
         display: block;
-        margin-top: 5px;
-        color: #999;
-        font-size: 0.85rem;
+        margin-top: 6px;
+        color: #666;
+        font-size: 0.82rem;
+        line-height: 1.4;
     }
 
     .btn-signup {
         width: 100%;
-        padding: 14px;
-        background-color: #FBDB93;
+        padding: 16px;
+        background: linear-gradient(135deg, #8B4049 0%, #a85252 100%);
         border: none;
-        border-radius: 8px;
+        border-radius: 12px;
         font-size: 1rem;
         font-weight: 600;
-        color: #333;
+        color: white;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: all 0.3s;
         margin-top: 10px;
+        box-shadow: 0 4px 12px rgba(139, 64, 73, 0.3);
     }
 
     .btn-signup:hover {
-        background-color: #f9d073;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(139, 64, 73, 0.4);
+    }
+
+    .btn-signup:active {
+        transform: translateY(0);
     }
 
     .login-link {
         text-align: center;
-        margin-top: 20px;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid #e0e0e0;
         color: #666;
         font-size: 0.95rem;
     }
@@ -125,41 +172,83 @@
         color: #8B4049;
         text-decoration: none;
         font-weight: 600;
+        transition: color 0.3s;
     }
 
     .login-link a:hover {
+        color: #6d3139;
         text-decoration: underline;
     }
 
     .alert {
-        padding: 12px;
-        border-radius: 8px;
+        padding: 14px 16px;
+        border-radius: 12px;
         margin-bottom: 20px;
+        font-size: 0.9rem;
+        border: 2px solid;
     }
 
     .alert-danger {
-        background-color: #fee;
+        background-color: #fff5f5;
         color: #c33;
-        border: 1px solid #fcc;
+        border-color: #fcc;
     }
 
     .alert-success {
-        background-color: #efe;
-        color: #3c3;
-        border: 1px solid #cfc;
+        background-color: #f0fdf4;
+        color: #166534;
+        border-color: #86efac;
+    }
+
+    .logo-link {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        padding: 10px 20px;
+        background: white;
+        border-radius: 50px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s;
+        z-index: 100;
+    }
+
+    .logo-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .logo-link img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .logo-link strong {
+        color: #333;
+        font-size: 0.95rem;
+        font-weight: 600;
     }
 </style>
 
-<div class="register-container">
-    <div class="register-left">
-        <h1>Welcome!</h1>
-        <div class="subtitle">to bookbuddi</div>
-    </div>
+<a href="/" class="logo-link">
+    <img src="/assets/logo.svg" alt="Book Buddi" />
+    <strong>Book Buddi</strong>
+</a>
 
-    <div class="register-right">
-        <div class="register-form">
-            <h2>Welcome Back</h2>
-            <p class="subtitle-text">Sign in to continue the adventure</p>
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-card-header">
+            <h1>Join Book Buddi</h1>
+            <div class="subtitle">Create your account and start exploring</div>
+        </div>
+
+        <div class="register-card-body">
+            <div class="register-form">
+                <h2>Create Account</h2>
+                <p class="subtitle-text">Fill in the details below to get started</p>
 
             @if (!string.IsNullOrEmpty(Model.ErrorMessage))
             {
@@ -192,8 +281,9 @@
                 <button type="submit" class="btn-signup">Sign Up</button>
             </form>
 
-            <div class="login-link">
-                Already have an Account. <a href="/Account/Login">Sign In</a>
+                <div class="login-link">
+                    Already have an account? <a href="/Account/Login">Sign In</a>
+                </div>
             </div>
         </div>
     </div>

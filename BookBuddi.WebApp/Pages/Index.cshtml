@@ -1,7 +1,7 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "BookBuddi Catalog";
+    ViewData["Title"] = "bookBuddi Catalog";
 }
 
 @{
@@ -11,98 +11,381 @@
 }
 
 <style>
-    .hero-section {
-        background: linear-gradient(to bottom, #f8f9fa 0%, #f8f9fa 60%, #FBDB93 60%, #FBDB93 100%);
-        min-height: 500px;
+    body {
+        margin: 0;
+        padding: 0;
+        background-image: url('/assets/bg1.svg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Top Navigation */
+    .top-nav {
         display: flex;
-        flex-direction: column;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
-        position: relative;
-        margin: -20px -12px 0;
-        padding: 60px 20px;
-    }
-
-    .welcome-text {
-        font-size: 8rem;
-        font-weight: 300;
-        letter-spacing: -2px;
-        margin-bottom: 10px;
-        color: #2c2c2c;
-    }
-
-    .welcome-subtext {
-        font-size: 2.5rem;
-        color: #8b3a3a;
-        font-weight: 400;
-        margin-bottom: 60px;
-    }
-
-    .search-container {
-        display: flex;
-        gap: 15px;
-        max-width: 900px;
-        width: 100%;
-        align-items: center;
-    }
-
-    .search-input {
-        flex: 1;
-        padding: 15px 20px;
-        border: 1px solid #ddd;
-        border-radius: 25px;
-        font-size: 1rem;
+        padding: 15px 40px;
         background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        position: sticky;
+        top: 0;
+        z-index: 100;
     }
 
-    .search-input:focus {
-        outline: none;
-        border-color: #8b3a3a;
-        box-shadow: 0 0 0 3px rgba(139, 58, 58, 0.1);
+    .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    .book-logo {
-        position: absolute;
-        bottom: 20px;
-        right: 60px;
-        width: 180px;
-        height: 180px;
-        opacity: 0.8;
+    .nav-logo img {
+        width: 30px;
+        height: 30px;
     }
 
-    .auth-buttons {
-        position: absolute;
-        top: 20px;
-        right: 30px;
+    .nav-logo strong {
+        font-size: 1.1rem;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .nav-auth-buttons {
         display: flex;
         gap: 15px;
+        align-items: center;
     }
 
     .btn-signup {
         background-color: #FBDB93;
-        color: #2c2c2c;
+        color: #333;
         padding: 10px 25px;
         border-radius: 20px;
         border: none;
-        font-weight: 500;
+        font-weight: 600;
         text-decoration: none;
         display: inline-block;
+        transition: all 0.3s;
+        text-transform: none;
     }
 
     .btn-login {
         background-color: transparent;
-        color: #2c2c2c;
+        color: #333;
         padding: 10px 25px;
         border-radius: 20px;
         border: none;
         font-weight: 500;
         text-decoration: none;
         display: inline-block;
+        transition: all 0.3s;
+        text-transform: none;
     }
 
-    .btn-signup:hover, .btn-login:hover {
-        opacity: 0.8;
+    .btn-signup:hover {
+        background-color: #f9d078;
+        transform: translateY(-2px);
+    }
+
+    .btn-login:hover {
+        background-color: #f5f5f5;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        background-image: url('/assets/bg1.svg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 80px 40px 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.75);
+        z-index: 1;
+    }
+
+    .hero-content {
+        text-align: center;
+        max-width: 1200px;
+        width: 100%;
+        z-index: 2;
+    }
+
+    .welcome-text {
+        font-size: 7rem;
+        font-weight: 300;
+        letter-spacing: -3px;
+        margin: 0 0 10px 0;
         color: #2c2c2c;
+        line-height: 1;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .welcome-subtext {
+        font-size: 2rem;
+        color: #8B4049;
+        font-weight: 500;
+        margin-bottom: 50px;
+        text-shadow: 1px 1px 4px rgba(139, 64, 73, 0.2);
+    }
+
+    /* Search Section */
+    .search-section {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, #FBDB93 50%);
+        padding: 60px 40px 80px;
+        position: relative;
+        box-shadow: inset 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-container {
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 16px 24px;
+        border: 1px solid #ddd;
+        border-radius: 30px;
+        font-size: 1rem;
+        background: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #8B4049;
+        box-shadow: 0 4px 16px rgba(139, 64, 73, 0.2);
+    }
+
+    .search-btn {
+        padding: 16px 35px;
+        background-color: #8B4049;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(139, 64, 73, 0.3);
+    }
+
+    .search-btn:hover {
+        background-color: #6d3139;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(139, 64, 73, 0.4);
+    }
+
+    /* Decorative Logo */
+    .decorative-logo {
+        position: absolute;
+        bottom: 30px;
+        right: 80px;
+        width: 200px;
+        height: 200px;
+        opacity: 0.6;
+        z-index: 1;
+    }
+
+    /* New Arrivals Section */
+    .new-arrivals-section {
+        background: #FBDB93;
+        padding: 60px 40px 80px;
+    }
+
+    .section-header {
+        max-width: 1200px;
+        margin: 0 auto 40px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .section-header h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+        margin: 0;
+    }
+
+    /* Books Grid */
+    .books-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 30px;
+        padding: 20px 0;
+    }
+
+    .book-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 1px solid rgba(139, 64, 73, 0.1);
+    }
+
+    .book-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(139, 64, 73, 0.2);
+        border-color: #8B4049;
+    }
+
+    .book-cover {
+        width: 100%;
+        height: 280px;
+        background: linear-gradient(135deg, #8B4049 0%, #FBDB93 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .no-cover {
+        font-size: 3rem;
+        color: white;
+        font-weight: 300;
+    }
+
+    .book-info {
+        padding: 16px;
+    }
+
+    .book-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c2c2c;
+        margin-bottom: 6px;
+        line-height: 1.3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .book-author {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .book-meta {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+
+    .badge {
+        padding: 4px 12px;
+        background: #f0f0f0;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        color: #666;
+    }
+
+    .book-copies {
+        font-size: 0.85rem;
+        color: #8B4049;
+        margin: 0;
+    }
+
+    /* Search Results */
+    .search-results-section {
+        background: white;
+        padding: 60px 40px;
+    }
+
+    .search-results-header {
+        max-width: 1200px;
+        margin: 0 auto 40px;
+    }
+
+    .search-results-header h2 {
+        color: #8B4049;
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .search-results-header p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+
+    /* Modal */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 16px;
+        max-width: 800px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        padding: 40px;
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 20px;
+        right: 25px;
+        font-size: 2rem;
+        cursor: pointer;
+        color: #999;
+        transition: color 0.3s;
+    }
+
+    .close-modal:hover {
+        color: #333;
     }
 
     @@media (max-width: 768px) {
@@ -115,7 +398,7 @@
         .search-container {
             flex-direction: column;
         }
-        .book-logo {
+        .decorative-logo {
             width: 120px;
             height: 120px;
             right: 20px;
@@ -123,41 +406,85 @@
     }
 </style>
 
-<div class="hero-section">
-    <div class="auth-buttons">
+<!-- Top Navigation -->
+<div class="top-nav">
+    <div class="nav-logo">
+        <img src="/assets/logo.svg" alt="Book Buddi Logo" />
+        <strong>Book Buddi</strong>
+    </div>
+    <div class="nav-auth-buttons">
         @if (string.IsNullOrEmpty(userRole))
         {
-            <a href="/Account/Register" class="btn-signup">sign up</a>
-            <a href="/Account/Login" class="btn-login">log in</a>
+            <a href="/Account/Login" class="btn-login">Log In</a>
+            <a href="/Account/Register" class="btn-signup">Sign Up</a>
         }
         else if (userRole == "Admin")
         {
-            <span style="margin-right: 10px;">Admin - @adminName</span>
+            <span style="margin-right: 10px; color: #666;">Admin - @adminName</span>
             <a href="/Account/Logout" class="btn-login">Logout</a>
         }
         else
         {
-            <span style="margin-right: 10px;">@memberName</span>
+            <span style="margin-right: 10px; color: #666;">@memberName</span>
             <a href="/Account/Logout" class="btn-login">Logout</a>
         }
     </div>
+</div>
 
-    <h1 class="welcome-text">Welcome!</h1>
-    <p class="welcome-subtext">to bookbuddi</p>
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="welcome-text">Welcome!</h1>
+        <p class="welcome-subtext">to bookbuddi</p>
+    </div>
+</div>
 
+<!-- Search Section -->
+<div class="search-section">
     <form id="searchForm" method="get" class="search-container">
         <input type="text" id="searchInput" name="searchTerm" class="search-input" placeholder="Search for books, authors, or subjects..." value="@Model.SearchTerm" />
-        <button type="submit" class="btn-signup" style="padding: 15px 35px; cursor: pointer; border-radius: 25px;">Search</button>
+        <button type="submit" class="search-btn">Search</button>
     </form>
 
-    <div class="book-logo">
-        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <rect x="40" y="30" width="60" height="140" fill="#8b3a3a" rx="5"/>
-            <rect x="60" y="30" width="40" height="140" fill="#a85252" rx="3"/>
-            <rect x="100" y="40" width="60" height="130" fill="#d4a373" rx="5"/>
-            <rect x="120" y="40" width="40" height="130" fill="#e6b88a" rx="3"/>
-        </svg>
+    <div class="decorative-logo">
+        <img src="/assets/logo.svg" alt="Book Buddi" style="width: 100%; height: 100%;" />
     </div>
+</div>
+
+<!-- New Arrivals Section -->
+<div class="new-arrivals-section">
+    <div class="section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="#8B4049" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <h2>New Arrivals</h2>
+    </div>
+
+    @if (Model.RecentBooks != null && Model.RecentBooks.Any())
+    {
+        <div class="books-grid">
+            @foreach (var book in Model.RecentBooks)
+            {
+                <div class="book-card" onclick="showBookModal(@book.BookId)">
+                    <div class="book-cover">
+                        @if (!string.IsNullOrEmpty(book.CoverImageUrl))
+                        {
+                            <img src="@book.CoverImageUrl" alt="@book.BookTitle" />
+                        }
+                        else
+                        {
+                            <div class="no-cover">📚</div>
+                        }
+                    </div>
+                    <div class="book-info">
+                        <h3 class="book-title">@book.BookTitle</h3>
+                        <p class="book-author">@(book.AuthorNames ?? "Unknown Author")</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
 
 <!-- Search Results Section -->

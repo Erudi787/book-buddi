@@ -32,15 +32,20 @@
     body {
         margin: 0;
         padding: 0;
-        background-color: #f9f9f9;
+        background-image: url('/assets/bg1.svg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
     }
 
     .catalog-header {
-        background: linear-gradient(135deg, #6d4c41 0%, #8d6e63 100%);
+        background: linear-gradient(135deg, #8B4049 0%, #6d3139 100%);
         color: white;
         padding: 80px 40px;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
 
     .catalog-header::before {
@@ -50,8 +55,8 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-image: url('/images/book-pattern.png');
-        opacity: 0.1;
+        background: radial-gradient(circle at top right, rgba(251, 219, 147, 0.15) 0%, transparent 60%);
+        opacity: 1;
     }
 
     .header-content {
@@ -110,7 +115,11 @@
         align-items: center;
         padding: 15px 40px;
         background: white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 2px solid #f0f0f0;
     }
 
     .nav-right {
@@ -126,18 +135,24 @@
     }
 
     .member-actions a {
-        padding: 8px 16px;
+        padding: 10px 20px;
         border-radius: 20px;
         text-decoration: none;
         color: #333;
-        background: #f5f5f5;
+        background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
         font-size: 0.9rem;
         font-weight: 500;
         transition: all 0.3s;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .member-actions a:hover {
-        background: #e0e0e0;
+        background: linear-gradient(135deg, #8B4049 0%, #a85252 100%);
+        color: white;
+        border-color: #8B4049;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(139, 64, 73, 0.2);
     }
 
     .notification-bell {
@@ -150,27 +165,32 @@
         height: 40px;
         border-radius: 50%;
         background: #f5f5f5;
-        transition: background 0.3s;
+        transition: all 0.3s;
+        border: 2px solid transparent;
     }
 
     .notification-bell:hover {
-        background: #e0e0e0;
+        background: #fff3e0;
+        border-color: #FBDB93;
+        transform: scale(1.05);
     }
 
     .notification-badge {
         position: absolute;
-        top: 8px;
-        right: 8px;
+        top: 6px;
+        right: 6px;
         background: #dc3545;
         color: white;
         border-radius: 50%;
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 0.7rem;
         font-weight: bold;
+        border: 2px solid white;
+        box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
     }
 
     .notification-dropdown {
@@ -940,21 +960,27 @@
 
     .book-card {
         cursor: pointer;
-        transition: transform 0.3s;
+        transition: all 0.3s ease;
+        background: white;
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
     .book-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(139, 64, 73, 0.15);
     }
 
     .book-cover {
         width: 100%;
         aspect-ratio: 2/3;
-        background: #e0e0e0;
+        background: linear-gradient(135deg, #8B4049 0%, #FBDB93 100%);
         border-radius: 8px;
         margin-bottom: 10px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         overflow: hidden;
+        border: 1px solid rgba(139, 64, 73, 0.1);
     }
 
     .book-cover img {
@@ -964,25 +990,29 @@
     }
 
     .book-title {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         font-weight: 600;
-        margin-bottom: 4px;
-        color: #333;
+        margin-bottom: 6px;
+        color: #2c2c2c;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        line-height: 1.3;
     }
 
     .book-author {
         font-size: 0.85rem;
-        color: #666;
+        color: #8B4049;
+        font-weight: 500;
     }
 
     .footer {
-        background: #FBDB93;
+        background: linear-gradient(180deg, #FBDB93 0%, #f9d078 100%);
         padding: 60px 40px 40px;
         margin-top: 80px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+        border-top: 3px solid #8B4049;
     }
 
     .footer-content {
@@ -1020,21 +1050,21 @@
         color: #666;
         text-decoration: none;
         margin-bottom: 10px;
-        transition: color 0.3s;
+        transition: all 0.3s;
+        padding-left: 0;
     }
 
     .footer a:hover {
         color: #8B4049;
+        padding-left: 8px;
+        font-weight: 500;
     }
 </style>
 
 <div class="top-nav">
     <div style="display: flex; align-items: center; gap: 10px;">
-        <svg width="30" height="30" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <rect x="40" y="30" width="60" height="140" fill="#8b3a3a" rx="5"/>
-            <rect x="60" y="30" width="40" height="140" fill="#a85252" rx="3"/>
-        </svg>
-        <strong>Library Catalog</strong>
+        <img src="/assets/logo.svg" alt="BookBuddi Logo" width="30" height="30" />
+        <strong>Book Buddi</strong>
     </div>
     <div class="nav-right">
         @if (userRole == "Member")
@@ -1276,11 +1306,7 @@ else if (Model.Filter == "popular")
     <div class="footer-content">
         <div>
             <div class="footer-logo">
-                <svg width="40" height="40" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="40" y="30" width="60" height="140" fill="#8b3a3a" rx="5"/>
-                    <rect x="60" y="30" width="40" height="140" fill="#a85252" rx="3"/>
-                    <rect x="100" y="40" width="60" height="130" fill="#d4a373" rx="5"/>
-                </svg>
+                <img src="/assets/logo.svg" alt="BookBuddi Logo" width="40" height="40" />
                 <span>Book Buddi</span>
             </div>
             <p class="footer-description">Book Buddi is your digital companion for exploring, borrowing, and enjoying an extensive collection of books.</p>

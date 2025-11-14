@@ -25,6 +25,7 @@ public class IndexModel : PageModel
     public int ActiveTransactions { get; set; }
     public int UnpaidFines { get; set; }
     public List<BookViewModel> SearchResults { get; set; } = new List<BookViewModel>();
+    public List<BookViewModel> RecentBooks { get; set; } = new List<BookViewModel>();
     public string? SearchTerm { get; set; }
 
     public async Task<IActionResult> OnGetAsync(string? searchTerm)
@@ -50,6 +51,9 @@ public class IndexModel : PageModel
                 (b.ISBN != null && b.ISBN.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
             ).ToList();
         }
+
+        // Get recent books for the landing page
+        RecentBooks = _bookService.GetAllBooks().Take(8).ToList();
 
         // Directly query the database for dashboard stats
         TotalBooks = await _context.Books.CountAsync();
