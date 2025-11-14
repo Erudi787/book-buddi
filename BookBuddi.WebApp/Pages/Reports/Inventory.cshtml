@@ -7,52 +7,16 @@
 
 <div class="report-container">
     <div class="report-header">
-        <h1 class="report-title">Book Report</h1>
-        
-        <!-- Tab Navigation -->
-        <div class="tab-navigation">
-            <a href="/Reports/Borrowing" class="tab">Borrowing</a>
-            <a href="/Reports/Inventory" class="tab active">Inventory</a>
-            <a href="/Reports/Members" class="tab">Members</a>
-            <a href="/Reports/Requests" class="tab">Request</a>
-            <a href="/Reports/LostBooks" class="tab">Lost Book</a>
-        </div>
-    </div>
+        <div class="header-left">
+            <h1 class="report-title">Book Report</h1>
 
-    <!-- Summary Cards -->
-    <div class="summary-grid">
-        <div class="summary-card total-books">
-            <div class="card-content">
-                <h2>@Model.TotalBooks</h2>
-                <p>Total Books</p>
-            </div>
-        </div>
-
-        <div class="summary-card available-books">
-            <div class="card-content">
-                <h2>@Model.AvailableBooks</h2>
-                <p>Available</p>
-            </div>
-        </div>
-
-        <div class="summary-card borrowed-books">
-            <div class="card-content">
-                <h2>@Model.CurrentlyBorrowed</h2>
-                <p>Currently Borrowed</p>
-            </div>
-        </div>
-
-        <div class="summary-card reserved-books">
-            <div class="card-content">
-                <h2>@Model.ReservedBooks</h2>
-                <p>Reserved/On Request</p>
-            </div>
-        </div>
-
-        <div class="summary-card lost-books">
-            <div class="card-content">
-                <h2>0</h2>
-                <p>Lost</p>
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <a href="/Reports/Borrowing" class="tab">Borrowing</a>
+                <a href="/Reports/Inventory" class="tab active">Inventory</a>
+                <a href="/Reports/Members" class="tab">Members</a>
+                <a href="/Reports/Requests" class="tab">Request</a>
+                <a href="/Reports/LostBooks" class="tab">Lost Book</a>
             </div>
         </div>
     </div>
@@ -60,234 +24,234 @@
     <!-- Controls -->
     <div class="controls-bar">
         <div class="search-box">
-            <input type="text" placeholder="Search for title, or authors" />
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchBox" placeholder="Search books or authors..." />
         </div>
-        
+
         <div class="filter-controls">
-            <select class="filter-dropdown">
-                <option>Status</option>
-            </select>
-            <select class="filter-dropdown">
-                <option>Sort date</option>
+            <select id="statusFilter" class="filter-dropdown">
+                <option value="">All Statuses</option>
+                <option value="Available">Available</option>
+                <option value="Borrowed">Currently Borrowed</option>
+                <option value="Reserved">Reserved</option>
+                <option value="Lost">Lost</option>
             </select>
         </div>
 
         <div class="action-buttons">
-            <button class="btn-export btn-export-primary">Add New Book</button>
-            <button class="btn-export btn-export-secondary">Update Stack</button>
+            <button id="addBookBtn" class="btn-add-book">Add New Book</button>
         </div>
     </div>
 
-    <!-- Inventory Table -->
-    <div class="table-container">
-        <table class="report-table">
-            <thead>
-                <tr>
-                    <th>Book Title</th>
-                    <th>Author</th>
-                    <th>Quantity</th>
-                    <th>Available</th>
-                    <th>Borrowed</th>
-                    <th>Lost</th>
-                </tr>
-            </thead>
+    <div class="content-layout">
+        <!-- Sidebar with Summary Cards -->
+        <div class="summary-sidebar">
+            <div class="summary-card @(Model.CurrentFilter=="All" ? "highlight-card" : "")" data-filter="All">
+                <div class="card-icon">📚</div>
+                <div class="card-text">
+                    <h2>@Model.TotalBooks</h2>
+                    <p>Total Books</p>
+                </div>
+            </div>
 
-            <tbody>
-                @foreach (var b in Model.BookList)
-                {
-                    <tr>
-                        <td>@b.BookTitle</td>
-                        <td>@b.Author</td>
-                        <td>@(b.Available + b.Borrowed)</td>
-                        <td>@b.Available</td>
-                        <td>@b.Borrowed</td>
-                        <td>0</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+            <div class="summary-card @(Model.CurrentFilter=="Available" ? "highlight-card" : "")" data-filter="Available">
+                <div class="card-icon">✅</div>
+                <div class="card-text">
+                    <h2>@Model.AvailableBooks</h2>
+                    <p>Available</p>
+                </div>
+            </div>
+
+            <div class="summary-card @(Model.CurrentFilter=="Borrowed" ? "highlight-card" : "")" data-filter="Borrowed">
+                <div class="card-icon">📖</div>
+                <div class="card-text">
+                    <h2>@Model.CurrentlyBorrowed</h2>
+                    <p>Currently Borrowed</p>
+                </div>
+            </div>
+
+            <div class="summary-card @(Model.CurrentFilter=="Reserved" ? "highlight-card" : "")" data-filter="Reserved">
+                <div class="card-icon">📝</div>
+                <div class="card-text">
+                    <h2>@Model.ReservedBooks</h2>
+                    <p>Reserved/On Request</p>
+                </div>
+            </div>
+
+            <div class="summary-card @(Model.CurrentFilter=="Lost" ? "highlight-card" : "")" data-filter="Lost">
+                <div class="card-icon">❌</div>
+                <div class="card-text">
+                    <h2>@Model.LostBooks</h2>
+                    <p>Lost</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Table -->
+        <div class="main-content">
+            <div class="table-container">
+                <table class="report-table" id="inventoryTable">
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Author</th>
+                            <th>Quantity</th>
+                            <th>Available</th>
+                            <th>Borrowed</th>
+                            <th>Lost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var b in Model.BookList)
+                        {
+                            <tr>
+                                <td>@b.BookTitle</td>
+                                <td>@b.Author</td>
+                                <td>@(b.Available + b.Borrowed)</td>
+                                <td>@b.Available</td>
+                                <td>@b.Borrowed</td>
+                                <td>0</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
+<!-- Add Book Popup -->
+<div id="addBookPopup" class="popup-overlay" style="display:none;">
+    <div class="popup-content">
+        <h2>Add New Book</h2>
+        <form method="post" asp-page-handler="AddBook">
+            <input name="NewBook.BookTitle" placeholder="Book Title" required />
+            <input name="NewBook.Author" placeholder="Author" />
+            <input type="number" name="NewBook.Available" placeholder="Available Copies" min="1" required />
+            <div class="popup-actions">
+                <button type="submit" class="btn-add-confirm">Add</button>
+                <button type="button" id="cancelPopup" class="btn-cancel">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <style>
-    .report-container {
-        padding: 0;
-        background: #f5f6fa;
-        min-height: 100vh;
-    }
+/* --- Reset & Layout --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Segoe UI", Roboto, Arial; color: #333; }
 
-    .report-header {
-        padding: 30px;
-        background: white;
-        border-bottom: 1px solid #e0e0e0;
-    }
+.report-container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f5f6fa;
+}
 
-    .report-title {
-        font-size: 32px;
-        margin: 0 0 20px 0;
-        font-weight: bold;
-        color: #2c3e50;
-    }
+.report-header { padding: 16px 32px; background: #f4d9a0; }
+.header-left { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.report-title { font-size: 28px; font-weight: 700; color: #2f2f2f; }
 
-    /* Tab Navigation */
-    .tab-navigation {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
+/* Tabs */
+.tab-navigation { display: flex; gap: 12px; }
+.tab { padding: 8px 20px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 14px; background: #fff; color: #6b6b6b; box-shadow: 0 2px 6px rgba(62,45,45,0.04); transition: all 0.15s; }
+.tab:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(62,45,45,0.08); }
+.tab.active { background: #7d2e2e; color: #fff; box-shadow: none; }
 
-    .tab {
-        padding: 10px 20px;
-        background: #f0f0f0;
-        border: none;
-        border-radius: 20px;
-        color: #666;
-        text-decoration: none;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
+/* Controls Bar */
+.controls-bar { display: flex; gap: 16px; align-items:center; padding:16px 32px; border-bottom:1px solid #eee; flex-wrap: wrap; background:#fff; }
+.search-box { flex:1; position:relative; }
+.search-box input { width:100%; padding:10px 12px 10px 36px; border-radius:999px; border:1px solid #e6e6e6; font-size:14px; }
+.search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#999; }
+.filter-dropdown { padding:10px 14px; border-radius:8px; border:1px solid #e6e6e6; background:#fff; font-size:14px; appearance:none; }
 
-    .tab:hover {
-        background: #e0e0e0;
-    }
+/* Content Layout */
+.content-layout { display:flex; flex:1; gap:24px; padding:16px 32px; overflow:hidden; }
 
-    .tab.active {
-        background: #8b3a3a;
-        color: white;
-    }
+/* Sidebar Cards */
+.summary-sidebar { flex:0 0 320px; display:flex; flex-direction:column; gap:18px; }
+.summary-card { display:flex; align-items:center; gap:16px; padding:16px; border-radius:14px; background:#fff; box-shadow:0 6px 18px rgba(31,31,31,0.04); transition: all 0.2s; cursor:pointer; }
+.summary-card .card-icon { width:58px; height:58px; display:flex; align-items:center; justify-content:center; background:#fafafa; border-radius:10px; font-size:28px; }
+.summary-card h2 { font-size:32px; font-weight:800; color:#0b0b0b; }
+.summary-card p { font-size:14px; font-weight:600; color:inherit; opacity:0.95; }
 
-    /* Summary Grid */
-    .summary-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        padding: 30px;
-        background: white;
-        border-bottom: 1px solid #e0e0e0;
-    }
+/* Highlighted Card */
+.highlight-card { background:#8A2D3B; color:#fff; }
+.highlight-card .card-icon { background: rgba(255,255,255,0.12); font-size:30px; color:#fff; }
+.highlight-card h2, .highlight-card p { color:#fff; }
 
-    .summary-card {
-        padding: 20px;
-        background: #f9f9f9;
-        border-radius: 8px;
-        border-left: 4px solid #8b3a3a;
-    }
+/* Main Table */
+.main-content { flex:1; display:flex; flex-direction:column; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 6px 20px rgba(15,15,15,0.03); }
+.table-container { flex:1; overflow:auto; padding:20px; }
+.report-table { width:100%; border-collapse:collapse; min-width:700px; }
+.report-table th, .report-table td { padding:12px; text-align:left; border-bottom:1px solid #eee; }
+.report-table tbody tr:hover { background:#fafafa; }
 
-    .card-content {
-        text-align: center;
-    }
+.popup-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:1000; }
+.popup-content { background:white; padding:20px; border-radius:8px; width:400px; display:flex; flex-direction:column; gap:10px; }
+.popup-actions { display:flex; justify-content:flex-end; gap:10px; }
+.btn-add-confirm { background:#8b3a3b; color:white; padding:8px 16px; border:none; border-radius:6px; cursor:pointer; }
+.btn-add-confirm:hover { background:#6d2e2e; }
+.btn-cancel { padding:8px 16px; border-radius:6px; border:1px solid #ddd; cursor:pointer; background:white; }
 
-    .summary-card h2 {
-        font-size: 36px;
-        margin: 0;
-        font-weight: bold;
-        color: #2c3e50;
-    }
-
-    .summary-card p {
-        font-size: 14px;
-        margin: 8px 0 0 0;
-        color: #999;
-    }
-
-    /* Controls Bar */
-    .controls-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        padding: 20px 30px;
-        background: white;
-        border-bottom: 1px solid #e0e0e0;
-        flex-wrap: wrap;
-    }
-
-    .search-box input {
-        width: 300px;
-        padding: 10px 15px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 14px;
-    }
-
-    .filter-controls {
-        display: flex;
-        gap: 10px;
-    }
-
-    .filter-dropdown {
-        padding: 10px 15px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        background: white;
-        cursor: pointer;
-        font-size: 14px;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 10px;
-    }
-
-    .btn-export {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-        font-size: 14px;
-        transition: all 0.3s;
-    }
-
-    .btn-export-primary {
-        background: #8b3a3a;
-        color: white;
-    }
-
-    .btn-export-primary:hover {
-        background: #6d2e2e;
-    }
-
-    .btn-export-secondary {
-        background: white;
-        color: #666;
-        border: 1px solid #ddd;
-    }
-
-    .btn-export-secondary:hover {
-        background: #f5f5f5;
-    }
-
-    /* Table */
-    .table-container {
-        padding: 30px;
-        background: white;
-        overflow-x: auto;
-    }
-
-    .report-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-    }
-
-    .report-table th {
-        background: #f5f5f5;
-        padding: 15px;
-        text-align: left;
-        font-weight: 600;
-        color: #2c3e50;
-        border-bottom: 2px solid #e0e0e0;
-    }
-
-    .report-table td {
-        padding: 15px;
-        border-bottom: 1px solid #e0e0e0;
-        color: #555;
-    }
-
-    .report-table tr:hover {
-        background: #f9f9f9;
-    }
+/* Responsive */
+@@media(max-width:1100px){.content-layout{padding:16px;gap:14px;}.summary-sidebar{width:260px;}}
+@@media(max-width:880px){.content-layout{flex-direction:column;}.summary-sidebar{width:100%;flex-direction:row;overflow-x:auto;padding-bottom:8px;}.summary-card{min-width:220px;}}
 </style>
+
+<script>
+const searchBox = document.getElementById('searchBox');
+const statusFilter = document.getElementById('statusFilter');
+const tableRows = document.querySelectorAll('#inventoryTable tbody tr');
+const summaryCards = document.querySelectorAll('.summary-card');
+const cardFilterMap = ["All","Available","Borrowed","Reserved","Lost"];
+const addBookBtn = document.getElementById('addBookBtn');
+const addBookPopup = document.getElementById('addBookPopup');
+const cancelPopup = document.getElementById('cancelPopup');
+
+addBookBtn.addEventListener('click', () => addBookPopup.style.display = 'flex');
+cancelPopup.addEventListener('click', () => addBookPopup.style.display = 'none');
+
+function filterTable(){
+    const searchTerm = searchBox.value.toLowerCase();
+    const statusTerm = statusFilter.value;
+
+    // Filter table rows
+    tableRows.forEach(row=>{
+        const bookTitle = row.cells[0].innerText.toLowerCase();
+        const author = row.cells[1].innerText.toLowerCase();
+        const statusMatch = statusTerm === "" ||
+            (statusTerm==="Available" && parseInt(row.cells[3].innerText)>0) ||
+            (statusTerm==="Borrowed" && parseInt(row.cells[4].innerText)>0) ||
+            (statusTerm==="Reserved" && parseInt(row.cells[4].innerText)>0) || // can customize if needed
+            (statusTerm==="Lost" && parseInt(row.cells[5].innerText)>0);
+
+        const searchMatch = bookTitle.includes(searchTerm) || author.includes(searchTerm);
+
+        row.style.display = (searchMatch && statusMatch) ? "" : "none";
+    });
+
+    // Highlight cards
+    summaryCards.forEach((card,index)=>{
+        const cardFilter = cardFilterMap[index];
+        if(statusTerm==="" && cardFilter==="All") card.classList.add("highlight-card");
+        else if(statusTerm===cardFilter) card.classList.add("highlight-card");
+        else card.classList.remove("highlight-card");
+    });
+}
+
+filterTable();
+searchBox.addEventListener('input',filterTable);
+statusFilter.addEventListener('change',filterTable);
+
+// Highlight card click
+summaryCards.forEach(card=>{
+    card.addEventListener('click',()=>{
+        const filter = card.getAttribute('data-filter');
+        statusFilter.value = filter==="All"?"":filter;
+        filterTable();
+    });
+});
+</script>
