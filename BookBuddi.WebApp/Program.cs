@@ -77,6 +77,8 @@ builder.Services.AddScoped<IBorrowTransactionRepository, BorrowTransactionReposi
 builder.Services.AddScoped<IFineRepository, FineRepository>();
 builder.Services.AddScoped<IBookRequestRepository, BookRequestRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 
 // Register Managers
 builder.Services.AddScoped<PasswordManager>();
@@ -90,6 +92,8 @@ builder.Services.AddScoped<IBorrowingService, BorrowingService>();
 builder.Services.AddScoped<IFineService, FineService>();
 builder.Services.AddScoped<IBookRequestService, BookRequestService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IGenreService, GenreService>();
 
 var app = builder.Build();
 

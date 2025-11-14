@@ -28,7 +28,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var member in Model.Members)
+        @foreach (var member in Model.Members.Items)
         {
             <tr>
                 <td>@member.MemberId</td>
@@ -47,5 +47,43 @@
         }
     </tbody>
 </table>
+
+@* Pagination Controls *@
+<div style="margin: 20px 0; text-align: center;">
+    <p>
+        Showing @((Model.Members.PageNumber - 1) * Model.Members.PageSize + 1) -
+        @Math.Min(Model.Members.PageNumber * Model.Members.PageSize, Model.Members.TotalCount)
+        of @Model.Members.TotalCount members
+    </p>
+
+    @if (Model.Members.TotalPages > 1)
+    {
+        <div style="display: inline-block;">
+            @if (Model.Members.HasPreviousPage)
+            {
+                <a href="?pageNumber=1&searchTerm=@Model.SearchTerm" style="padding: 5px 10px; margin: 0 2px; background-color: #007bff; color: white; text-decoration: none; border-radius: 3px;">First</a>
+                <a href="?pageNumber=@(Model.Members.PageNumber - 1)&searchTerm=@Model.SearchTerm" style="padding: 5px 10px; margin: 0 2px; background-color: #007bff; color: white; text-decoration: none; border-radius: 3px;">Previous</a>
+            }
+
+            @for (int i = Math.Max(1, Model.Members.PageNumber - 2); i <= Math.Min(Model.Members.TotalPages, Model.Members.PageNumber + 2); i++)
+            {
+                if (i == Model.Members.PageNumber)
+                {
+                    <span style="padding: 5px 10px; margin: 0 2px; background-color: #28a745; color: white; border-radius: 3px; font-weight: bold;">@i</span>
+                }
+                else
+                {
+                    <a href="?pageNumber=@i&searchTerm=@Model.SearchTerm" style="padding: 5px 10px; margin: 0 2px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 3px;">@i</a>
+                }
+            }
+
+            @if (Model.Members.HasNextPage)
+            {
+                <a href="?pageNumber=@(Model.Members.PageNumber + 1)&searchTerm=@Model.SearchTerm" style="padding: 5px 10px; margin: 0 2px; background-color: #007bff; color: white; text-decoration: none; border-radius: 3px;">Next</a>
+                <a href="?pageNumber=@Model.Members.TotalPages&searchTerm=@Model.SearchTerm" style="padding: 5px 10px; margin: 0 2px; background-color: #007bff; color: white; text-decoration: none; border-radius: 3px;">Last</a>
+            }
+        </div>
+    }
+</div>
 
 <p><a href="/">Back to Home</a></p>

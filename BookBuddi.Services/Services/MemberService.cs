@@ -30,6 +30,28 @@ namespace BookBuddi.Services.Services
             return _mapper.Map<IEnumerable<MemberViewModel>>(members);
         }
 
+        public PagedResult<MemberViewModel> GetMembersPaged(int pageNumber, int pageSize, string? searchTerm = null)
+        {
+            var query = _memberRepository.GetMembers();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(m =>
+                    m.FirstName.Contains(searchTerm) ||
+                    m.LastName.Contains(searchTerm) ||
+                    m.Email.Contains(searchTerm));
+            }
+
+            var totalCount = query.Count();
+            var members = query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var memberViewModels = _mapper.Map<List<MemberViewModel>>(members);
+            return new PagedResult<MemberViewModel>(memberViewModels, totalCount, pageNumber, pageSize);
+        }
+
         public MemberViewModel? GetMemberById(int memberId)
         {
             var member = _memberRepository.GetMemberById(memberId);

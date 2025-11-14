@@ -24,7 +24,7 @@
         align-items: center;
         padding: 15px 40px;
         background: white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .nav-right {
@@ -126,7 +126,7 @@
     .return-card {
         background: white;
         border-radius: 16px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         padding: 40px;
         margin-bottom: 30px;
     }
@@ -268,7 +268,7 @@
     .btn-primary:hover {
         background: #f9d073;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .btn-danger {
@@ -288,7 +288,7 @@
     .btn-danger:hover {
         background: #6d3239;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .btn-secondary {
@@ -414,7 +414,7 @@
 <div class="page-container">
     <a href="/Borrowing/Index" class="back-button">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
+            <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
         Back to My Borrowing
     </a>
@@ -471,14 +471,16 @@
             {
                 <div class="overdue-warning">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                        </path>
                         <line x1="12" y1="9" x2="12" y2="13"></line>
                         <line x1="12" y1="17" x2="12.01" y2="17"></line>
                     </svg>
                     <div class="overdue-warning-content">
                         <h3>Overdue Book</h3>
                         <p>
-                            This book is <span class="overdue-days">@daysOverdue day@(daysOverdue > 1 ? "s" : "") overdue</span>. 
+                            This book is <span class="overdue-days">@daysOverdue day@(daysOverdue > 1 ? "s" : "")
+                                overdue</span>.
                             A late fee may be applied to your account upon return.
                         </p>
                     </div>

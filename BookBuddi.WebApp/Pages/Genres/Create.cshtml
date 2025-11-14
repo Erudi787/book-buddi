@@ -1,0 +1,45 @@
+@page
+@model BookBuddi.Pages.Genres.CreateModel
+@{
+    ViewData["Title"] = "Add Genre";
+    var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
+}
+
+<h1>Add New Genre</h1>
+
+@if (!isAdmin)
+{
+    <p style="color: red;">Admin access required.</p>
+    <p><a href="/Admin/Login">Login as Admin</a></p>
+}
+else
+{
+    <form method="post" style="max-width: 600px;">
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Genre Name: *</label><br/>
+            <input type="text" name="genreName" required style="width: 100%; padding: 8px;" maxlength="100" />
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Description:</label><br/>
+            <textarea name="genreDescription" rows="4" style="width: 100%; padding: 8px;" maxlength="500"></textarea>
+        </div>
+        <div>
+            <button type="submit" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Create Genre</button>
+            <a href="/Genres/Index" style="margin-left: 10px; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px;">Cancel</a>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div style="margin-top: 20px; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px;">
+            @Model.ErrorMessage
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div style="margin-top: 20px; padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 5px;">
+            @Model.SuccessMessage
+        </div>
+    }
+}

@@ -14,10 +14,12 @@ namespace BookBuddi.Pages.Members
             _memberService = memberService;
         }
 
-        public IEnumerable<MemberViewModel> Members { get; set; } = new List<MemberViewModel>();
+        public PagedResult<MemberViewModel> Members { get; set; } = new PagedResult<MemberViewModel>();
         public string? SearchTerm { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 20;
 
-        public IActionResult OnGet(string? searchTerm)
+        public IActionResult OnGet(string? searchTerm, int pageNumber = 1, int pageSize = 20)
         {
             // Admin-only check
             var userRole = HttpContext.Session.GetString("UserRole");
@@ -27,15 +29,10 @@ namespace BookBuddi.Pages.Members
             }
 
             SearchTerm = searchTerm;
+            PageNumber = pageNumber;
+            PageSize = pageSize;
 
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                Members = _memberService.SearchMembers(searchTerm);
-            }
-            else
-            {
-                Members = _memberService.GetAllMembers();
-            }
+            Members = _memberService.GetMembersPaged(pageNumber, pageSize, searchTerm);
 
             return Page();
         }

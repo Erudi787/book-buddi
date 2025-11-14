@@ -1,0 +1,44 @@
+@page
+@model BookBuddi.Pages.Genres.DeleteModel
+@{
+    ViewData["Title"] = "Delete Genre";
+    var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
+}
+
+<h1>Delete Genre</h1>
+
+@if (!isAdmin)
+{
+    <p style="color: red;">Admin access required.</p>
+    <p><a href="/Admin/Login">Login as Admin</a></p>
+}
+else
+{
+    <div style="max-width: 600px;">
+        <div style="padding: 20px; background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 5px; margin-bottom: 20px;">
+            <h3 style="color: #856404;">Are you sure you want to delete this genre?</h3>
+            <p style="color: #856404;">This action cannot be undone.</p>
+        </div>
+
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <p><strong>Genre ID:</strong> @Model.Genre.GenreId</p>
+            <p><strong>Genre Name:</strong> @Model.Genre.GenreName</p>
+            <p><strong>Description:</strong> @(Model.Genre.GenreDescription ?? "-")</p>
+            <p><strong>Created By:</strong> @Model.Genre.CreatedBy</p>
+            <p><strong>Created Date:</strong> @Model.Genre.CreatedTime.ToString("MMM dd, yyyy")</p>
+        </div>
+
+        <form method="post">
+            <input type="hidden" name="id" value="@Model.Genre.GenreId" />
+            <button type="submit" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">Confirm Delete</button>
+            <a href="/Genres/Index" style="margin-left: 10px; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px;">Cancel</a>
+        </form>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div style="margin-top: 20px; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px;">
+                @Model.ErrorMessage
+            </div>
+        }
+    </div>
+}
