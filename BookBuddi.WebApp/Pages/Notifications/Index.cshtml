@@ -33,7 +33,11 @@
     body {
         margin: 0;
         padding: 0;
-        background-color: #f9f9f9;
+        background-image: url('/assets/bg1.svg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
     }
 
     .top-nav {
@@ -42,7 +46,11 @@
         align-items: center;
         padding: 15px 40px;
         background: white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 2px solid #f0f0f0;
     }
 
     .nav-right {
@@ -58,19 +66,32 @@
     }
 
     .member-actions a {
-        padding: 8px 16px;
+        padding: 10px 20px;
         border-radius: 20px;
         text-decoration: none;
         color: #333;
-        background: #f5f5f5;
+        background: linear-gradient(135deg, #f8f8f8 0%, #f0f0f0 100%);
         font-size: 0.9rem;
         font-weight: 500;
         transition: all 0.3s;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
-    .member-actions a:hover,
+    .member-actions a:hover {
+        background: linear-gradient(135deg, #8B4049 0%, #a85252 100%);
+        color: white;
+        border-color: #8B4049;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(139, 64, 73, 0.2);
+    }
+
     .member-actions a.active {
-        background: #FBDB93;
+        background: linear-gradient(135deg, #FBDB93 0%, #f9d078 100%);
+        color: #333;
+        border-color: #FBDB93;
+        font-weight: 600;
+        box-shadow: 0 3px 6px rgba(251, 219, 147, 0.3);
     }
 
     .user-account {
@@ -486,11 +507,8 @@
 
 <div class="top-nav">
     <div style="display: flex; align-items: center; gap: 10px;">
-        <svg width="30" height="30" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <rect x="40" y="30" width="60" height="140" fill="#8b3a3a" rx="5"/>
-            <rect x="60" y="30" width="40" height="140" fill="#a85252" rx="3"/>
-        </svg>
-        <strong>Library Catalog</strong>
+        <img src="/assets/logo.svg" alt="BookBuddi Logo" width="30" height="30" />
+        <strong>Book Buddi</strong>
     </div>
     <div class="nav-right">
         @if (userRole == "Member")

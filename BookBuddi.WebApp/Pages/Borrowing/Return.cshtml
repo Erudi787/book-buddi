@@ -11,7 +11,11 @@
     body {
         margin: 0;
         padding: 0;
-        background-color: #f9f9f9;
+        background-image: url('/assets/bg1.svg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
     }
 
     .top-nav {
@@ -373,11 +377,8 @@
 
 <div class="top-nav">
     <div style="display: flex; align-items: center; gap: 10px;">
-        <svg width="30" height="30" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <rect x="40" y="30" width="60" height="140" fill="#8b3a3a" rx="5"/>
-            <rect x="60" y="30" width="40" height="140" fill="#a85252" rx="3"/>
-        </svg>
-        <strong>Return a Book</strong>
+        <img src="/assets/logo.svg" alt="BookBuddi Logo" width="30" height="30" />
+        <strong>Return Books</strong>
     </div>
     <div class="nav-right">
         @if (userRole == "Member")
