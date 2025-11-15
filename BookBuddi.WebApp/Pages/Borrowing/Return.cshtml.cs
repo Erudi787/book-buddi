@@ -29,6 +29,14 @@ namespace BookBuddi.Pages.Borrowing
 
         public IActionResult OnGet(int id)
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             Transaction = _borrowingService.GetTransactionById(id);
 
             if (Transaction == null)
@@ -50,21 +58,19 @@ namespace BookBuddi.Pages.Borrowing
                 MemberName = $"{member.FirstName} {member.LastName}";
             }
 
-            // Load notifications for members
-            var userRole = HttpContext.Session.GetString("UserRole");
-            var memberId = HttpContext.Session.GetInt32("MemberId");
-            if (userRole == "Member" && memberId.HasValue)
-            {
-                var allNotifications = _notificationService.GetNotificationsByMember(memberId.Value);
-                RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5);
-                UnreadNotificationCount = allNotifications.Count(n => !n.IsRead);
-            }
-
             return Page();
         }
 
         public IActionResult OnPost(int id)
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             try
             {
                 var adminName = HttpContext.Session.GetString("AdminName") ?? "System";

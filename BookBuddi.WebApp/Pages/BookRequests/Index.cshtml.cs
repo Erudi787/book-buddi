@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookBuddi.Services.Interfaces;
 using BookBuddi.Services.ServiceModels;
@@ -21,11 +22,18 @@ namespace BookBuddi.Pages.BookRequests
         public IEnumerable<NotificationViewModel> RecentNotifications { get; set; } = new List<NotificationViewModel>();
         public int UnreadNotificationCount { get; set; }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            // Authentication check - require login
             var userRole = HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(userRole))
+            {
+                TempData["ErrorMessage"] = "You must be logged in to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             var memberId = HttpContext.Session.GetInt32("MemberId");
-            
+
             // Load notifications for members
             if (userRole == "Member" && memberId.HasValue)
             {
@@ -33,8 +41,11 @@ namespace BookBuddi.Pages.BookRequests
                 RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5);
                 UnreadNotificationCount = allNotifications.Count(n => !n.IsRead);
             }
-            
-            var requestList = _requestService.GetAllRequests();
+
+            // Admin sees all requests, Members see only their own
+            var requestList = userRole == "Admin"
+                ? _requestService.GetAllRequests()
+                : (memberId.HasValue ? _requestService.GetRequestsByMember(memberId.Value) : new List<BookRequestViewModel>());
 
             // Enrich requests with member names
             Requests = requestList.Select(r =>
@@ -46,6 +57,8 @@ namespace BookBuddi.Pages.BookRequests
                     MemberName = member != null ? $"{member.FirstName} {member.LastName}" : "Unknown"
                 };
             }).ToList();
+
+            return Page();
         }
 
         public class RequestWithMemberViewModel

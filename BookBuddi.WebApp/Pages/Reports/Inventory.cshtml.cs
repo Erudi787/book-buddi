@@ -37,8 +37,16 @@ namespace BookBuddi.WebApp.Pages
             public int Borrowed { get; set; }
         }
 
-        public async Task OnGet(string filter, string search)
+        public async Task<IActionResult> OnGet(string filter, string search)
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             CurrentFilter = string.IsNullOrEmpty(filter) ? "All" : filter;
 
             var books = await _db.Books.ToListAsync();
@@ -77,11 +85,21 @@ namespace BookBuddi.WebApp.Pages
                 "Lost" => new List<BookInventoryDTO>(), // placeholder
                 _ => BookList
             };
+
+            return Page();
         }
 
         // Handle Add New Book form submission
         public async Task<IActionResult> OnPostAddBook()
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             if (!ModelState.IsValid)
                 return Page();
 

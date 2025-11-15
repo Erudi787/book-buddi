@@ -19,6 +19,14 @@ namespace BookBuddi.Pages.Members
 
         public IActionResult OnGet(int id)
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             var member = _memberService.GetMemberById(id);
             if (member == null)
             {
@@ -32,6 +40,14 @@ namespace BookBuddi.Pages.Members
 
         public IActionResult OnPost(int id, string reason)
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             try
             {
                 var member = _memberService.GetMemberById(id);

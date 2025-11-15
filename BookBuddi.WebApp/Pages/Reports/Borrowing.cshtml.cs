@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using BookBuddi.Data;
@@ -25,8 +26,16 @@ namespace BookBuddi.Pages.Reports
         // Current filter
         public string CurrentFilter { get; set; } = "All";
 
-        public async Task OnGet(string filter, string search)
+        public async Task<IActionResult> OnGet(string filter, string search)
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             CurrentFilter = string.IsNullOrEmpty(filter) ? "All" : filter;
 
             var today = DateTime.Today;
@@ -72,6 +81,8 @@ namespace BookBuddi.Pages.Reports
                                 (t.MemberName ?? "").ToLower().Contains(search))
                     .ToList();
             }
+
+            return Page();
         }
 
         public class BorrowDTO

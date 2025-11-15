@@ -6,7 +6,7 @@
 
 <h1>Members Management</h1>
 
-<p><a href="/Members/Create">Add New Member</a></p>
+<p><a href="/Admin/CreateAccount">Add New Member</a></p>
 
 <form method="get">
     <input type="text" name="searchTerm" placeholder="Search members..." value="@Model.SearchTerm" />
@@ -39,6 +39,7 @@
                 <td>@member.CurrentBorrowedCount</td>
                 <td>@member.BorrowingLimit</td>
                 <td>
+                    <a href="/Members/Edit?id=@member.MemberId">Edit</a> |
                     <a href="/Members/Details?id=@member.MemberId">Details</a> |
                     <a href="/Members/Suspend?id=@member.MemberId">Suspend</a> |
                     <a href="/Members/Reactivate?id=@member.MemberId">Reactivate</a>

@@ -62,7 +62,7 @@ namespace BookBuddi.Pages.Admin
             var userRole = HttpContext.Session.GetString("UserRole");
             if (userRole != "Admin")
             {
-                return RedirectToPage("/Admin/Login");
+                return RedirectToPage("/Account/Login");
             }
 
             var today = DateTime.Today;

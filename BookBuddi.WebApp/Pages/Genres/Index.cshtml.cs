@@ -19,11 +19,12 @@ namespace BookBuddi.Pages.Genres
 
         public IActionResult OnGet(string? searchTerm)
         {
-            // Admin-only check
+            // Admin authorization check
             var userRole = HttpContext.Session.GetString("UserRole");
             if (userRole != "Admin")
             {
-                return RedirectToPage("/Index");
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
             }
 
             SearchTerm = searchTerm;

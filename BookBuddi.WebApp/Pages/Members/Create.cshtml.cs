@@ -18,12 +18,29 @@ namespace BookBuddi.Pages.Members
         public MemberViewModel Member { get; set; } = new MemberViewModel();
         public string? ErrorMessage { get; set; }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
+            return Page();
         }
 
         public IActionResult OnPost(string password)
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             if (!ModelState.IsValid)
             {
                 return Page();

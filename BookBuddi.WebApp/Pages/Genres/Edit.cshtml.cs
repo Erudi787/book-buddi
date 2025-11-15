@@ -20,11 +20,12 @@ namespace BookBuddi.Pages.Genres
 
         public IActionResult OnGet(int id)
         {
-            // Admin-only check
+            // Admin authorization check
             var userRole = HttpContext.Session.GetString("UserRole");
             if (userRole != "Admin")
             {
-                return RedirectToPage("/Admin/Login");
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
             }
 
             var genre = _genreService.GetGenreById(id);
@@ -39,10 +40,12 @@ namespace BookBuddi.Pages.Genres
 
         public IActionResult OnPost()
         {
-            var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
-            if (!isAdmin)
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
             {
-                return RedirectToPage("/Admin/Login");
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
             }
 
             try

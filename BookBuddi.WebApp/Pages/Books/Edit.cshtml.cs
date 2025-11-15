@@ -32,7 +32,7 @@ namespace BookBuddi.Pages.Books
             var userRole = HttpContext.Session.GetString("UserRole");
             if (userRole != "Admin")
             {
-                return RedirectToPage("/Admin/Login");
+                return RedirectToPage("/Account/Login");
             }
 
             var book = _bookService.GetBookById(id);
@@ -51,7 +51,7 @@ namespace BookBuddi.Pages.Books
             var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
             if (!isAdmin)
             {
-                return RedirectToPage("/Admin/Login");
+                return RedirectToPage("/Account/Login");
             }
 
             if (!ModelState.IsValid)

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using BookBuddi.Data;
@@ -24,8 +25,16 @@ namespace BookBuddi.WebApp.Pages
         public int InactiveMembers { get; set; }
         public int TotalBooksBorrowed { get; set; }
 
-        public async Task OnGet()
+        public async Task<IActionResult> OnGet()
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             var members = await _db.Members.ToListAsync();
 
             // Summary calculations
@@ -44,6 +53,8 @@ namespace BookBuddi.WebApp.Pages
                 StatusText = m.Status.ToString(),
                 StatusClass = m.Status == MemberStatus.Active ? "status-active" : "status-inactive"
             }).ToList();
+
+            return Page();
         }
 
         public class MemberDTO

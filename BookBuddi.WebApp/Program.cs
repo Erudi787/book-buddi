@@ -51,13 +51,14 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromHours(24);
-    options.LoginPath = "/Admin/Login";
+    options.LoginPath = "/Account/Login";
     options.AccessDeniedPath = "/Admin/AccessDenied";
     options.SlidingExpiration = true;
 });
 
 // Add AutoMapper
-var mapperConfig = new AutoMapper.MapperConfiguration(cfg => {
+var mapperConfig = new AutoMapper.MapperConfiguration(cfg =>
+{
     cfg.AddProfile<AutoMapperProfile>();
 });
 var mapper = mapperConfig.CreateMapper();

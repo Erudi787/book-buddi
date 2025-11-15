@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using BookBuddi.Data;
@@ -24,8 +25,16 @@ namespace BookBuddi.WebApp.Pages
         public int ApprovedRequests { get; set; }
         public int RejectedRequests { get; set; }
 
-        public async Task OnGet()
+        public async Task<IActionResult> OnGet()
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             // Load requests and members
             var requests = await _db.BookRequests.ToListAsync();
             var members = await _db.Members.ToListAsync();
@@ -47,6 +56,8 @@ namespace BookBuddi.WebApp.Pages
                 StatusClass = r.Status == RequestStatus.Pending ? "status-pending" :
                               r.Status == RequestStatus.Approved ? "status-approved" : "status-rejected"
             }).ToList();
+
+            return Page();
         }
 
         public class RequestDTO

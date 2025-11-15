@@ -26,13 +26,30 @@ namespace BookBuddi.Pages.Books
         public List<Genre> Genres { get; set; } = new List<Genre>();
         public string? ErrorMessage { get; set; }
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Admin/Login");
+            }
+
             await LoadDropdownsAsync();
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Admin/Login");
+            }
+
             if (!ModelState.IsValid)
             {
                 await LoadDropdownsAsync();

@@ -20,6 +20,11 @@
         <input type="email" asp-for="Member.Email" required />
     </div>
     <div>
+        <label>Password:</label><br/>
+        <input type="password" name="password" required minlength="8" />
+        <small>Must be at least 8 characters with uppercase, lowercase, digit, and special character</small>
+    </div>
+    <div>
         <label>Phone:</label><br/>
         <input type="tel" asp-for="Member.Phone" />
     </div>

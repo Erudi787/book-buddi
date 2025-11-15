@@ -1,0 +1,109 @@
+@page
+@model BookBuddi.Pages.Admin.EditAdminModel
+@{
+    ViewData["Title"] = "Edit Administrator";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Edit Administrator: @Model.FirstName @Model.LastName</h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill"></i> @Model.SuccessMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <input type="hidden" asp-for="AdminId" />
+
+                        <h5 class="text-primary mb-3">Basic Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="FirstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="FirstName" asp-for="FirstName" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="LastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="LastName" asp-for="LastName" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="Email" asp-for="Email" required />
+                            <small class="form-text text-muted">This will be used for login</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="IsActive" asp-for="IsActive" />
+                                <label class="form-check-label" for="IsActive">
+                                    <strong>Account Active</strong>
+                                </label>
+                                <small class="form-text text-muted d-block">Inactive accounts cannot log in</small>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <h5 class="text-primary mb-3">Change Password (Optional)</h5>
+                        <p class="text-muted small">Leave blank to keep the current password</p>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="NewPassword" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="NewPassword" asp-for="NewPassword" minlength="8" />
+                                <small class="form-text text-muted">At least 8 characters with uppercase, lowercase, digit, and special character</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ConfirmPassword" class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" id="ConfirmPassword" asp-for="ConfirmPassword" minlength="8" />
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/Admin/ManageAdmins" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Admin List
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Update Administrator
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            @if (Model.AdminUser != null)
+            {
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6 class="text-muted">Audit Information</h6>
+                        <p class="mb-1"><small><strong>Created By:</strong> @Model.AdminUser.CreatedBy on @Model.AdminUser.CreatedTime.ToString("MMM dd, yyyy hh:mm tt")</small></p>
+                        <p class="mb-0"><small><strong>Last Updated By:</strong> @Model.AdminUser.UpdatedBy on @Model.AdminUser.UpdatedTime.ToString("MMM dd, yyyy hh:mm tt")</small></p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

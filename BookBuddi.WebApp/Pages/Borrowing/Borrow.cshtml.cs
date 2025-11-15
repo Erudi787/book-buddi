@@ -28,28 +28,33 @@ namespace BookBuddi.Pages.Borrowing
         public IEnumerable<NotificationViewModel> RecentNotifications { get; set; } = new List<NotificationViewModel>();
         public int UnreadNotificationCount { get; set; }
 
-        public void OnGet(int? bookId)
+        public IActionResult OnGet(int? bookId)
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             Members = _memberService.GetMembersByStatus(BookBuddi.Resources.Constants.MemberStatus.Active).ToList();
             AvailableBooks = _bookService.GetAvailableBooks().ToList();
             SelectedBookId = bookId;
 
-            // Load notifications for members
-            var userRole = HttpContext.Session.GetString("UserRole");
-            if (userRole == "Member")
-            {
-                var memberId = HttpContext.Session.GetInt32("MemberId");
-                if (memberId.HasValue)
-                {
-                    var allNotifications = _notificationService.GetNotificationsByMember(memberId.Value);
-                    RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5);
-                    UnreadNotificationCount = allNotifications.Count(n => !n.IsRead);
-                }
-            }
+            return Page();
         }
 
         public IActionResult OnPost(int memberId, int bookId)
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             try
             {
                 var adminName = HttpContext.Session.GetString("AdminName") ?? "System";
@@ -60,19 +65,6 @@ namespace BookBuddi.Pages.Borrowing
                 Members = _memberService.GetMembersByStatus(BookBuddi.Resources.Constants.MemberStatus.Active).ToList();
                 AvailableBooks = _bookService.GetAvailableBooks().ToList();
 
-                // Reload notifications
-                var userRole = HttpContext.Session.GetString("UserRole");
-                if (userRole == "Member")
-                {
-                    var memberIdSession = HttpContext.Session.GetInt32("MemberId");
-                    if (memberIdSession.HasValue)
-                    {
-                        var allNotifications = _notificationService.GetNotificationsByMember(memberIdSession.Value);
-                        RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5);
-                        UnreadNotificationCount = allNotifications.Count(n => !n.IsRead);
-                    }
-                }
-
                 return Page();
             }
             catch (Exception ex)
@@ -82,19 +74,6 @@ namespace BookBuddi.Pages.Borrowing
                 // Reload dropdowns
                 Members = _memberService.GetMembersByStatus(BookBuddi.Resources.Constants.MemberStatus.Active).ToList();
                 AvailableBooks = _bookService.GetAvailableBooks().ToList();
-
-                // Reload notifications
-                var userRole = HttpContext.Session.GetString("UserRole");
-                if (userRole == "Member")
-                {
-                    var memberIdSession = HttpContext.Session.GetInt32("MemberId");
-                    if (memberIdSession.HasValue)
-                    {
-                        var allNotifications = _notificationService.GetNotificationsByMember(memberIdSession.Value);
-                        RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5);
-                        UnreadNotificationCount = allNotifications.Count(n => !n.IsRead);
-                    }
-                }
 
                 return Page();
             }
