@@ -32,7 +32,8 @@ namespace BookBuddi.Pages.Books
             var userRole = HttpContext.Session.GetString("UserRole");
             if (userRole != "Admin")
             {
-                return RedirectToPage("/Account/Login");
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Admin/Login" : "/Admin/AccessDenied");
             }
 
             var book = _bookService.GetBookById(id);
@@ -48,10 +49,11 @@ namespace BookBuddi.Pages.Books
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
-            if (!isAdmin)
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
             {
-                return RedirectToPage("/Account/Login");
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Admin/Login" : "/Admin/AccessDenied");
             }
 
             if (!ModelState.IsValid)

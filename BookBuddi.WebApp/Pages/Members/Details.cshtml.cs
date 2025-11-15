@@ -23,7 +23,7 @@ namespace BookBuddi.Pages.Members
             if (userRole != "Admin")
             {
                 TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage("/Account/Login");
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Admin/Login" : "/Admin/AccessDenied");
             }
 
             Member = _memberService.GetMemberById(id);

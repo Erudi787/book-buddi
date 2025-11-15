@@ -21,8 +21,15 @@ namespace BookBuddi.Pages.Account
         public string? ErrorMessage { get; set; }
         public string? SuccessMessage { get; set; }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            // Redirect if already logged in
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (!string.IsNullOrEmpty(userRole))
+            {
+                return RedirectToPage(userRole == "Admin" ? "/Admin/Index" : "/Books/Index");
+            }
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(string firstName, string lastName, string email,

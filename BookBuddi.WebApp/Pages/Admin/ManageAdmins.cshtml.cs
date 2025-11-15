@@ -26,7 +26,7 @@ namespace BookBuddi.Pages.Admin
             if (userRole != "Admin")
             {
                 TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage("/Account/Login");
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Admin/Login" : "/Admin/AccessDenied");
             }
 
             Admins = await _userManager.Users.OrderBy(a => a.FirstName).ThenBy(a => a.LastName).ToListAsync();
@@ -51,7 +51,7 @@ namespace BookBuddi.Pages.Admin
             if (userRole != "Admin")
             {
                 TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage("/Account/Login");
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Admin/Login" : "/Admin/AccessDenied");
             }
 
             try

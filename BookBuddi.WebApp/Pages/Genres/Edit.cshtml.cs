@@ -25,7 +25,7 @@ namespace BookBuddi.Pages.Genres
             if (userRole != "Admin")
             {
                 TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage("/Account/Login");
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Admin/Login" : "/Admin/AccessDenied");
             }
 
             var genre = _genreService.GetGenreById(id);
@@ -45,7 +45,7 @@ namespace BookBuddi.Pages.Genres
             if (userRole != "Admin")
             {
                 TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage("/Account/Login");
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Admin/Login" : "/Admin/AccessDenied");
             }
 
             try

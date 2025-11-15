@@ -33,7 +33,7 @@ namespace BookBuddi.Pages.Books
             if (userRole != "Admin")
             {
                 TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage("/Admin/Login");
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Admin/Login" : "/Admin/AccessDenied");
             }
 
             await LoadDropdownsAsync();
@@ -47,7 +47,7 @@ namespace BookBuddi.Pages.Books
             if (userRole != "Admin")
             {
                 TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage("/Admin/Login");
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Admin/Login" : "/Admin/AccessDenied");
             }
 
             if (!ModelState.IsValid)
