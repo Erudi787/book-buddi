@@ -16,16 +16,27 @@ namespace BookBuddi.Pages.Authors
 
         public string? ErrorMessage { get; set; }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
+            }
+
+            return Page();
         }
 
         public IActionResult OnPost(string firstName, string lastName, string? biography)
         {
-            var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
-            if (!isAdmin)
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
             {
-                return RedirectToPage("/Admin/Login");
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
             }
 
             try

@@ -6,6 +6,7 @@ namespace BookBuddi.Services.Interfaces
     public interface IMemberService
     {
         IEnumerable<MemberViewModel> GetAllMembers();
+        PagedResult<MemberViewModel> GetMembersPaged(int pageNumber, int pageSize, string? searchTerm = null);
         MemberViewModel? GetMemberById(int memberId);
         MemberViewModel? GetMemberByEmail(string email);
         IEnumerable<MemberViewModel> SearchMembers(string searchTerm);

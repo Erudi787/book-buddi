@@ -867,7 +867,7 @@
     }
     @if (totalUnpaid > 0)
     {
-        <p class="total-fines">Total Outstanding: $@totalUnpaid.ToString("F2")</p>
+        <p class="total-fines">Total Outstanding: ₱@totalUnpaid.ToString("N2")</p>
     }
 </div>
 
@@ -889,7 +889,7 @@
             </div>
             <div class="summary-item">
                 <div class="summary-label">Total Amount</div>
-                <div class="summary-value">$@Model.Fines.Sum(f => f.Fine.Amount).ToString("F2")</div>
+                <div class="summary-value">₱@Model.Fines.Sum(f => f.Fine.Amount).ToString("N2")</div>
             </div>
         </div>
 
@@ -902,10 +902,10 @@
         <div class="fines-grid" id="finesGrid">
             @foreach (var item in Model.Fines.OrderByDescending(f => f.Fine.IssueDate))
             {
-                <div class="fine-card @(item.Fine.Status == BookBuddi.Resources.Constants.FineStatus.Unpaid ? "unpaid" : "paid")" 
+                <div class="fine-card @(item.Fine.Status == BookBuddi.Resources.Constants.FineStatus.Unpaid ? "unpaid" : "paid")"
                      data-reason="@item.Fine.Reason" data-member="@item.MemberName">
                     <div class="fine-header">
-                        <div class="fine-amount">$@item.Fine.Amount.ToString("F2")</div>
+                        <div class="fine-amount">₱@item.Fine.Amount.ToString("N2")</div>
                         <span class="status-badge @(item.Fine.Status == BookBuddi.Resources.Constants.FineStatus.Unpaid ? "status-unpaid" : "status-paid")">
                             @item.Fine.Status
                         </span>

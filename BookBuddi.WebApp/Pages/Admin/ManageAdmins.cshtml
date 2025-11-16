@@ -1,0 +1,108 @@
+@page
+@model BookBuddi.Pages.Admin.ManageAdminsModel
+@{
+    ViewData["Title"] = "Manage Administrators";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Administrators</h2>
+        <a href="/Admin/CreateAccount" class="btn btn-primary">
+            <i class="bi bi-person-plus-fill"></i> Create New Admin
+        </a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @Model.SuccessMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            @if (Model.Admins.Count == 0)
+            {
+                <p class="text-muted text-center py-4">No administrators found.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Last Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var admin in Model.Admins)
+                            {
+                                <tr>
+                                    <td>@admin.FirstName @admin.LastName</td>
+                                    <td>@admin.Email</td>
+                                    <td>
+                                        @if (admin.IsActive)
+                                        {
+                                            <span class="badge bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Inactive</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <small>@admin.DateCreated.ToString("MMM dd, yyyy")</small>
+                                    </td>
+                                    <td>
+                                        <small>@admin.UpdatedTime.ToString("MMM dd, yyyy")</small>
+                                    </td>
+                                    <td>
+                                        <a href="/Admin/EditAdmin?id=@admin.Id" class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="bi bi-pencil-fill"></i> Edit
+                                        </a>
+                                        <form method="post" asp-page-handler="ToggleStatus" asp-route-adminId="@admin.Id" style="display: inline;">
+                                            @if (admin.IsActive)
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Deactivate"
+                                                        onclick="return confirm('Are you sure you want to deactivate @admin.FirstName @admin.LastName?')">
+                                                    <i class="bi bi-x-circle"></i> Deactivate
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" class="btn btn-sm btn-outline-success" title="Activate"
+                                                        onclick="return confirm('Are you sure you want to activate @admin.FirstName @admin.LastName?')">
+                                                    <i class="bi bi-check-circle"></i> Activate
+                                                </button>
+                                            }
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="/Admin/Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>

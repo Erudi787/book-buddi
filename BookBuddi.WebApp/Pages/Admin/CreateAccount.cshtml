@@ -1,0 +1,178 @@
+@page
+@model BookBuddi.Pages.Admin.CreateAccountModel
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Create New Account</h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill"></i> @Model.SuccessMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div class="mb-4">
+                            <h5 class="text-primary">Account Type</h5>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AccountType" id="accountTypeMember" value="Member" checked asp-for="AccountType" />
+                                <label class="form-check-label" for="accountTypeMember">
+                                    <strong>Member Account</strong> - Library member with borrowing privileges
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="AccountType" id="accountTypeAdmin" value="Admin" asp-for="AccountType" />
+                                <label class="form-check-label" for="accountTypeAdmin">
+                                    <strong>Admin Account</strong> - Full system access and management
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <h5 class="text-primary mb-3">Basic Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="FirstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="FirstName" asp-for="FirstName" required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="LastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="LastName" asp-for="LastName" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="Email" asp-for="Email" required />
+                            <small class="form-text text-muted">This will be used for login</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="Password" class="form-label">Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="Password" asp-for="Password" required minlength="8" />
+                                <small class="form-text text-muted">At least 8 characters with uppercase, lowercase, digit, and special character</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ConfirmPassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="ConfirmPassword" asp-for="ConfirmPassword" required minlength="8" />
+                            </div>
+                        </div>
+
+                        <div id="memberFields">
+                            <hr />
+                            <h5 class="text-primary mb-3">Member Details</h5>
+                            <p class="text-muted small">These fields are only for Member accounts</p>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="Phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="Phone" asp-for="Phone" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="DateOfBirth" class="form-label">Date of Birth</label>
+                                    <input type="date" class="form-control" id="DateOfBirth" asp-for="DateOfBirth" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="Address" class="form-label">Address</label>
+                                <textarea class="form-control" id="Address" asp-for="Address" rows="2"></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="BorrowingLimit" class="form-label">Borrowing Limit</label>
+                                    <input type="number" class="form-control" id="BorrowingLimit" asp-for="BorrowingLimit" min="1" max="20" value="5" />
+                                    <small class="form-text text-muted">Maximum books that can be borrowed at once</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="MembershipExpiryDate" class="form-label">Membership Expiry Date</label>
+                                    <input type="date" class="form-control" id="MembershipExpiryDate" asp-for="MembershipExpiryDate" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/Admin/Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-person-plus-fill"></i> Create Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Show/hide member fields based on account type
+    document.querySelectorAll('input[name="AccountType"]').forEach((elem) => {
+        elem.addEventListener("change", function(event) {
+            const memberFields = document.getElementById('memberFields');
+            if (event.target.value === 'Member') {
+                memberFields.style.display = 'block';
+            } else {
+                memberFields.style.display = 'none';
+            }
+        });
+    });
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', (event) => {
+        const memberFields = document.getElementById('memberFields');
+        const checkedRadio = document.querySelector('input[name="AccountType"]:checked');
+        if (checkedRadio && checkedRadio.value === 'Admin') {
+            memberFields.style.display = 'none';
+        }
+    });
+</script>
+
+<style>
+    .form-check-inline {
+        display: block;
+        margin-bottom: 10px;
+        padding: 12px;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+
+    .form-check-inline:hover {
+        border-color: #0d6efd;
+        background-color: #f8f9fa;
+    }
+
+    .form-check-inline input:checked + label {
+        color: #0d6efd;
+        font-weight: 600;
+    }
+
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+</style>

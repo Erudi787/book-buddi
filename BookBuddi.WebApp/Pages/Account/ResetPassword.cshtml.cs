@@ -21,6 +21,13 @@ namespace BookBuddi.Pages.Account
 
         public IActionResult OnGet()
         {
+            // Redirect if already logged in
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (!string.IsNullOrEmpty(userRole))
+            {
+                return RedirectToPage(userRole == "Admin" ? "/Admin/Index" : "/Books/Index");
+            }
+
             if (string.IsNullOrEmpty(Token))
             {
                 ErrorMessage = "Invalid password reset link.";

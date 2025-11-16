@@ -15,8 +15,13 @@ namespace BookBuddi.Pages.Authors
 
         public IActionResult OnGet(int id)
         {
-            var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
-            if (!isAdmin) return RedirectToPage("/Admin/Login");
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
+            }
 
             _authorService.DeleteAuthor(id);
             return RedirectToPage("./Index");

@@ -1,0 +1,246 @@
+@page
+@model BorrowingModel
+@using BookBuddi.Data.Models
+@{
+    ViewData["Title"] = "Borrowing Report";
+}
+
+<div class="report-container">
+    <div class="report-header">
+        <div class="header-left">
+            <h1 class="report-title">Book Report</h1>
+            <div class="tab-navigation">
+                <a href="/Reports/Borrowing" class="tab active">Borrowing</a>
+                <a href="/Reports/Inventory" class="tab">Inventory</a>
+                <a href="/Reports/Members" class="tab">Members</a>
+                <a href="/Reports/Requests" class="tab">Request</a>
+                <a href="/Reports/LostBooks" class="tab">Lost Book</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls: Search, Filter, Export -->
+    <div class="controls-top">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchBox" placeholder="Search books or borrowers..." />
+        </div>
+
+        <div class="filter-controls">
+            <select id="statusFilter" class="filter-dropdown">
+                <option value="">All Statuses</option>
+                <option value="Returned">Returned</option>
+                <option value="Active">Active</option>
+                <option value="Overdue">Overdue</option>
+            </select>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-export btn-export-pdf">Export PDF</button>
+            <button class="btn-export btn-export-csv">Export CSV</button>
+        </div>
+    </div>
+
+    <div class="content-layout">
+        <!-- Sidebar with Summary Cards -->
+        <div class="summary-sidebar">
+            <div class="summary-card @(Model.CurrentFilter=="All" ? "highlight-card" : "")">
+                <div class="card-icon">📚</div>
+                <div class="card-text">
+                    <h2>@Model.TotalBorrowed</h2>
+                    <p>Total Borrowed Books</p>
+                </div>
+            </div>
+            <div class="summary-card @(Model.CurrentFilter=="Returned" ? "highlight-card" : "")">
+                <div class="card-icon">📥</div>
+                <div class="card-text">
+                    <h2>@Model.TotalReturned</h2>
+                    <p>Books Returned</p>
+                </div>
+            </div>
+            <div class="summary-card @(Model.CurrentFilter=="Active" ? "highlight-card" : "")">
+                <div class="card-icon">📖</div>
+                <div class="card-text">
+                    <h2>@Model.TotalActive</h2>
+                    <p>Currently Borrowed</p>
+                </div>
+            </div>
+            <div class="summary-card @(Model.CurrentFilter=="Overdue" ? "highlight-card" : "")">
+                <div class="card-icon">📅</div>
+                <div class="card-text">
+                    <h2>@Model.TotalOverdue</h2>
+                    <p>Overdue Books</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Table -->
+        <div class="main-content">
+            <div class="table-container">
+                <table class="report-table" id="borrowTable">
+                    <thead>
+                        <tr>
+                            <th>Book Title</th>
+                            <th>Borrower</th>
+                            <th>Borrow Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in Model.BorrowList)
+                        {
+                            <tr>
+                                <td>@t.BookTitle</td>
+                                <td>@t.MemberName</td>
+                                <td>@t.BorrowDate.ToString("MMM dd, yyyy")</td>
+                                <td>@(t.ReturnDate?.ToString("MMM dd, yyyy") ?? "-")</td>
+                                <td><span class="status @t.StatusClass">@t.StatusText</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* --- Reset & Layout --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Instrument Sans", Roboto, Arial; color: #333; }
+
+.report-container { width: 100%; height: 100vh; display: flex; flex-direction: column; background: #f5f6fa; }
+
+.report-header { padding: 16px 32px; background: #f4d9a0; }
+.header-left { display: flex; align-items: center; gap: 24px; }
+.report-title { font-size: 28px; font-weight: 700; color: #2f2f2f; }
+
+/* Tabs */
+.tab-navigation { display: flex; gap: 12px; }
+.tab { padding: 8px 20px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 14px; background: #fff; color: #6b6b6b; box-shadow: 0 2px 6px rgba(62,45,45,0.04); transition: all 0.15s; }
+.tab:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(62,45,45,0.08); }
+.tab.active { background: #7d2e2e; color: #fff; box-shadow: none; }
+
+/* Controls Top */
+.controls-top { display:flex; gap:16px; align-items:center; padding:16px 32px; background:#fff; border-bottom:1px solid #eee; }
+.search-box { flex:1; position:relative; }
+.search-box input { width:100%; padding:10px 12px 10px 36px; border-radius:999px; border:1px solid #e6e6e6; font-size:14px; }
+.search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#999; }
+
+.filter-controls { display:flex; gap:12px; align-items:center; }
+.filter-dropdown { padding:10px 36px 10px 14px; border-radius:8px; border:1px solid #e6e6e6; background:#fff; font-size:14px; appearance:none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
+
+.action-buttons { display:flex; gap:10px; }
+.btn-export { padding:10px 18px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; border:none; }
+.btn-export-pdf { background:#7d2e2e;color:#fff;box-shadow:0 4px 12px rgba(125,46,46,0.12); }
+.btn-export-csv { background:#fff;color:#555;border:1px solid #e6e6e6; }
+
+/* Content Layout */
+.content-layout { display:flex; flex:1; gap:24px; padding:16px 32px; overflow:hidden; }
+.summary-sidebar { flex:0 0 320px; display:flex; flex-direction:column; gap:18px; }
+.summary-card { display:flex; align-items:center; gap:16px; padding:16px; border-radius:14px; background:#fff; box-shadow:0 6px 18px rgba(31,31,31,0.04); transition: all 0.2s; }
+.summary-card .card-icon { width:58px;height:58px;display:flex;align-items:center;justify-content:center;background:#fafafa;border-radius:10px;font-size:28px; }
+.summary-card h2 { font-size:32px; font-weight:800; color:#0b0b0b; }
+.summary-card p { font-size:14px; font-weight:600; color:inherit; opacity:0.95; }
+
+/* Highlight */
+.highlight-card { background:#8A2D3B; color:#fff; }
+.highlight-card .card-icon { background: rgba(255,255,255,0.12); font-size:30px; color:#fff; }
+.highlight-card h2, .highlight-card p { color:#fff; }
+
+/* Main Table */
+.main-content { flex:1; display:flex; flex-direction:column; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 6px 20px rgba(15,15,15,0.03); }
+.table-container { flex:1; overflow:auto; padding:20px; }
+.report-table { width:100%; border-collapse:collapse; min-width:700px; }
+.report-table th, .report-table td { padding:12px; text-align:left; border-bottom:1px solid #eee; }
+.report-table tbody tr:hover { background:#fafafa; }
+
+.status { padding:6px 12px; border-radius:999px; font-weight:600; font-size:13px; }
+.status-returned { background:#eaf5ee;color:#1b7a3a; }
+.status-active { background:#fff4e6;color:#7a4e00; }
+.status-overdue { background:#fdecea;color:#a42b2b; }
+
+/* Responsive */
+@@media(max-width:1100px){.content-layout{padding:16px;gap:14px;}.summary-sidebar{width:260px;}}
+@@media(max-width:880px){.content-layout{flex-direction:column;}.summary-sidebar{width:100%;flex-direction:row;overflow-x:auto;padding-bottom:8px;}.summary-card{min-width:220px;}}
+</style>
+
+<script>
+const searchBox = document.getElementById('searchBox');
+const statusFilter = document.getElementById('statusFilter');
+const tableRows = document.querySelectorAll('#borrowTable tbody tr');
+const summaryCards = document.querySelectorAll('.summary-card');
+const cardFilterMap = ["All", "Returned", "Active", "Overdue"];
+const btnExportCSV = document.querySelector('.btn-export-csv');
+const btnExportPDF = document.querySelector('.btn-export-pdf');
+
+function filterTable() {
+    const searchTerm = searchBox.value.toLowerCase();
+    const statusTerm = statusFilter.value;
+
+    // Filter table rows
+    tableRows.forEach(row => {
+        const bookTitle = row.cells[0].innerText.toLowerCase();
+        const borrower = row.cells[1].innerText.toLowerCase();
+        const status = row.cells[4].innerText;
+
+        const matchesSearch = bookTitle.includes(searchTerm) || borrower.includes(searchTerm);
+        const matchesStatus = statusTerm === "" || status === statusTerm;
+
+        row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
+    });
+
+    // Update summary card highlights
+    summaryCards.forEach((card, index) => {
+        const cardFilter = cardFilterMap[index];
+        if ((statusTerm === "" && cardFilter === "All") || statusTerm === cardFilter) {
+            card.classList.add("highlight-card");
+        } else {
+            card.classList.remove("highlight-card");
+        }
+    });
+}
+
+// --- Export CSV ---
+function exportCSV() {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Book Title,Borrower,Borrow Date,Return Date,Status\n";
+
+    tableRows.forEach(row => {
+        if (row.style.display !== "none") {
+            const rowData = Array.from(row.cells)
+                .map(cell => `"${cell.innerText.replace(/"/g, '""')}"`)
+                .join(",");
+            csvContent += rowData + "\n";
+        }
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "borrowing_report.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// --- Export PDF (basic print to PDF) ---
+function exportPDF() {
+    const originalContent = document.body.innerHTML;
+    const tableContent = document.querySelector('.main-content').innerHTML;
+    document.body.innerHTML = tableContent;
+    window.print();
+    document.body.innerHTML = originalContent;
+    window.location.reload(); // reload to restore scripts/events
+}
+
+// --- Event Listeners ---
+searchBox.addEventListener('input', filterTable);
+statusFilter.addEventListener('change', filterTable);
+btnExportCSV.addEventListener('click', exportCSV);
+btnExportPDF.addEventListener('click', exportPDF);
+
+// Initial table/card state
+filterTable();
+</script>

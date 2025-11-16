@@ -21,8 +21,15 @@ namespace BookBuddi.Pages.Account
         public string? ErrorMessage { get; set; }
         public string? SuccessMessage { get; set; }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            // Redirect if already logged in
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (!string.IsNullOrEmpty(userRole))
+            {
+                return RedirectToPage(userRole == "Admin" ? "/Admin/Index" : "/Books/Index");
+            }
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(string firstName, string lastName, string email,
@@ -30,10 +37,42 @@ namespace BookBuddi.Pages.Account
         {
             try
             {
+                // Basic validation
+                if (string.IsNullOrWhiteSpace(firstName))
+                {
+                    ErrorMessage = "First name is required.";
+                    return Page();
+                }
+
+                if (string.IsNullOrWhiteSpace(lastName))
+                {
+                    ErrorMessage = "Last name is required.";
+                    return Page();
+                }
+
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    ErrorMessage = "Email is required.";
+                    return Page();
+                }
+
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    ErrorMessage = "Password is required.";
+                    return Page();
+                }
+
                 // Validate passwords match
                 if (password != confirmPassword)
                 {
                     ErrorMessage = "Passwords do not match.";
+                    return Page();
+                }
+
+                // Check if email already exists
+                if (_memberService.EmailExists(email))
+                {
+                    ErrorMessage = "An account with this email already exists. Please use a different email or try logging in.";
                     return Page();
                 }
 
@@ -56,16 +95,23 @@ namespace BookBuddi.Pages.Account
                     Status = MemberStatus.Active,
                     BorrowingLimit = 5,
                     MembershipDate = DateTime.Now,
-                    MembershipExpiryDate = DateTime.Now.AddYears(1) // 1 year membership
+                    MembershipExpiryDate = DateTime.Now.AddYears(1), // 1 year membership
+                    CurrentBorrowedCount = 0
                 };
 
-                _memberService.AddMember(memberViewModel, password, "System");
-                SuccessMessage = "Registration successful! You can now login.";
+                _memberService.AddMember(memberViewModel, password, "Self-Registration");
+                SuccessMessage = "Registration successful! You can now login with your email and password.";
+
+                // Clear form data
+                ModelState.Clear();
+
                 return Page();
             }
             catch (Exception ex)
             {
-                ErrorMessage = ex.Message;
+                ErrorMessage = $"Registration failed: {ex.Message}";
+                // Log the full exception for debugging
+                Console.WriteLine($"Registration error: {ex}");
                 return Page();
             }
         }

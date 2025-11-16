@@ -20,6 +20,14 @@ namespace BookBuddi.Pages.Books
 
         public IActionResult OnGet(int id)
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
+            }
+
             var book = _bookService.GetBookById(id);
             if (book == null)
             {
@@ -32,6 +40,14 @@ namespace BookBuddi.Pages.Books
 
         public IActionResult OnPost()
         {
+            // Admin authorization check
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+            {
+                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
+            }
+
             try
             {
                 _bookService.DeleteBook(Book.BookId);

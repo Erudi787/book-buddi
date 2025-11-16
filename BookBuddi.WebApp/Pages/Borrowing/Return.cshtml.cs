@@ -29,6 +29,14 @@ namespace BookBuddi.Pages.Borrowing
 
         public IActionResult OnGet(int id)
         {
+            // Authentication check - both Admin and Member can access
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(userRole))
+            {
+                TempData["ErrorMessage"] = "You must be logged in to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             Transaction = _borrowingService.GetTransactionById(id);
 
             if (Transaction == null)
@@ -50,25 +58,25 @@ namespace BookBuddi.Pages.Borrowing
                 MemberName = $"{member.FirstName} {member.LastName}";
             }
 
-            // Load notifications for members
-            var userRole = HttpContext.Session.GetString("UserRole");
-            var memberId = HttpContext.Session.GetInt32("MemberId");
-            if (userRole == "Member" && memberId.HasValue)
-            {
-                var allNotifications = _notificationService.GetNotificationsByMember(memberId.Value);
-                RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5);
-                UnreadNotificationCount = allNotifications.Count(n => !n.IsRead);
-            }
-
             return Page();
         }
 
         public IActionResult OnPost(int id)
         {
+            // Authentication check - both Admin and Member can access
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(userRole))
+            {
+                TempData["ErrorMessage"] = "You must be logged in to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             try
             {
-                var adminName = HttpContext.Session.GetString("AdminName") ?? "System";
-                _borrowingService.ReturnBook(id, adminName);
+                var processedBy = userRole == "Admin"
+                    ? HttpContext.Session.GetString("AdminName") ?? "Admin"
+                    : HttpContext.Session.GetString("MemberName") ?? "Member";
+                _borrowingService.ReturnBook(id, processedBy);
                 return RedirectToPage("./Index");
             }
             catch (Exception ex)

@@ -24,7 +24,7 @@
         align-items: center;
         padding: 15px 40px;
         background: white;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         position: sticky;
         top: 0;
         z-index: 100;
@@ -53,7 +53,7 @@
         font-weight: 500;
         transition: all 0.3s;
         border: 1px solid #e0e0e0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .member-actions a:hover {
@@ -149,7 +149,7 @@
         right: 0;
         background: white;
         border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
         width: 480px;
         max-height: 600px;
         z-index: 1000;
@@ -166,6 +166,7 @@
             opacity: 0;
             transform: translateY(-10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -375,7 +376,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0,0,0,0.5);
+        background: rgba(0, 0, 0, 0.5);
         z-index: 10000;
         align-items: center;
         justify-content: center;
@@ -390,6 +391,7 @@
         from {
             opacity: 0;
         }
+
         to {
             opacity: 1;
         }
@@ -410,6 +412,7 @@
             transform: translateY(50px);
             opacity: 0;
         }
+
         to {
             transform: translateY(0);
             opacity: 1;
@@ -609,7 +612,7 @@
         background: white;
         border-radius: 12px;
         padding: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s, box-shadow 0.3s;
         display: flex;
         gap: 20px;
@@ -617,7 +620,7 @@
 
     .book-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .book-cover {
@@ -768,47 +771,56 @@
                         @if (Model.UnreadNotificationCount > 0)
                         {
                             <button class="mark-all-read-btn" onclick="markAllAsRead(event)">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
                                     <polyline points="20 6 9 17 4 12"></polyline>
                                 </svg>
                                 Mark All as read
                             </button>
                         }
                     </div>
-                    
+
                     <div class="notification-tabs">
                         <button class="notification-tab active" data-tab="all" onclick="switchTab(event, 'all')">
                             View all <span class="tab-badge">@Model.RecentNotifications.Count()</span>
                         </button>
                         <button class="notification-tab" data-tab="duedate" onclick="switchTab(event, 'duedate')">
-                            Due date <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type == BookBuddi.Resources.Constants.NotificationType.DueReminder)</span>
-                        </button>
-                        <button class="notification-tab" data-tab="request" onclick="switchTab(event, 'request')">
-                            Request <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type == BookBuddi.Resources.Constants.NotificationType.RequestUpdate)</span>
-                        </button>
-                        <button class="notification-tab" data-tab="system" onclick="switchTab(event, 'system')">
-                            System Alerts <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type == BookBuddi.Resources.Constants.NotificationType.OverdueAlert || n.Type == BookBuddi.Resources.Constants.NotificationType.FineIssued || n.Type == BookBuddi.Resources.Constants.NotificationType.General)</span>
-                        </button>
-                    </div>
+                            Due date <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type ==
+                                                            BookBuddi.Resources.Constants.NotificationType.DueReminder)</span>
+                    </button>
+                    <button class="notification-tab" data-tab="request" onclick="switchTab(event, 'request')">
+                        Request <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type ==
+                                                        BookBuddi.Resources.Constants.NotificationType.RequestUpdate)</span>
+                    </button>
+                    <button class="notification-tab" data-tab="system" onclick="switchTab(event, 'system')">
+                        System Alerts <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type ==
+                                                        BookBuddi.Resources.Constants.NotificationType.OverdueAlert || n.Type ==
+                                                        BookBuddi.Resources.Constants.NotificationType.FineIssued || n.Type ==
+                                                        BookBuddi.Resources.Constants.NotificationType.General)</span>
+                    </button>
+                </div>
 
                     <div class="notification-list" id="notificationList">
-                        @if (Model.RecentNotifications != null && Model.RecentNotifications.Any())
+                    @if (Model.RecentNotifications != null && Model.RecentNotifications.Any())
                         {
                             @foreach (var notification in Model.RecentNotifications.OrderByDescending(n => n.DateCreated))
                             {
-                                var notificationTypeClass = notification.Type == BookBuddi.Resources.Constants.NotificationType.DueReminder ? "duedate" :
-                                                           notification.Type == BookBuddi.Resources.Constants.NotificationType.RequestUpdate ? "request" : "system";
-                                
-                                <div class="notification-card @(!notification.IsRead ? "unread" : "")" 
-                                     data-notification-id="@notification.NotificationId"
-                                     data-notification-type="@notificationTypeClass"
-                                     onclick="openNotificationModal(@notification.NotificationId, '@notification.Title.Replace("'", "\\'")' , '@notification.Message.Replace("'", "\\'")' , '@notification.DateCreated.ToString("MMMM dd, yyyy")', '@notification.DateCreated.ToString("h:mm tt")', @notification.IsRead.ToString().ToLower())">
+                                var notificationTypeClass = notification.Type ==
+                                BookBuddi.Resources.Constants.NotificationType.DueReminder ? "duedate" :
+                                notification.Type == BookBuddi.Resources.Constants.NotificationType.RequestUpdate ? "request" :
+                                "system";
+
+                                <div class="notification-card @(!notification.IsRead ? "unread" : "")"
+                                    data-notification-id="@notification.NotificationId"
+                                    data-notification-type="@notificationTypeClass"
+                                    onclick="openNotificationModal(@notification.NotificationId, '@notification.Title.Replace("'", "\\'")' , '@notification.Message.Replace("'", "\\'")' , '@notification.DateCreated.ToString("MMMM dd, yyyy")', '@notification.DateCreated.ToString("h:mm tt")', @notification.IsRead.ToString().ToLower())">
                                     <div class="notification-indicator @(!notification.IsRead ? "unread" : "read")"></div>
                                     <div class="notification-content">
                                         <div class="notification-title">@notification.Title</div>
                                         <div class="notification-message">@notification.Message</div>
                                         <div class="notification-meta">
-                                            <span class="notification-time">@notification.DateCreated.ToString("MMMM dd, yyyy") @notification.DateCreated.ToString("h:mm tt")</span>
+                                            <span class="notification-time">@notification.DateCreated.ToString("MMMM dd, yyyy")
+                                                @notification.DateCreated.ToString("h:mm tt")</span>
                                         </div>
                                     </div>
                                 </div>
@@ -817,7 +829,8 @@
                         else
                         {
                             <div class="notification-empty">
-                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1">
                                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                                     <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                                 </svg>
@@ -857,11 +870,11 @@
     }
 
     // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         const dropdown = document.getElementById('notificationDropdown');
         const bell = document.querySelector('.notification-bell');
         const modal = document.getElementById('notificationModal');
-        
+
         if (dropdown && bell && !bell.contains(event.target) && !modal.classList.contains('show')) {
             dropdown.classList.remove('show');
         }
@@ -870,20 +883,20 @@
     // Tab switching functionality
     function switchTab(event, tabName) {
         event.stopPropagation();
-        
+
         // Remove active class from all tabs
         document.querySelectorAll('.notification-tab').forEach(tab => {
             tab.classList.remove('active');
         });
-        
+
         // Add active class to clicked tab
         event.target.classList.add('active');
-        
+
         // Filter notifications
         const notifications = document.querySelectorAll('.notification-card');
         notifications.forEach(notification => {
             const notificationType = notification.getAttribute('data-notification-type');
-            
+
             if (tabName === 'all') {
                 notification.style.display = 'flex';
             } else if (notificationType === tabName) {
@@ -897,13 +910,13 @@
     // Open notification modal
     function openNotificationModal(id, title, message, date, time, isRead) {
         event.stopPropagation();
-        
+
         // Populate modal content
         document.getElementById('modalNotificationTitle').textContent = title;
         document.getElementById('modalNotificationMessage').textContent = message;
         document.getElementById('modalNotificationDate').textContent = date;
         document.getElementById('modalNotificationTime').textContent = time;
-        
+
         // Show/hide mark as read button
         const markReadBtn = document.getElementById('modalMarkReadBtn');
         if (!isRead) {
@@ -913,10 +926,10 @@
         } else {
             markReadBtn.style.display = 'none';
         }
-        
+
         // Show modal
         document.getElementById('notificationModal').classList.add('show');
-        
+
         // Close dropdown
         const dropdown = document.getElementById('notificationDropdown');
         if (dropdown) {
@@ -937,14 +950,14 @@
     }
 
     // Close modal with Escape key
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
             closeNotificationModal();
         }
     });
 
     // Close modal when clicking outside
-    document.getElementById('notificationModal')?.addEventListener('click', function(event) {
+    document.getElementById('notificationModal')?.addEventListener('click', function (event) {
         if (event.target === this) {
             closeNotificationModal();
         }
@@ -990,7 +1003,8 @@
 <div class="content-wrapper">
     <div class="filters-section">
         <div class="search-box">
-            <input type="text" placeholder="Search for books, authors, or subjects..." id="searchInput" onkeyup="filterBooks()" />
+            <input type="text" placeholder="Search for books, authors, or subjects..." id="searchInput"
+                onkeyup="filterBooks()" />
         </div>
     </div>
 
@@ -999,7 +1013,8 @@
         {
             @foreach (var item in Model.Transactions)
             {
-                <div class="book-card" data-title="@item.BookTitle" data-author="@item.BookAuthor" data-status="@item.Transaction.Status">
+                <div class="book-card" data-title="@item.BookTitle" data-author="@item.BookAuthor"
+                    data-status="@item.Transaction.Status">
                     <div class="book-cover">
                         @if (!string.IsNullOrEmpty(item.CoverImageUrl))
                         {
@@ -1009,7 +1024,7 @@
                     <div class="book-info">
                         <div class="book-title">@item.BookTitle</div>
                         <div class="book-author">by @(item.BookAuthor ?? "Unknown Author")</div>
-                        
+
                         @if (item.Transaction.Status == BookBuddi.Resources.Constants.TransactionStatus.Active)
                         {
                             <span class="status-badge status-active">Active</span>
@@ -1022,14 +1037,14 @@
                         {
                             <span class="status-badge status-returned">Returned</span>
                         }
-                        
+
                         <div class="book-meta">Borrowed: @item.Transaction.BorrowDate.ToString("MMM dd, yyyy")</div>
                         <div class="book-meta">Due: @item.Transaction.DueDate.ToString("MMM dd, yyyy")</div>
-                        
+
                         @if (item.Transaction.Status == BookBuddi.Resources.Constants.TransactionStatus.Active ||
-                             item.Transaction.Status == BookBuddi.Resources.Constants.TransactionStatus.Overdue)
+                                        item.Transaction.Status == BookBuddi.Resources.Constants.TransactionStatus.Overdue)
                         {
-                            <a href="/Borrowing/Return?id=@item.Transaction.TransactionId" class="action-btn">Return Again</a>
+                            <a href="/Borrowing/Return?id=@item.Transaction.TransactionId" class="action-btn">Return Book</a>
                         }
                         else
                         {
@@ -1058,13 +1073,13 @@
     function filterBooks() {
         const searchValue = document.getElementById('searchInput').value.toLowerCase();
         const cards = document.querySelectorAll('.book-card');
-        
+
         cards.forEach(card => {
             const title = card.getAttribute('data-title').toLowerCase();
             const author = card.getAttribute('data-author').toLowerCase();
-            
+
             const matchesSearch = title.includes(searchValue) || author.includes(searchValue);
-            
+
             if (matchesSearch) {
                 card.style.display = 'flex';
             } else {

@@ -26,6 +26,14 @@ namespace BookBuddi.Pages.Fines
 
         public IActionResult OnGet(int id)
         {
+            // Authentication check - both Admin and Member can access
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(userRole))
+            {
+                TempData["ErrorMessage"] = "You must be logged in to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             Fine = _fineService.GetFineById(id);
 
             if (Fine == null)
@@ -40,27 +48,24 @@ namespace BookBuddi.Pages.Fines
                 MemberName = $"{member.FirstName} {member.LastName}";
             }
 
-            // Load notifications for members
-            var userRole = HttpContext.Session.GetString("UserRole");
-            if (userRole == "Member")
-            {
-                var memberId = HttpContext.Session.GetInt32("MemberId");
-                if (memberId.HasValue)
-                {
-                    var allNotifications = _notificationService.GetNotificationsByMember(memberId.Value);
-                    RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5).ToList();
-                    UnreadNotificationCount = _notificationService.GetUnreadCount(memberId.Value);
-                }
-            }
-
             return Page();
         }
 
         public IActionResult OnPost(int id)
         {
+            // Authentication check - both Admin and Member can access
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(userRole))
+            {
+                TempData["ErrorMessage"] = "You must be logged in to access this page.";
+                return RedirectToPage("/Account/Login");
+            }
+
             try
             {
-                var updatedBy = HttpContext.Session.GetString("MemberName") ?? HttpContext.Session.GetString("AdminName") ?? "System";
+                var updatedBy = userRole == "Admin"
+                    ? HttpContext.Session.GetString("AdminName") ?? "Admin"
+                    : HttpContext.Session.GetString("MemberName") ?? "Member";
                 _fineService.PayFine(id, updatedBy);
                 return RedirectToPage("./Index");
             }
@@ -68,20 +73,7 @@ namespace BookBuddi.Pages.Fines
             {
                 ErrorMessage = ex.Message;
                 Fine = _fineService.GetFineById(id);
-                
-                // Reload notifications for members
-                var userRole = HttpContext.Session.GetString("UserRole");
-                if (userRole == "Member")
-                {
-                    var memberId = HttpContext.Session.GetInt32("MemberId");
-                    if (memberId.HasValue)
-                    {
-                        var allNotifications = _notificationService.GetNotificationsByMember(memberId.Value);
-                        RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5).ToList();
-                        UnreadNotificationCount = _notificationService.GetUnreadCount(memberId.Value);
-                    }
-                }
-                
+
                 return Page();
             }
         }

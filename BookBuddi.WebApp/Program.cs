@@ -51,13 +51,14 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromHours(24);
-    options.LoginPath = "/Admin/Login";
+    options.LoginPath = "/Account/Login";
     options.AccessDeniedPath = "/Admin/AccessDenied";
     options.SlidingExpiration = true;
 });
 
 // Add AutoMapper
-var mapperConfig = new AutoMapper.MapperConfiguration(cfg => {
+var mapperConfig = new AutoMapper.MapperConfiguration(cfg =>
+{
     cfg.AddProfile<AutoMapperProfile>();
 });
 var mapper = mapperConfig.CreateMapper();
@@ -77,6 +78,8 @@ builder.Services.AddScoped<IBorrowTransactionRepository, BorrowTransactionReposi
 builder.Services.AddScoped<IFineRepository, FineRepository>();
 builder.Services.AddScoped<IBookRequestRepository, BookRequestRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 
 // Register Managers
 builder.Services.AddScoped<PasswordManager>();
@@ -90,6 +93,8 @@ builder.Services.AddScoped<IBorrowingService, BorrowingService>();
 builder.Services.AddScoped<IFineService, FineService>();
 builder.Services.AddScoped<IBookRequestService, BookRequestService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IGenreService, GenreService>();
 
 var app = builder.Build();
 

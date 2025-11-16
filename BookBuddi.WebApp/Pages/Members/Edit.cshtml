@@ -1,0 +1,150 @@
+@page
+@model BookBuddi.Pages.Members.EditModel
+@{
+    ViewData["Title"] = "Edit Member";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Edit Member: @Model.Member.FullName</h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill"></i> @Model.SuccessMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <input type="hidden" asp-for="Member.MemberId" />
+
+                        <h5 class="text-primary mb-3">Basic Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="FirstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="FirstName" asp-for="Member.FirstName" required />
+                                <span asp-validation-for="Member.FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="LastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="LastName" asp-for="Member.LastName" required />
+                                <span asp-validation-for="Member.LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="Email" asp-for="Member.Email" required />
+                            <span asp-validation-for="Member.Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="Phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="Phone" asp-for="Member.Phone" />
+                                <span asp-validation-for="Member.Phone" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="DateOfBirth" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="DateOfBirth" asp-for="Member.DateOfBirth" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Address" class="form-label">Address</label>
+                            <textarea class="form-control" id="Address" asp-for="Member.Address" rows="2"></textarea>
+                            <span asp-validation-for="Member.Address" class="text-danger"></span>
+                        </div>
+
+                        <hr />
+
+                        <h5 class="text-primary mb-3">Membership Details</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="Status" class="form-label">Status</label>
+                                <select class="form-select" id="Status" asp-for="Member.Status" asp-items="Html.GetEnumSelectList<BookBuddi.Resources.Constants.MemberStatus>()">
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="BorrowingLimit" class="form-label">Borrowing Limit</label>
+                                <input type="number" class="form-control" id="BorrowingLimit" asp-for="Member.BorrowingLimit" min="1" max="20" />
+                                <small class="form-text text-muted">Maximum books that can be borrowed at once (1-20)</small>
+                                <span asp-validation-for="Member.BorrowingLimit" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="MembershipDate" class="form-label">Membership Date</label>
+                                <input type="date" class="form-control" id="MembershipDate" asp-for="Member.MembershipDate" readonly />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="MembershipExpiryDate" class="form-label">Membership Expiry Date</label>
+                                <input type="date" class="form-control" id="MembershipExpiryDate" asp-for="Member.MembershipExpiryDate" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Current Borrowed Count</label>
+                            <input type="text" class="form-control" value="@Model.Member.CurrentBorrowedCount" readonly />
+                            <small class="form-text text-muted">Number of books currently borrowed</small>
+                        </div>
+
+                        <hr />
+
+                        <h5 class="text-primary mb-3">Change Password (Optional)</h5>
+                        <p class="text-muted small">Leave blank to keep the current password</p>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="NewPassword" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="NewPassword" asp-for="NewPassword" minlength="8" />
+                                <small class="form-text text-muted">At least 8 characters with uppercase, lowercase, digit, and special character</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ConfirmPassword" class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" id="ConfirmPassword" asp-for="ConfirmPassword" minlength="8" />
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/Members/Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Members
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Update Member
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="text-muted">Audit Information</h6>
+                    <p class="mb-1"><small><strong>Created By:</strong> @Model.Member.CreatedBy on @Model.Member.CreatedTime.ToString("MMM dd, yyyy hh:mm tt")</small></p>
+                    <p class="mb-0"><small><strong>Last Updated By:</strong> @Model.Member.UpdatedBy on @Model.Member.UpdatedTime.ToString("MMM dd, yyyy hh:mm tt")</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

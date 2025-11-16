@@ -1,0 +1,108 @@
+@page
+@model BookBuddi.Pages.Books.EditModel
+@{
+    ViewData["Title"] = "Edit Book";
+    var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
+}
+
+<h1>Edit Book</h1>
+
+@if (!isAdmin)
+{
+    <p style="color: red;">Admin access required.</p>
+    <p><a href="/Account/Login">Login as Admin</a></p>
+}
+else
+{
+    <form method="post" style="max-width: 800px;">
+        <input type="hidden" asp-for="Book.BookId" />
+        <input type="hidden" asp-for="Book.CreatedBy" />
+        <input type="hidden" asp-for="Book.CreatedTime" />
+
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Title: *</label><br/>
+            <input type="text" asp-for="Book.BookTitle" required style="width: 100%; padding: 8px;" />
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">ISBN: *</label><br/>
+            <input type="text" asp-for="Book.ISBN" required style="width: 100%; padding: 8px;" />
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Publisher:</label><br/>
+            <input type="text" asp-for="Book.Publisher" style="width: 100%; padding: 8px;" />
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Publication Date:</label><br/>
+            <input type="date" asp-for="Book.PublicationDate" style="padding: 8px;" />
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Description:</label><br/>
+            <textarea asp-for="Book.Description" rows="4" style="width: 100%; padding: 8px;"></textarea>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Page Count:</label><br/>
+            <input type="number" asp-for="Book.PageCount" style="padding: 8px;" min="0" />
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Available Copies: *</label><br/>
+            <input type="number" asp-for="Book.AvailableCopies" required style="padding: 8px;" min="0" />
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Category: *</label><br/>
+            <select asp-for="Book.CategoryId" required style="width: 100%; padding: 8px;">
+                <option value="">-- Select Category --</option>
+                @foreach (var category in Model.Categories)
+                {
+                    <option value="@category.CategoryId">@category.CategoryName</option>
+                }
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Genre: *</label><br/>
+            <select asp-for="Book.GenreId" required style="width: 100%; padding: 8px;">
+                <option value="">-- Select Genre --</option>
+                @foreach (var genre in Model.Genres)
+                {
+                    <option value="@genre.GenreId">@genre.GenreName</option>
+                }
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: bold;">Status:</label><br/>
+            <select asp-for="Book.Status" style="width: 100%; padding: 8px;">
+                <option value="0">Available</option>
+                <option value="1">Borrowed</option>
+                <option value="2">Reserved</option>
+                <option value="3">Lost</option>
+                <option value="4">Damaged</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <p style="color: #666; font-size: 14px;">
+                Created by: <strong>@Model.Book.CreatedBy</strong> on @Model.Book.CreatedTime.ToString("MMM dd, yyyy hh:mm tt")
+            </p>
+        </div>
+
+        <div>
+            <button type="submit" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Update Book</button>
+            <a href="/Books/Index" style="margin-left: 10px; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px;">Cancel</a>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div style="margin-top: 20px; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px;">
+            @Model.ErrorMessage
+        </div>
+    }
+}

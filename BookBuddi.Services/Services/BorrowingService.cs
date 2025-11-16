@@ -34,6 +34,9 @@ namespace BookBuddi.Services.Services
 
         public IEnumerable<BorrowTransactionViewModel> GetAllTransactions()
         {
+            // Automatically update overdue transactions before retrieving
+            ProcessOverdueTransactions();
+
             var transactions = _transactionRepository.GetTransactions().ToList();
             return _mapper.Map<IEnumerable<BorrowTransactionViewModel>>(transactions);
         }
@@ -46,6 +49,9 @@ namespace BookBuddi.Services.Services
 
         public IEnumerable<BorrowTransactionViewModel> GetTransactionsByMember(int memberId)
         {
+            // Automatically update overdue transactions before retrieving
+            ProcessOverdueTransactions();
+
             var transactions = _transactionRepository.GetTransactionsByMember(memberId);
             return _mapper.Map<IEnumerable<BorrowTransactionViewModel>>(transactions);
         }
@@ -64,6 +70,9 @@ namespace BookBuddi.Services.Services
 
         public IEnumerable<BorrowTransactionViewModel> GetActiveTransactionsByMember(int memberId)
         {
+            // Automatically update overdue transactions before retrieving
+            ProcessOverdueTransactions();
+
             var transactions = _transactionRepository.GetActiveTransactionsByMember(memberId);
             return _mapper.Map<IEnumerable<BorrowTransactionViewModel>>(transactions);
         }
@@ -168,7 +177,7 @@ namespace BookBuddi.Services.Services
             if (transaction == null)
                 throw new InvalidOperationException("Transaction not found");
 
-            if (transaction.Status != TransactionStatus.Active)
+            if (transaction.Status != TransactionStatus.Active && transaction.Status != TransactionStatus.Overdue)
                 throw new InvalidOperationException("Book has already been returned");
 
             // Update transaction
