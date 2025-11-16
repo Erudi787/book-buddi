@@ -81,9 +81,18 @@ namespace BookBuddi.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    // Check if admin account is active
+                    if (!admin.IsActive)
+                    {
+                        ErrorMessage = "Your admin account has been deactivated. Please contact support.";
+                        await _signInManager.SignOutAsync();
+                        return Page();
+                    }
+
                     HttpContext.Session.SetString("UserRole", "Admin");
                     HttpContext.Session.SetString("AdminName", $"{admin.FirstName} {admin.LastName}");
-                    return RedirectToPage("/Index");
+                    HttpContext.Session.SetString("AdminEmail", admin.Email!);
+                    return RedirectToPage("/Admin/Index");
                 }
             }
 
