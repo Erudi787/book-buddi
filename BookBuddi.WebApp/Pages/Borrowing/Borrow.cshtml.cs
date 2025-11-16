@@ -30,12 +30,12 @@ namespace BookBuddi.Pages.Borrowing
 
         public IActionResult OnGet(int? bookId)
         {
-            // Admin authorization check
+            // Authentication check - both Admin and Member can access
             var userRole = HttpContext.Session.GetString("UserRole");
-            if (userRole != "Admin")
+            if (string.IsNullOrEmpty(userRole))
             {
-                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
+                TempData["ErrorMessage"] = "You must be logged in to access this page.";
+                return RedirectToPage("/Account/Login");
             }
 
             Members = _memberService.GetMembersByStatus(BookBuddi.Resources.Constants.MemberStatus.Active).ToList();
@@ -47,18 +47,20 @@ namespace BookBuddi.Pages.Borrowing
 
         public IActionResult OnPost(int memberId, int bookId)
         {
-            // Admin authorization check
+            // Authentication check - both Admin and Member can access
             var userRole = HttpContext.Session.GetString("UserRole");
-            if (userRole != "Admin")
+            if (string.IsNullOrEmpty(userRole))
             {
-                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
+                TempData["ErrorMessage"] = "You must be logged in to access this page.";
+                return RedirectToPage("/Account/Login");
             }
 
             try
             {
-                var adminName = HttpContext.Session.GetString("AdminName") ?? "System";
-                _borrowingService.BorrowBook(memberId, bookId, adminName);
+                var processedBy = userRole == "Admin"
+                    ? HttpContext.Session.GetString("AdminName") ?? "Admin"
+                    : HttpContext.Session.GetString("MemberName") ?? "Member";
+                _borrowingService.BorrowBook(memberId, bookId, processedBy);
                 SuccessMessage = "Book borrowed successfully!";
 
                 // Reload dropdowns

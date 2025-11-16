@@ -17,7 +17,7 @@ namespace BookBuddi.Resources.Constants
         // Default Values
         public const int DefaultBorrowingLimit = 5;
         public const int DefaultBorrowPeriodDays = 14;
-        public const decimal DefaultOverdueFinePerDay = 1.00m;
+        public const decimal DefaultOverdueFinePerDay = 50.00m; // Philippine Pesos (₱50.00 per day)
 
         // Validation
         public const int MinPasswordLength = 8;

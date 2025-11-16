@@ -29,12 +29,12 @@ namespace BookBuddi.Pages.Borrowing
 
         public IActionResult OnGet(int id)
         {
-            // Admin authorization check
+            // Authentication check - both Admin and Member can access
             var userRole = HttpContext.Session.GetString("UserRole");
-            if (userRole != "Admin")
+            if (string.IsNullOrEmpty(userRole))
             {
-                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
+                TempData["ErrorMessage"] = "You must be logged in to access this page.";
+                return RedirectToPage("/Account/Login");
             }
 
             Transaction = _borrowingService.GetTransactionById(id);
@@ -63,18 +63,20 @@ namespace BookBuddi.Pages.Borrowing
 
         public IActionResult OnPost(int id)
         {
-            // Admin authorization check
+            // Authentication check - both Admin and Member can access
             var userRole = HttpContext.Session.GetString("UserRole");
-            if (userRole != "Admin")
+            if (string.IsNullOrEmpty(userRole))
             {
-                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
+                TempData["ErrorMessage"] = "You must be logged in to access this page.";
+                return RedirectToPage("/Account/Login");
             }
 
             try
             {
-                var adminName = HttpContext.Session.GetString("AdminName") ?? "System";
-                _borrowingService.ReturnBook(id, adminName);
+                var processedBy = userRole == "Admin"
+                    ? HttpContext.Session.GetString("AdminName") ?? "Admin"
+                    : HttpContext.Session.GetString("MemberName") ?? "Member";
+                _borrowingService.ReturnBook(id, processedBy);
                 return RedirectToPage("./Index");
             }
             catch (Exception ex)

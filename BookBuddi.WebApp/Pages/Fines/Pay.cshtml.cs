@@ -26,12 +26,12 @@ namespace BookBuddi.Pages.Fines
 
         public IActionResult OnGet(int id)
         {
-            // Admin authorization check
+            // Authentication check - both Admin and Member can access
             var userRole = HttpContext.Session.GetString("UserRole");
-            if (userRole != "Admin")
+            if (string.IsNullOrEmpty(userRole))
             {
-                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
+                TempData["ErrorMessage"] = "You must be logged in to access this page.";
+                return RedirectToPage("/Account/Login");
             }
 
             Fine = _fineService.GetFineById(id);
@@ -53,17 +53,19 @@ namespace BookBuddi.Pages.Fines
 
         public IActionResult OnPost(int id)
         {
-            // Admin authorization check
+            // Authentication check - both Admin and Member can access
             var userRole = HttpContext.Session.GetString("UserRole");
-            if (userRole != "Admin")
+            if (string.IsNullOrEmpty(userRole))
             {
-                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
+                TempData["ErrorMessage"] = "You must be logged in to access this page.";
+                return RedirectToPage("/Account/Login");
             }
 
             try
             {
-                var updatedBy = HttpContext.Session.GetString("AdminName") ?? "System";
+                var updatedBy = userRole == "Admin"
+                    ? HttpContext.Session.GetString("AdminName") ?? "Admin"
+                    : HttpContext.Session.GetString("MemberName") ?? "Member";
                 _fineService.PayFine(id, updatedBy);
                 return RedirectToPage("./Index");
             }

@@ -456,6 +456,7 @@
     {
         var isOverdue = Model.Transaction.DueDate < DateTime.Now;
         var daysOverdue = isOverdue ? (DateTime.Now - Model.Transaction.DueDate).Days : 0;
+        var fineAmount = daysOverdue * 50.00m; // ₱50.00 per day
 
         <div class="return-card">
             <div class="confirmation-text">
@@ -477,11 +478,11 @@
                         <line x1="12" y1="17" x2="12.01" y2="17"></line>
                     </svg>
                     <div class="overdue-warning-content">
-                        <h3>Overdue Book</h3>
+                        <h3>Overdue Book - Fine Will Be Applied</h3>
                         <p>
                             This book is <span class="overdue-days">@daysOverdue day@(daysOverdue > 1 ? "s" : "")
                                 overdue</span>.
-                            A late fee may be applied to your account upon return.
+                            A fine of <strong style="color: #dc3545; font-size: 1.1em;">₱@fineAmount.ToString("N2")</strong> (₱50.00 per day) will be applied to your account upon return.
                         </p>
                     </div>
                 </div>
@@ -518,6 +519,18 @@
                         </span>
                     </span>
                 </div>
+                @if (isOverdue)
+                {
+                    <div class="detail-row" style="background: #fff3cd; margin-top: 10px; padding: 20px; border-radius: 8px;">
+                        <span class="detail-label" style="color: #856404;">Fine Amount</span>
+                        <span class="detail-value" style="color: #dc3545; font-size: 1.3rem; font-weight: 700;">
+                            ₱@fineAmount.ToString("N2")
+                        </span>
+                    </div>
+                    <div style="padding: 10px 0; font-size: 0.9rem; color: #666;">
+                        <em>This fine will be automatically added to your account when you confirm the return.</em>
+                    </div>
+                }
             </div>
 
             <form method="post">

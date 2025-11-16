@@ -679,6 +679,64 @@
         border-left: 4px solid #dc3545;
     }
 
+    .borrowing-info-card {
+        background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+        border-radius: 16px;
+        padding: 25px 30px;
+        margin-bottom: 30px;
+        border-left: 5px solid #2196F3;
+        box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+    }
+
+    .borrowing-info-card h3 {
+        font-size: 1.3rem;
+        color: #1565c0;
+        margin: 0 0 15px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+    }
+
+    .borrowing-info-card h3 svg {
+        stroke: #1565c0;
+    }
+
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .info-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+        color: #0d47a1;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .info-list li svg {
+        flex-shrink: 0;
+        margin-top: 2px;
+        stroke: #2196F3;
+    }
+
+    .info-list li strong {
+        color: #0d47a1;
+        font-weight: 600;
+    }
+
+    .info-highlight {
+        background: rgba(255, 152, 0, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: #e65100;
+        font-weight: 600;
+    }
+
     .book-preview {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         border-radius: 12px;
@@ -1068,13 +1126,26 @@
 
     @if (!string.IsNullOrEmpty(Model.SuccessMessage))
     {
-        <div class="alert alert-success">
+        <div class="alert alert-success" id="successAlert">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
-            @Model.SuccessMessage
+            <span>@Model.SuccessMessage Redirecting to My Borrowing in <span id="countdown">3</span> seconds...</span>
         </div>
+        <script>
+            let countdown = 3;
+            const countdownElement = document.getElementById('countdown');
+            const interval = setInterval(function() {
+                countdown--;
+                if (countdown > 0) {
+                    countdownElement.textContent = countdown;
+                } else {
+                    clearInterval(interval);
+                    window.location.href = '/Borrowing/Index';
+                }
+            }, 1000);
+        </script>
     }
 
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
@@ -1088,6 +1159,49 @@
             @Model.ErrorMessage
         </div>
     }
+
+    <div class="borrowing-info-card">
+        <h3>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 16v-4"></path>
+                <path d="M12 8h.01"></path>
+            </svg>
+            Borrowing Terms & Conditions
+        </h3>
+        <ul class="info-list">
+            <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span><strong>Borrowing Period:</strong> You can borrow books for up to <span class="info-highlight">14 days</span> from the date of borrowing.</span>
+            </li>
+            <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span><strong>Borrowing Limit:</strong> You can borrow up to <span class="info-highlight">5 books</span> at a time.</span>
+            </li>
+            <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span><strong>Overdue Fines:</strong> Books returned after the due date will incur a fine of <span class="info-highlight">₱50.00 per day</span>.</span>
+            </li>
+            <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span><strong>Unpaid Fines:</strong> You must pay all outstanding fines before borrowing new books.</span>
+            </li>
+            <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span><strong>Book Condition:</strong> Please return books in the same condition you received them. Damaged books may result in additional charges.</span>
+            </li>
+        </ul>
+    </div>
 
     <div class="borrow-card">
         <form method="post">
