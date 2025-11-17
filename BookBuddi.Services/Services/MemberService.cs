@@ -233,5 +233,35 @@ namespace BookBuddi.Services.Services
             _memberRepository.UpdateMember(member);
             _context.SaveChanges();
         }
+
+        public MemberViewModel? GetMemberByVerificationToken(string token)
+        {
+            Console.WriteLine($"[MemberService] Searching for member with token: {token?.Substring(0, Math.Min(20, token?.Length ?? 0))}...");
+
+            var member = _context.Members
+                .FirstOrDefault(m => m.EmailVerificationToken == token);
+
+            if (member != null)
+            {
+                Console.WriteLine($"[MemberService] Found member: {member.Email}, Token in DB: {member.EmailVerificationToken?.Substring(0, Math.Min(20, member.EmailVerificationToken?.Length ?? 0))}...");
+            }
+            else
+            {
+                Console.WriteLine($"[MemberService] No member found with this token");
+                // Check if any members exist with verification tokens
+                var anyWithToken = _context.Members.Any(m => m.EmailVerificationToken != null);
+                Console.WriteLine($"[MemberService] Members with verification tokens in DB: {anyWithToken}");
+            }
+
+            return member != null ? _mapper.Map<MemberViewModel>(member) : null;
+        }
+
+        public MemberViewModel? GetMemberByVerificationCode(string code)
+        {
+            var member = _context.Members
+                .FirstOrDefault(m => m.EmailVerificationCode == code);
+
+            return member != null ? _mapper.Map<MemberViewModel>(member) : null;
+        }
     }
 }
