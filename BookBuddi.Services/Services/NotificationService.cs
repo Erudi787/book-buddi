@@ -11,11 +11,31 @@ namespace BookBuddi.Services.Services
     {
         private readonly INotificationRepository _notificationRepository;
         private readonly IMapper _mapper;
+        private readonly IEmailService? _emailService;
+        private readonly IMemberRepository? _memberRepository;
+        private readonly IBorrowTransactionRepository? _borrowingRepository;
+        private readonly IBookRepository? _bookRepository;
+        private readonly IFineRepository? _fineRepository;
+        private readonly IBookRequestRepository? _bookRequestRepository;
 
-        public NotificationService(INotificationRepository notificationRepository, IMapper mapper)
+        public NotificationService(
+            INotificationRepository notificationRepository,
+            IMapper mapper,
+            IEmailService? emailService = null,
+            IMemberRepository? memberRepository = null,
+            IBorrowTransactionRepository? borrowingRepository = null,
+            IBookRepository? bookRepository = null,
+            IFineRepository? fineRepository = null,
+            IBookRequestRepository? bookRequestRepository = null)
         {
             _notificationRepository = notificationRepository;
             _mapper = mapper;
+            _emailService = emailService;
+            _memberRepository = memberRepository;
+            _borrowingRepository = borrowingRepository;
+            _bookRepository = bookRepository;
+            _fineRepository = fineRepository;
+            _bookRequestRepository = bookRequestRepository;
         }
 
         public IEnumerable<NotificationViewModel> GetAllNotifications()
@@ -89,6 +109,31 @@ namespace BookBuddi.Services.Services
             };
 
             _notificationRepository.AddNotification(notification);
+
+            // Send email notification
+            if (_emailService != null && _memberRepository != null && _borrowingRepository != null && _bookRepository != null)
+            {
+                try
+                {
+                    var member = _memberRepository.GetMemberById(memberId);
+                    var transaction = _borrowingRepository.GetTransactionById(transactionId);
+                    var book = transaction != null ? _bookRepository.GetBookById(transaction.BookId) : null;
+
+                    if (member != null && book != null)
+                    {
+                        _ = _emailService.SendBookDueReminderAsync(
+                            member.Email,
+                            $"{member.FirstName} {member.LastName}",
+                            book.BookTitle,
+                            dueDate);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Log but don't fail on email send errors
+                    Console.WriteLine($"Failed to send due reminder email: {ex.Message}");
+                }
+            }
         }
 
         public void CreateOverdueAlertNotification(int memberId, int transactionId)
@@ -110,6 +155,32 @@ namespace BookBuddi.Services.Services
             };
 
             _notificationRepository.AddNotification(notification);
+
+            // Send email notification
+            if (_emailService != null && _memberRepository != null && _borrowingRepository != null && _bookRepository != null)
+            {
+                try
+                {
+                    var member = _memberRepository.GetMemberById(memberId);
+                    var transaction = _borrowingRepository.GetTransactionById(transactionId);
+                    var book = transaction != null ? _bookRepository.GetBookById(transaction.BookId) : null;
+
+                    if (member != null && transaction != null && book != null)
+                    {
+                        var daysOverdue = (DateTime.Now - transaction.DueDate).Days;
+                        _ = _emailService.SendOverdueAlertAsync(
+                            member.Email,
+                            $"{member.FirstName} {member.LastName}",
+                            book.BookTitle,
+                            transaction.DueDate,
+                            daysOverdue);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to send overdue alert email: {ex.Message}");
+                }
+            }
         }
 
         public void CreateFineIssuedNotification(int memberId, int fineId, decimal amount)
@@ -119,7 +190,7 @@ namespace BookBuddi.Services.Services
                 MemberId = memberId,
                 Type = NotificationType.FineIssued,
                 Title = "Fine Issued",
-                Message = $"A fine of ${amount:F2} has been issued to your account for an overdue book. Please pay it at your earliest convenience.",
+                Message = $"A fine of ₱{amount:F2} has been issued to your account for an overdue book. Please pay it at your earliest convenience.",
                 DateCreated = DateTime.Now,
                 IsRead = false,
                 RelatedEntityId = fineId,
@@ -131,6 +202,29 @@ namespace BookBuddi.Services.Services
             };
 
             _notificationRepository.AddNotification(notification);
+
+            // Send email notification
+            if (_emailService != null && _memberRepository != null && _fineRepository != null)
+            {
+                try
+                {
+                    var member = _memberRepository.GetMemberById(memberId);
+                    var fine = _fineRepository.GetFineById(fineId);
+
+                    if (member != null && fine != null)
+                    {
+                        _ = _emailService.SendFineIssuedNotificationAsync(
+                            member.Email,
+                            $"{member.FirstName} {member.LastName}",
+                            fine.Amount,
+                            fine.Reason.ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to send fine issued email: {ex.Message}");
+                }
+            }
         }
 
         public void CreateRequestUpdateNotification(int memberId, int requestId, RequestStatus newStatus)
@@ -160,6 +254,29 @@ namespace BookBuddi.Services.Services
             };
 
             _notificationRepository.AddNotification(notification);
+
+            // Send email notification
+            if (_emailService != null && _memberRepository != null && _bookRequestRepository != null)
+            {
+                try
+                {
+                    var member = _memberRepository.GetMemberById(memberId);
+                    var request = _bookRequestRepository.GetRequestById(requestId);
+
+                    if (member != null && request != null)
+                    {
+                        _ = _emailService.SendBookRequestUpdateAsync(
+                            member.Email,
+                            $"{member.FirstName} {member.LastName}",
+                            request.BookTitle,
+                            statusText);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to send book request update email: {ex.Message}");
+                }
+            }
         }
     }
 }

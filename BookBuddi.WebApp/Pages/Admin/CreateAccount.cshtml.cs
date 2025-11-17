@@ -5,7 +5,10 @@ using BookBuddi.Data.Models;
 using BookBuddi.Services.Interfaces;
 using BookBuddi.Services.Manager;
 using BookBuddi.Services.ServiceModels;
+using BookBuddi.Services.Configuration;
 using BookBuddi.Resources.Constants;
+using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
 
 namespace BookBuddi.Pages.Admin
 {
@@ -15,17 +18,23 @@ namespace BookBuddi.Pages.Admin
         private readonly UserManager<Data.Models.Admin> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly PasswordManager _passwordManager;
+        private readonly IEmailService _emailService;
+        private readonly ApplicationSettings _appSettings;
 
         public CreateAccountModel(
             IMemberService memberService,
             UserManager<Data.Models.Admin> userManager,
             RoleManager<IdentityRole> roleManager,
-            PasswordManager passwordManager)
+            PasswordManager passwordManager,
+            IEmailService emailService,
+            IOptions<ApplicationSettings> appSettings)
         {
             _memberService = memberService;
             _userManager = userManager;
             _roleManager = roleManager;
             _passwordManager = passwordManager;
+            _emailService = emailService;
+            _appSettings = appSettings.Value;
         }
 
         [BindProperty]
@@ -167,6 +176,11 @@ namespace BookBuddi.Pages.Admin
                         return Page();
                     }
 
+                    // Generate email verification token and code
+                    var verificationToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+                    var verificationCode = new Random().Next(100000, 999999).ToString(); // 6-digit code
+                    var tokenExpiry = DateTime.Now.AddHours(_appSettings.TokenExpirationHours);
+
                     var memberViewModel = new MemberViewModel
                     {
                         FirstName = FirstName,
@@ -178,11 +192,42 @@ namespace BookBuddi.Pages.Admin
                         Status = MemberStatus.Active,
                         BorrowingLimit = BorrowingLimit,
                         MembershipDate = DateTime.Now,
-                        MembershipExpiryDate = MembershipExpiryDate
+                        MembershipExpiryDate = MembershipExpiryDate,
+                        EmailVerified = false,
+                        EmailVerificationToken = verificationToken,
+                        EmailVerificationCode = verificationCode,
+                        EmailVerificationTokenExpiry = tokenExpiry
                     };
 
                     _memberService.AddMember(memberViewModel, Password, adminName);
-                    SuccessMessage = $"Member account created successfully for {FirstName} {LastName}.";
+
+                    // Send verification email
+                    try
+                    {
+                        Console.WriteLine($"[CreateAccount] Attempting to send verification email to {Email}...");
+                        var emailResult = await _emailService.SendMemberVerificationEmailAsync(
+                            Email,
+                            FirstName,
+                            verificationToken,
+                            verificationCode);
+
+                        if (emailResult)
+                        {
+                            Console.WriteLine($"[CreateAccount] Verification email sent successfully to {Email}");
+                            SuccessMessage = $"Member account created successfully for {FirstName} {LastName}! A verification email has been sent to {Email}.";
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[CreateAccount] Email service returned false for {Email}");
+                            SuccessMessage = $"Member account created for {FirstName} {LastName}, but email sending returned false. Check logs.";
+                        }
+                    }
+                    catch (Exception emailEx)
+                    {
+                        Console.WriteLine($"[CreateAccount] Failed to send verification email: {emailEx.Message}");
+                        Console.WriteLine($"[CreateAccount] Stack trace: {emailEx.StackTrace}");
+                        SuccessMessage = $"Member account created for {FirstName} {LastName}, but failed to send verification email: {emailEx.Message}";
+                    }
 
                     // Clear form
                     ModelState.Clear();

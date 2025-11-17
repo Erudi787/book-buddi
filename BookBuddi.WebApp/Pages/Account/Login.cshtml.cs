@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Identity;
 using BookBuddi.Services.Interfaces;
 using BookBuddi.Services.Manager;
 using BookBuddi.Services.ServiceModels;
+using BookBuddi.Services.Configuration;
 using BookBuddi.Data.Models;
 using BookBuddi.Resources.Constants;
+using Microsoft.Extensions.Options;
 using AdminModel = BookBuddi.Data.Models.Admin;
 
 namespace BookBuddi.Pages.Account
@@ -16,17 +18,20 @@ namespace BookBuddi.Pages.Account
         private readonly PasswordManager _passwordManager;
         private readonly SignInManager<AdminModel> _signInManager;
         private readonly UserManager<AdminModel> _userManager;
+        private readonly ApplicationSettings _appSettings;
 
         public LoginModel(
             IMemberService memberService,
             PasswordManager passwordManager,
             SignInManager<AdminModel> signInManager,
-            UserManager<AdminModel> userManager)
+            UserManager<AdminModel> userManager,
+            IOptions<ApplicationSettings> appSettings)
         {
             _memberService = memberService;
             _passwordManager = passwordManager;
             _signInManager = signInManager;
             _userManager = userManager;
+            _appSettings = appSettings.Value;
         }
 
         public string? ErrorMessage { get; set; }
@@ -55,6 +60,13 @@ namespace BookBuddi.Pages.Account
                 if (member == null)
                 {
                     ErrorMessage = "Invalid email or password.";
+                    return Page();
+                }
+
+                // Check email verification if required
+                if (_appSettings.EmailVerificationRequired && !member.EmailVerified)
+                {
+                    ErrorMessage = "Please verify your email address before logging in. Check your inbox for the verification link.";
                     return Page();
                 }
 

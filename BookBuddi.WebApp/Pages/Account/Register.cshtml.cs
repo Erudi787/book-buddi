@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookBuddi.Services.Interfaces;
 using BookBuddi.Services.Manager;
 using BookBuddi.Services.ServiceModels;
+using BookBuddi.Services.Configuration;
 using BookBuddi.Resources.Constants;
+using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
 
 namespace BookBuddi.Pages.Account
 {
@@ -11,11 +14,19 @@ namespace BookBuddi.Pages.Account
     {
         private readonly IMemberService _memberService;
         private readonly PasswordManager _passwordManager;
+        private readonly IEmailService _emailService;
+        private readonly ApplicationSettings _appSettings;
 
-        public RegisterModel(IMemberService memberService, PasswordManager passwordManager)
+        public RegisterModel(
+            IMemberService memberService,
+            PasswordManager passwordManager,
+            IEmailService emailService,
+            IOptions<ApplicationSettings> appSettings)
         {
             _memberService = memberService;
             _passwordManager = passwordManager;
+            _emailService = emailService;
+            _appSettings = appSettings.Value;
         }
 
         public string? ErrorMessage { get; set; }
@@ -84,6 +95,11 @@ namespace BookBuddi.Pages.Account
                     return Page();
                 }
 
+                // Generate email verification token and code
+                var verificationToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+                var verificationCode = new Random().Next(100000, 999999).ToString(); // 6-digit code
+                var tokenExpiry = DateTime.Now.AddHours(_appSettings.TokenExpirationHours);
+
                 var memberViewModel = new MemberViewModel
                 {
                     FirstName = firstName,
@@ -96,16 +112,37 @@ namespace BookBuddi.Pages.Account
                     BorrowingLimit = 5,
                     MembershipDate = DateTime.Now,
                     MembershipExpiryDate = DateTime.Now.AddYears(1), // 1 year membership
-                    CurrentBorrowedCount = 0
+                    CurrentBorrowedCount = 0,
+                    EmailVerified = false,
+                    EmailVerificationToken = verificationToken,
+                    EmailVerificationCode = verificationCode,
+                    EmailVerificationTokenExpiry = tokenExpiry
                 };
 
                 _memberService.AddMember(memberViewModel, password, "Self-Registration");
-                SuccessMessage = "Registration successful! You can now login with your email and password.";
 
-                // Clear form data
-                ModelState.Clear();
+                // Send verification email with code
+                try
+                {
+                    await _emailService.SendMemberVerificationEmailAsync(email, firstName, verificationToken, verificationCode);
+                }
+                catch (Exception emailEx)
+                {
+                    // Log email error but don't fail registration
+                    Console.WriteLine($"Failed to send verification email: {emailEx.Message}");
+                }
 
-                return Page();
+                if (_appSettings.EmailVerificationRequired)
+                {
+                    // Redirect to verification code entry page
+                    return RedirectToPage("/Account/EnterVerificationCode", new { email = email });
+                }
+                else
+                {
+                    SuccessMessage = "Registration successful! You can now login with your email and password.";
+                    ModelState.Clear();
+                    return Page();
+                }
             }
             catch (Exception ex)
             {

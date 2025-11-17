@@ -8,11 +8,19 @@ using BookBuddi.Services.Interfaces;
 using BookBuddi.Services.Services;
 using BookBuddi.Services.Manager;
 using BookBuddi.Services;
+using BookBuddi.Services.Configuration;
+using Hangfire;
+using Hangfire.SqlServer;
+using Hangfire.Dashboard;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+// Configure Settings
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("ApplicationSettings"));
 
 // Add session support
 builder.Services.AddSession(options =>
@@ -25,6 +33,22 @@ builder.Services.AddSession(options =>
 // Database Context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add Hangfire services
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
+    {
+        CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+        SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+        QueuePollInterval = TimeSpan.Zero,
+        UseRecommendedIsolationLevel = true,
+        DisableGlobalLocks = true
+    }));
+
+builder.Services.AddHangfireServer();
 
 // Identity
 builder.Services.AddIdentity<Admin, IdentityRole>(options =>
@@ -96,6 +120,10 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
 
+// Register Email Service
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<EmailNotificationBackgroundService>();
+
 var app = builder.Build();
 
 // Seed the database
@@ -135,8 +163,43 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Use Hangfire Dashboard (accessible only in Development or for admins)
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireDashboardAuthorizationFilter() }
+});
+
+// Schedule recurring background jobs
+RecurringJob.AddOrUpdate<EmailNotificationBackgroundService>(
+    "send-due-reminders",
+    service => service.SendDueRemindersAsync(),
+    Cron.Daily(9)); // Run daily at 9 AM
+
+RecurringJob.AddOrUpdate<EmailNotificationBackgroundService>(
+    "send-overdue-alerts",
+    service => service.SendOverdueAlertsAsync(),
+    Cron.Daily(10)); // Run daily at 10 AM
+
+RecurringJob.AddOrUpdate<EmailNotificationBackgroundService>(
+    "send-membership-expiry-reminders",
+    service => service.SendMembershipExpiryRemindersAsync(),
+    Cron.Daily(8)); // Run daily at 8 AM
+
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
 
 app.Run();
+
+// Hangfire Dashboard Authorization Filter
+public class HangfireDashboardAuthorizationFilter : IDashboardAuthorizationFilter
+{
+    public bool Authorize(DashboardContext context)
+    {
+        // In development, allow access to everyone
+        // In production, you should check if the user is an admin
+        var httpContext = context.GetHttpContext();
+        return httpContext.Request.Host.Host.Contains("localhost") ||
+               httpContext.Session.GetString("UserRole") == "Admin";
+    }
+}

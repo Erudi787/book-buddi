@@ -1,18 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BookBuddi.Services.Interfaces;
+using BookBuddi.Services.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace BookBuddi.Pages.Account
 {
     public class ForgotPasswordModel : PageModel
     {
         private readonly IMemberService _memberService;
-        private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
+        private readonly EmailSettings _emailSettings;
 
-        public ForgotPasswordModel(IMemberService memberService, IConfiguration configuration)
+        public ForgotPasswordModel(
+            IMemberService memberService,
+            IEmailService emailService,
+            IOptions<EmailSettings> emailSettings)
         {
             _memberService = memberService;
-            _configuration = configuration;
+            _emailService = emailService;
+            _emailSettings = emailSettings.Value;
         }
 
         public string? ErrorMessage { get; set; }
@@ -41,16 +48,47 @@ namespace BookBuddi.Pages.Account
 
                 // Generate reset token
                 var token = _memberService.GeneratePasswordResetToken(email);
+                var resetUrl = Url.Page("/Account/ResetPassword", null, new { token }, Request.Scheme)!;
 
-                // In a real application, you would send an email with the reset link
-                // For now, we'll show the link in the success message (development only)
-                var resetUrl = Url.Page("/Account/ResetPassword", null, new { token }, Request.Scheme);
+                // Get member info for personalized email
+                var member = _memberService.GetMemberByEmail(email);
+                if (member != null)
+                {
+                    // Send password reset email
+                    try
+                    {
+                        await _emailService.SendPasswordResetEmailAsync(email, member.FirstName, resetUrl);
 
-                // TODO: Replace with actual email sending service
-                // await _emailService.SendPasswordResetEmail(email, resetUrl);
+                        if (_emailSettings.UseDevelopmentMode)
+                        {
+                            SuccessMessage = $"Password reset link has been sent to your email. " +
+                                           $"(DEV MODE: {resetUrl})";
+                        }
+                        else
+                        {
+                            SuccessMessage = "If an account exists with that email, a password reset link has been sent.";
+                        }
+                    }
+                    catch (Exception emailEx)
+                    {
+                        Console.WriteLine($"Failed to send password reset email: {emailEx.Message}");
 
-                SuccessMessage = $"If an account exists with that email, a password reset link has been sent. " +
-                                $"(DEV MODE: {resetUrl})";
+                        // In development mode, show the link even if email fails
+                        if (_emailSettings.UseDevelopmentMode)
+                        {
+                            SuccessMessage = $"Email service unavailable. Use this link: {resetUrl}";
+                        }
+                        else
+                        {
+                            SuccessMessage = "If an account exists with that email, a password reset link has been sent.";
+                        }
+                    }
+                }
+                else
+                {
+                    // Don't reveal if account exists for security
+                    SuccessMessage = "If an account exists with that email, a password reset link has been sent.";
+                }
 
                 return Page();
             }

@@ -1,0 +1,71 @@
+@page
+@model BookBuddi.Pages.Account.TestEmailModel
+@{
+    ViewData["Title"] = "Test Email";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">Email Testing Tool</h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success">
+                            @Model.SuccessMessage
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger">
+                            @Model.ErrorMessage
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.EmailOutput))
+                    {
+                        <div class="alert alert-info">
+                            <h5>Email Preview (DEV MODE):</h5>
+                            <pre>@Model.EmailOutput</pre>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Test Email Type:</label>
+                            <select name="emailType" class="form-control" required>
+                                <option value="">Select email type...</option>
+                                <option value="verification">Email Verification</option>
+                                <option value="passwordreset">Password Reset</option>
+                                <option value="duereminder">Book Due Reminder</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Recipient Email:</label>
+                            <input type="email" name="email" class="form-control" placeholder="test@example.com" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Recipient Name:</label>
+                            <input type="text" name="name" class="form-control" placeholder="Test User" required />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Send Test Email</button>
+                        <a href="/" class="btn btn-secondary">Back to Home</a>
+                    </form>
+
+                    <hr />
+                    <div class="alert alert-warning">
+                        <strong>Note:</strong> With <code>UseDevelopmentMode: true</code>, emails are logged to the console instead of being sent.
+                        Check your terminal/console output for the email content.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

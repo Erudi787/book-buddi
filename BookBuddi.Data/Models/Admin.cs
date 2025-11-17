@@ -8,6 +8,7 @@ namespace BookBuddi.Data.Models
         public string LastName { get; set; } = string.Empty;
         public DateTime DateCreated { get; set; }
         public bool IsActive { get; set; } = true;
+        public bool EmailVerified { get; set; } = false;
 
         // Audit Trail
         public string CreatedBy { get; set; } = string.Empty;

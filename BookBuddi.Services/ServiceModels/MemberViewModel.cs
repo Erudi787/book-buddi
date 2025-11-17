@@ -22,6 +22,11 @@ namespace BookBuddi.Services.ServiceModels
         [StringLength(200, ErrorMessage = "Email cannot exceed 200 characters")]
         public string Email { get; set; } = string.Empty;
 
+        public bool EmailVerified { get; set; } = false;
+        public string? EmailVerificationToken { get; set; }
+        public string? EmailVerificationCode { get; set; }
+        public DateTime? EmailVerificationTokenExpiry { get; set; }
+
         [StringLength(20, ErrorMessage = "Phone cannot exceed 20 characters")]
         [Phone(ErrorMessage = "Invalid phone number")]
         public string? Phone { get; set; }

@@ -24,5 +24,9 @@ namespace BookBuddi.Services.Interfaces
         string GeneratePasswordResetToken(string email);
         bool ValidatePasswordResetToken(string token);
         void ResetPassword(string token, string newPassword);
+
+        // Email verification methods
+        MemberViewModel? GetMemberByVerificationToken(string token);
+        MemberViewModel? GetMemberByVerificationCode(string code);
     }
 }

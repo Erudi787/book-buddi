@@ -1,0 +1,84 @@
+@page
+@model BookBuddi.Pages.Account.DiagEmailModel
+@{
+    ViewData["Title"] = "Email Configuration Diagnostic";
+}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3>Email Configuration Diagnostic</h3>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <tr>
+                    <th>Environment:</th>
+                    <td><span class="badge bg-info">@Model.Environment</span></td>
+                </tr>
+                <tr>
+                    <th>SMTP Server:</th>
+                    <td>@Model.SmtpServer</td>
+                </tr>
+                <tr>
+                    <th>SMTP Port:</th>
+                    <td>@Model.SmtpPort</td>
+                </tr>
+                <tr>
+                    <th>SMTP Username:</th>
+                    <td>@Model.SmtpUsername</td>
+                </tr>
+                <tr>
+                    <th>Development Mode:</th>
+                    <td>
+                        @if (Model.UseDevelopmentMode)
+                        {
+                            <span class="badge bg-warning">TRUE - Emails logged to console</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">FALSE - Emails will be sent</span>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <th>Email Verification Required:</th>
+                    <td>
+                        @if (Model.EmailVerificationRequired)
+                        {
+                            <span class="badge bg-success">TRUE - Login checks verification</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">FALSE - No verification check</span>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <th>Application URL:</th>
+                    <td>@Model.ApplicationUrl</td>
+                </tr>
+            </table>
+
+            <div class="alert alert-info mt-3">
+                <strong>Status:</strong>
+                @if (!Model.EmailVerificationRequired)
+                {
+                    <p class="text-danger">⚠️ Email verification is DISABLED. Users can login without verifying their email.</p>
+                    <p><strong>Fix:</strong> Set <code>"EmailVerificationRequired": true</code> in <code>appsettings.Development.json</code></p>
+                }
+                else if (Model.UseDevelopmentMode)
+                {
+                    <p class="text-warning">⚠️ Development mode is ON. Emails will be logged to console instead of sent.</p>
+                    <p>Check your terminal/console for email output.</p>
+                }
+                else
+                {
+                    <p class="text-success">✓ Email verification is enabled and emails will be sent to @Model.SmtpServer</p>
+                }
+            </div>
+
+            <a href="/Account/TestEmail" class="btn btn-primary">Test Email Sending</a>
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+</div>
