@@ -112,7 +112,7 @@ namespace BookBuddi.Services.Services
             var unpaidFines = _fineRepository.GetTotalUnpaidFinesByMember(memberId);
             if (unpaidFines > 0)
             {
-                errorMessage = $"Member has unpaid fines totaling ${unpaidFines:F2}";
+                errorMessage = $"Member has unpaid fines totaling P{unpaidFines:F2}";
                 return false;
             }
 
