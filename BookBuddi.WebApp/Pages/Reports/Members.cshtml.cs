@@ -4,55 +4,61 @@ using Microsoft.EntityFrameworkCore;
 using BookBuddi.Data;
 using BookBuddi.Resources.Constants;
 using BookBuddi.Data.Models;
-using System.Linq;
 
 namespace BookBuddi.WebApp.Pages
 {
     public class MembersModel : PageModel
     {
         private readonly ApplicationDbContext _db;
-
-        public MembersModel(ApplicationDbContext db)
-        {
-            _db = db;
-        }
+        public MembersModel(ApplicationDbContext db) => _db = db;
 
         public List<MemberDTO> MemberList { get; set; } = new();
-
-        // Summary counts
         public int TotalMembers { get; set; }
         public int ActiveMembers { get; set; }
         public int InactiveMembers { get; set; }
         public int TotalBooksBorrowed { get; set; }
+        public string CurrentFilter { get; set; } = "All";
 
-        public async Task<IActionResult> OnGet()
+        public async Task<IActionResult> OnGet(string filter, string search)
         {
-            // Admin authorization check
             var userRole = HttpContext.Session.GetString("UserRole");
             if (userRole != "Admin")
-            {
-                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
-            }
+                return RedirectToPage(string.IsNullOrEmpty(userRole)? "/Account/Login":"/Admin/AccessDenied");
+
+            CurrentFilter = string.IsNullOrEmpty(filter) ? "All" : filter;
 
             var members = await _db.Members.ToListAsync();
 
-            // Summary calculations
             TotalMembers = members.Count;
             ActiveMembers = members.Count(m => m.Status == MemberStatus.Active);
             InactiveMembers = members.Count(m => m.Status != MemberStatus.Active);
             TotalBooksBorrowed = members.Sum(m => m.CurrentBorrowedCount);
 
-            // Map data into DTO
             MemberList = members.Select(m => new MemberDTO
             {
                 MemberId = m.MemberId,
-                MemberName = m.FirstName + " " + m.LastName,
+                MemberName = $"{m.FirstName} {m.LastName}",
                 Email = m.Email,
                 TotalBooksBorrowed = m.CurrentBorrowedCount,
                 StatusText = m.Status.ToString(),
                 StatusClass = m.Status == MemberStatus.Active ? "status-active" : "status-inactive"
             }).ToList();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.ToLower();
+                MemberList = MemberList
+                    .Where(m => (m.MemberName ?? "").ToLower().Contains(search) ||
+                                (m.Email ?? "").ToLower().Contains(search))
+                    .ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter) && filter != "All")
+            {
+                MemberList = MemberList
+                    .Where(m => m.StatusText == filter)
+                    .ToList();
+            }
 
             return Page();
         }
