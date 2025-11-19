@@ -1,0 +1,316 @@
+/* ------------------- BASE & UTILITIES ------------------- */
+    body {
+        background-color: #f8fafc;
+        font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        color: #2d3748;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    .delete-category-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    /* ------------------- HEADER STYLES ------------------- */
+    .page-header {
+        margin-bottom: 32px;
+        text-align: center;
+    }
+
+    .page-header h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #641B2E;
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
+    }
+
+    .page-header p {
+        color: #718096;
+        font-size: 16px;
+        margin: 0;
+    }
+
+    /* ------------------- ACCESS DENIED STYLES ------------------- */
+    .access-denied {
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 32px;
+    }
+
+    .access-denied-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        color: #ef4444;
+    }
+
+    .access-denied h2 {
+        color: #ef4444;
+        margin-bottom: 12px;
+        font-size: 20px;
+    }
+
+    .access-denied p {
+        color: #718096;
+        margin-bottom: 20px;
+    }
+
+    /* ------------------- WARNING CARD ------------------- */
+    .warning-card {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 12px;
+        padding: 32px;
+        margin-bottom: 24px;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .warning-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        color: #ef4444;
+    }
+
+    .warning-title {
+        color: #ef4444;
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .warning-message {
+        color: #dc2626;
+        font-size: 15px;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    /* ------------------- CATEGORY DETAILS CARD ------------------- */
+    .details-card {
+        background: white;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 32px;
+    }
+
+    .details-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .details-header-icon {
+        font-size: 24px;
+        color: #641B2E;
+    }
+
+    .details-header h3 {
+        color: #2d3748;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .details-grid {
+        display: grid;
+        gap: 16px;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #2d3748;
+        min-width: 120px;
+    }
+
+    .detail-value {
+        color: #718096;
+        text-align: right;
+        flex: 1;
+        margin-left: 16px;
+    }
+
+    .category-name {
+        color: #641B2E;
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    /* ------------------- ACTION BUTTONS ------------------- */
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        min-width: 140px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(220, 38, 38, 0.2);
+    }
+
+    .btn-outline {
+        background: white;
+        color: #2d3748;
+        border: 1.5px solid #e2e8f0;
+    }
+
+    .btn-outline:hover {
+        background: #f8fafc;
+        border-color: #718096;
+    }
+
+    /* ------------------- ERROR MESSAGE ------------------- */
+    .error-message {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        padding: 16px;
+        border-radius: 8px;
+        margin-top: 24px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .error-message::before {
+        content: '⚠️';
+        font-size: 18px;
+    }
+
+    /* ------------------- FORM STYLES ------------------- */
+    .delete-form {
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    /* ------------------- RESPONSIVE DESIGN ------------------- */
+    @media (max-width: 768px) {
+        .delete-category-container {
+            margin: 20px auto;
+            padding: 0 16px;
+        }
+
+        .warning-card,
+        .details-card {
+            padding: 24px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+        }
+
+        .action-buttons {
+            flex-direction: column-reverse;
+            gap: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        .detail-item {
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .detail-value {
+            text-align: left;
+            margin-left: 0;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .page-header h1 {
+            font-size: 24px;
+        }
+
+        .warning-card,
+        .details-card {
+            padding: 20px;
+        }
+
+        .warning-icon {
+            font-size: 36px;
+        }
+
+        .details-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 8px;
+        }
+    }
+
+    /* ------------------- ICON FONT ------------------- */
+    @font-face {
+        font-family: 'Material Icons';
+        font-style: normal;
+        font-weight: 400;
+        src: url(https://fonts.gstatic.com/s/materialicons/v140/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
+    }
+
+    .material-icons {
+        font-family: 'Material Icons';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 16px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-smoothing: antialiased;
+    }

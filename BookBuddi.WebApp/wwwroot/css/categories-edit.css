@@ -1,0 +1,305 @@
+/* ------------------- BASE & UTILITIES ------------------- */
+body {
+    background-color: #f8fafc;
+    font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #2d3748; /* @colorTextPrimary replaced */
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+.edit-category-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* ------------------- HEADER STYLES ------------------- */
+.page-header {
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.page-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #641B2E; /* @colorPrimary replaced */
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.page-header p {
+    color: #718096; /* @colorTextSecondary replaced */
+    font-size: 16px;
+    margin: 0;
+}
+
+/* ------------------- ACCESS DENIED STYLES ------------------- */
+.access-denied {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0; /* @colorBorder replaced */
+    margin-bottom: 32px;
+}
+
+.access-denied-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #ef4444; /* @colorDanger replaced */
+}
+
+.access-denied h2 {
+    color: #ef4444; /* @colorDanger replaced */
+    margin-bottom: 12px;
+    font-size: 20px;
+}
+
+.access-denied p {
+    color: #718096; /* @colorTextSecondary replaced */
+    margin-bottom: 20px;
+}
+
+/* ------------------- FORM STYLES ------------------- */
+.category-form {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0; /* @colorBorder replaced */
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #2d3748; /* @colorTextPrimary replaced */
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.required::after {
+    content: " *";
+    color: #ef4444; /* @colorDanger replaced */
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #e2e8f0; /* @colorBorder replaced */
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    background: white;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #641B2E; /* @colorPrimary replaced */
+    box-shadow: 0 0 0 3px rgba(100, 27, 46, 0.08);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.5;
+}
+
+.form-input:hover,
+.form-textarea:hover {
+    border-color: #cbd5e0;
+}
+
+/* ------------------- META INFO STYLES ------------------- */
+.meta-info {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    border: 1px solid #e2e8f0; /* @colorBorder replaced */
+}
+
+.meta-info p {
+    margin: 0;
+    color: #718096; /* @colorTextSecondary replaced */
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.meta-info strong {
+    color: #2d3748; /* @colorTextPrimary replaced */
+}
+
+/* ------------------- BUTTON STYLES ------------------- */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 24px;
+    border-top: 1px solid #e2e8f0; /* @colorBorder replaced */
+    margin-top: 8px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    min-width: 120px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: #641B2E; /* @colorPrimary replaced */
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #501625;
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    background: white;
+    color: #2d3748; /* @colorTextPrimary replaced */
+    border: 1.5px solid #e2e8f0; /* @colorBorder replaced */
+}
+
+.btn-outline:hover {
+    background: #f8fafc;
+    border-color: #718096; /* @colorTextSecondary replaced */
+}
+
+/* ------------------- ERROR MESSAGE ------------------- */
+.error-message {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 24px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.error-message::before {
+    content: '⚠️';
+    font-size: 18px;
+}
+
+/* ------------------- CHARACTER COUNTER ------------------- */
+.char-counter {
+    font-size: 12px;
+    color: #718096; /* @colorTextSecondary replaced */
+    margin-top: 4px;
+    text-align: right;
+}
+
+.char-counter.warning {
+    color: #f59e0b; /* @colorWarning replaced */
+}
+
+.char-counter.danger {
+    color: #ef4444; /* @colorDanger replaced */
+}
+
+/* ------------------- FORM VALIDATION ------------------- */
+.form-input:required,
+.form-textarea:required {
+    background-image: linear-gradient(45deg, transparent 95%, #641B2E 95%); /* @colorPrimary replaced */
+    background-size: 8px 8px;
+    background-repeat: no-repeat;
+    background-position: right 16px top 16px;
+}
+
+.form-input:invalid:not(:focus):not(:placeholder-shown),
+.form-textarea:invalid:not(:focus):not(:placeholder-shown) {
+    border-color: #fca5a5;
+    background-image: linear-gradient(45deg, transparent 95%, #dc2626 95%);
+}
+
+/* ------------------- RESPONSIVE DESIGN ------------------- */
+@media (max-width: 768px) {
+    .edit-category-container {
+        margin: 20px auto;
+        padding: 0 16px;
+    }
+
+    .category-form {
+        padding: 32px 24px;
+    }
+
+    .page-header h1 {
+        font-size: 28px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header h1 {
+        font-size: 24px;
+    }
+
+    .category-form {
+        padding: 24px 20px;
+    }
+
+    .meta-info p {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+}
+
+/* ------------------- ICON FONT ------------------- */
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://fonts.gstatic.com/s/materialicons/v140/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+}

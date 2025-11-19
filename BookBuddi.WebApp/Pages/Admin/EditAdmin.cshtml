@@ -2,108 +2,246 @@
 @model BookBuddi.Pages.Admin.EditAdminModel
 @{
     ViewData["Title"] = "Edit Administrator";
+    // Color palette
+    var colorTextSecondary = "#718096";
+    var colorSuccess = "#10b981";
+    var colorWarning = "#f59e0b";
+    var colorDanger = "#ef4444";
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Edit Administrator: @Model.FirstName @Model.LastName</h3>
-                </div>
-                <div class="card-body">
-                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
+<link rel="stylesheet" href="~/css/admin-edit.css" />
 
-                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="bi bi-check-circle-fill"></i> @Model.SuccessMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
+<div class="edit-admin-container">
+    <div class="page-header">
+        <h1>Edit Administrator</h1>
+        <p>Update administrator account information and permissions</p>
+    </div>
 
-                    <form method="post">
-                        <input type="hidden" asp-for="AdminId" />
-
-                        <h5 class="text-primary mb-3">Basic Information</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="FirstName" class="form-label">First Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="FirstName" asp-for="FirstName" required />
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="LastName" class="form-label">Last Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="LastName" asp-for="LastName" required />
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="Email" class="form-label">Email Address <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" id="Email" asp-for="Email" required />
-                            <small class="form-text text-muted">This will be used for login</small>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="IsActive" asp-for="IsActive" />
-                                <label class="form-check-label" for="IsActive">
-                                    <strong>Account Active</strong>
-                                </label>
-                                <small class="form-text text-muted d-block">Inactive accounts cannot log in</small>
-                            </div>
-                        </div>
-
-                        <hr />
-
-                        <h5 class="text-primary mb-3">Change Password (Optional)</h5>
-                        <p class="text-muted small">Leave blank to keep the current password</p>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="NewPassword" class="form-label">New Password</label>
-                                <input type="password" class="form-control" id="NewPassword" asp-for="NewPassword" minlength="8" />
-                                <small class="form-text text-muted">At least 8 characters with uppercase, lowercase, digit, and special character</small>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="ConfirmPassword" class="form-label">Confirm New Password</label>
-                                <input type="password" class="form-control" id="ConfirmPassword" asp-for="ConfirmPassword" minlength="8" />
-                            </div>
-                        </div>
-
-                        <hr />
-
-                        <div class="d-flex justify-content-between">
-                            <a href="/Admin/ManageAdmins" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left"></i> Back to Admin List
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save"></i> Update Administrator
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            @if (Model.AdminUser != null)
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <span class="material-icons">admin_panel_settings</span>
+                Editing: @Model.FirstName @Model.LastName
+            </h2>
+        </div>
+        <div class="card-body">
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
             {
-                <div class="card mt-3">
-                    <div class="card-body">
-                        <h6 class="text-muted">Audit Information</h6>
-                        <p class="mb-1"><small><strong>Created By:</strong> @Model.AdminUser.CreatedBy on @Model.AdminUser.CreatedTime.ToString("MMM dd, yyyy hh:mm tt")</small></p>
-                        <p class="mb-0"><small><strong>Last Updated By:</strong> @Model.AdminUser.UpdatedBy on @Model.AdminUser.UpdatedTime.ToString("MMM dd, yyyy hh:mm tt")</small></p>
-                    </div>
+                <div class="alert alert-danger">
+                    <span class="material-icons">error</span>
+                    <span>@Model.ErrorMessage</span>
+                    <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
                 </div>
             }
+
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success">
+                    <span class="material-icons">check_circle</span>
+                    <span>@Model.SuccessMessage</span>
+                    <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
+                </div>
+            }
+
+            <form method="post">
+                <input type="hidden" asp-for="AdminId" />
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="material-icons">person</span>
+                        Basic Information
+                    </h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label required">First Name</label>
+                            <input type="text" class="form-input" asp-for="FirstName" required 
+                                   placeholder="Enter first name" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label required">Last Name</label>
+                            <input type="text" class="form-input" asp-for="LastName" required 
+                                   placeholder="Enter last name" />
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label required">Email Address</label>
+                            <input type="email" class="form-input" asp-for="Email" required 
+                                   placeholder="Enter email address" />
+                            <span class="helper-text">This will be used for login and notifications</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="material-icons">toggle_on</span>
+                        Account Status
+                    </h3>
+                    
+                    <div class="toggle-group">
+                        <div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" asp-for="IsActive" id="IsActive" />
+                                <span class="toggle-slider"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="toggle-label">Account Active</div>
+                            <div class="toggle-description">Inactive accounts cannot log into the system</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="material-icons">lock</span>
+                        Change Password
+                    </h3>
+                    
+                    <p class="helper-text" style="margin-bottom: 16px;">Leave blank to keep the current password</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">New Password</label>
+                            <input type="password" class="form-input" id="NewPassword" asp-for="NewPassword" 
+                                   minlength="8" placeholder="Enter new password" />
+                            <div class="password-strength" id="passwordStrength">
+                                <div class="strength-bar">
+                                    <div class="strength-fill"></div>
+                                </div>
+                                <div class="strength-text" id="strengthText">Password strength</div>
+                            </div>
+                            <span class="helper-text">At least 8 characters with uppercase, lowercase, digit, and special character</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-input" id="ConfirmPassword" asp-for="ConfirmPassword" 
+                                   minlength="8" placeholder="Confirm new password" />
+                            <span class="helper-text" id="passwordMatch">Re-enter the new password</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="/Admin/ManageAdmins" class="btn btn-outline">
+                        <span class="material-icons">arrow_back</span>
+                        Back to Admin List
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="material-icons">save</span>
+                        Update Administrator
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+
+    @if (Model.AdminUser != null)
+    {
+        <div class="card">
+            <div class="card-body">
+                <div class="audit-title">
+                    <span class="material-icons">history</span>
+                    Audit Information
+                </div>
+                <div class="audit-details">
+                    <div class="audit-item">
+                        <span class="audit-label">Created By</span>
+                        <span class="audit-value">@Model.AdminUser.CreatedBy on @Model.AdminUser.CreatedTime.ToString("MMM dd, yyyy 'at' hh:mm tt")</span>
+                    </div>
+                    <div class="audit-item">
+                        <span class="audit-label">Last Updated By</span>
+                        <span class="audit-value">@Model.AdminUser.UpdatedBy on @Model.AdminUser.UpdatedTime.ToString("MMM dd, yyyy 'at' hh:mm tt")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const newPasswordInput = document.getElementById('NewPassword');
+        const confirmPasswordInput = document.getElementById('ConfirmPassword');
+        const passwordStrength = document.getElementById('passwordStrength');
+        const strengthText = document.getElementById('strengthText');
+        const passwordMatch = document.getElementById('passwordMatch');
+
+        // Password strength indicator
+        if (newPasswordInput) {
+            newPasswordInput.addEventListener('input', function() {
+                const password = this.value;
+                const strength = calculatePasswordStrength(password);
+                
+                passwordStrength.className = 'password-strength ' + strength.class;
+                passwordStrength.querySelector('.strength-fill').style.width = strength.width;
+                strengthText.textContent = strength.text;
+                strengthText.style.color = strength.color;
+            });
+        }
+
+        // Password match indicator
+        if (confirmPasswordInput && newPasswordInput) {
+            confirmPasswordInput.addEventListener('input', function() {
+                const newPassword = newPasswordInput.value;
+                const confirmPassword = this.value;
+                
+                if (confirmPassword === '') {
+                    passwordMatch.textContent = 'Re-enter the new password';
+                    passwordMatch.style.color = '@colorTextSecondary';
+                } else if (newPassword === confirmPassword) {
+                    passwordMatch.textContent = 'Passwords match';
+                    passwordMatch.style.color = '@colorSuccess';
+                } else {
+                    passwordMatch.textContent = 'Passwords do not match';
+                    passwordMatch.style.color = '@colorDanger';
+                }
+            });
+        }
+
+        function calculatePasswordStrength(password) {
+            if (password.length === 0) {
+                return { class: '', width: '0%', text: 'Password strength', color: '@colorTextSecondary' };
+            }
+
+            let score = 0;
+            
+            // Length check
+            if (password.length >= 8) score += 1;
+            if (password.length >= 12) score += 1;
+            
+            // Character variety
+            if (/[a-z]/.test(password)) score += 1;
+            if (/[A-Z]/.test(password)) score += 1;
+            if (/[0-9]/.test(password)) score += 1;
+            if (/[^a-zA-Z0-9]/.test(password)) score += 1;
+
+            if (score <= 2) {
+                return { class: 'strength-weak', width: '33%', text: 'Weak password', color: '@colorDanger' };
+            } else if (score <= 4) {
+                return { class: 'strength-medium', width: '66%', text: 'Medium strength', color: '@colorWarning' };
+            } else {
+                return { class: 'strength-strong', width: '100%', text: 'Strong password', color: '@colorSuccess' };
+            }
+        }
+
+        // Form validation
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const newPassword = newPasswordInput?.value;
+                const confirmPassword = confirmPasswordInput?.value;
+                
+                if (newPassword && newPassword !== confirmPassword) {
+                    e.preventDefault();
+                    passwordMatch.textContent = 'Passwords do not match';
+                    passwordMatch.style.color = '@colorDanger';
+                    confirmPasswordInput?.focus();
+                }
+            });
+        }
+    });
+</script>

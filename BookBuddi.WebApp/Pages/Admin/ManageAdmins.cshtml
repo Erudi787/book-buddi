@@ -4,105 +4,149 @@
     ViewData["Title"] = "Manage Administrators";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Manage Administrators</h2>
-        <a href="/Admin/CreateAccount" class="btn btn-primary">
-            <i class="bi bi-person-plus-fill"></i> Create New Admin
+<link rel="stylesheet" href="~/css/admin-manage.css" />
+
+<div class="manage-admins-container">
+    <div class="page-header">
+        <div>
+            <h1>Manage Administrators</h1>
+            <p>Manage admin accounts and their access permissions</p>
+        </div>
+        <a href="/Admin/CreateAccount" class="btn-primary">
+            <span class="material-icons">person_add</span>
+            Create New Admin
         </a>
     </div>
 
     @if (!string.IsNullOrEmpty(Model.SuccessMessage))
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill"></i> @Model.SuccessMessage
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="alert alert-success">
+            <span class="material-icons">check_circle</span>
+            <span>@Model.SuccessMessage</span>
+            <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
         </div>
     }
 
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMessage
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="alert alert-danger">
+            <span class="material-icons">error</span>
+            <span>@Model.ErrorMessage</span>
+            <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
         </div>
     }
 
-    <div class="card">
-        <div class="card-body">
-            @if (Model.Admins.Count == 0)
-            {
-                <p class="text-muted text-center py-4">No administrators found.</p>
-            }
-            else
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Status</th>
-                                <th>Created</th>
-                                <th>Last Updated</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var admin in Model.Admins)
-                            {
-                                <tr>
-                                    <td>@admin.FirstName @admin.LastName</td>
-                                    <td>@admin.Email</td>
-                                    <td>
+    <div class="table-container">
+        @if (Model.Admins.Count == 0)
+        {
+            <div class="empty-state">
+                <div class="material-icons empty-state-icon">admin_panel_settings</div>
+                <h3>No Administrators Found</h3>
+                <p>Get started by creating the first administrator account.</p>
+                <a href="/Admin/CreateAccount" class="btn-primary">
+                    <span class="material-icons">person_add</span>
+                    Create First Admin
+                </a>
+            </div>
+        }
+        else
+        {
+            <table class="admins-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Last Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var admin in Model.Admins)
+                    {
+                        <tr>
+                            <td data-label="Name">
+                                <strong>@admin.FirstName @admin.LastName</strong>
+                            </td>
+                            <td data-label="Email">@admin.Email</td>
+                            <td data-label="Status">
+                                <span class="status-badge @(admin.IsActive ? "status-active" : "status-inactive")">
+                                    @(admin.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td data-label="Created">
+                                <small>@admin.DateCreated.ToString("MMM dd, yyyy")</small>
+                            </td>
+                            <td data-label="Updated">
+                                <small>@admin.UpdatedTime.ToString("MMM dd, yyyy")</small>
+                            </td>
+                            <td data-label="Actions">
+                                <div class="action-buttons">
+                                    <a href="/Admin/EditAdmin?id=@admin.Id" class="action-btn" title="Edit Admin">
+                                        <span class="material-icons icon">edit</span>
+                                        Edit
+                                    </a>
+                                    <form method="post" asp-page-handler="ToggleStatus" asp-route-adminId="@admin.Id" style="display: inline;">
                                         @if (admin.IsActive)
                                         {
-                                            <span class="badge bg-success">Active</span>
+                                            <button type="submit" class="action-btn warning" title="Deactivate Admin"
+                                                    onclick="return confirm('Are you sure you want to deactivate @admin.FirstName @admin.LastName?')">
+                                                <span class="material-icons icon">toggle_off</span>
+                                                Deactivate
+                                            </button>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-danger">Inactive</span>
+                                            <button type="submit" class="action-btn success" title="Activate Admin"
+                                                    onclick="return confirm('Are you sure you want to activate @admin.FirstName @admin.LastName?')">
+                                                <span class="material-icons icon">toggle_on</span>
+                                                Activate
+                                            </button>
                                         }
-                                    </td>
-                                    <td>
-                                        <small>@admin.DateCreated.ToString("MMM dd, yyyy")</small>
-                                    </td>
-                                    <td>
-                                        <small>@admin.UpdatedTime.ToString("MMM dd, yyyy")</small>
-                                    </td>
-                                    <td>
-                                        <a href="/Admin/EditAdmin?id=@admin.Id" class="btn btn-sm btn-outline-primary" title="Edit">
-                                            <i class="bi bi-pencil-fill"></i> Edit
-                                        </a>
-                                        <form method="post" asp-page-handler="ToggleStatus" asp-route-adminId="@admin.Id" style="display: inline;">
-                                            @if (admin.IsActive)
-                                            {
-                                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Deactivate"
-                                                        onclick="return confirm('Are you sure you want to deactivate @admin.FirstName @admin.LastName?')">
-                                                    <i class="bi bi-x-circle"></i> Deactivate
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <button type="submit" class="btn btn-sm btn-outline-success" title="Activate"
-                                                        onclick="return confirm('Are you sure you want to activate @admin.FirstName @admin.LastName?')">
-                                                    <i class="bi bi-check-circle"></i> Activate
-                                                </button>
-                                            }
-                                        </form>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-        </div>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
     </div>
 
-    <div class="mt-3">
-        <a href="/Admin/Index" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Back to Dashboard
+    <div class="footer">
+        <a href="/Admin/Index" class="btn-secondary">
+            <span class="material-icons">arrow_back</span>
+            Back to Dashboard
         </a>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add confirmation for status toggle actions
+        const toggleButtons = document.querySelectorAll('.action-btn.warning, .action-btn.success');
+        
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const action = this.classList.contains('warning') ? 'deactivate' : 'activate';
+                const adminName = this.closest('tr').querySelector('td:first-child strong').textContent;
+                
+                if (!confirm(`Are you sure you want to ${action} ${adminName}?`)) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Keyboard navigation
+        const actionButtons = document.querySelectorAll('.action-btn');
+        actionButtons.forEach(button => {
+            button.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+        });
+    });
+</script>
