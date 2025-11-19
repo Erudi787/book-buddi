@@ -4,111 +4,146 @@
     ViewData["Title"] = "Members";
 }
 
-<h1>Members Management</h1>
+<link rel="stylesheet" href="~/css/member-index.css" />
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<div class="members-container">
+    <div class="page-header">
+        <h1>Members Management</h1>
+        <p>Manage library members and their accounts</p>
     </div>
-}
 
-@if (TempData["WarningMessage"] != null)
-{
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        @TempData["WarningMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-}
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-}
-
-<p><a href="/Admin/CreateAccount">Add New Member</a></p>
-
-<form method="get">
-    <input type="text" name="searchTerm" placeholder="Search members..." value="@Model.SearchTerm" />
-    <button type="submit">Search</button>
-    <a href="/Members/Index">Clear</a>
-</form>
-
-<table border="1">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Status</th>
-            <th>Borrowed Books</th>
-            <th>Borrowing Limit</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var member in Model.Members.Items)
-        {
-            <tr>
-                <td>@member.MemberId</td>
-                <td>@member.FirstName @member.LastName</td>
-                <td>@member.Email</td>
-                <td>@member.Phone</td>
-                <td>@member.Status</td>
-                <td>@member.CurrentBorrowedCount</td>
-                <td>@member.BorrowingLimit</td>
-                <td>
-                    <a href="/Members/Edit?id=@member.MemberId">Edit</a> |
-                    <a href="/Members/Details?id=@member.MemberId">Details</a> |
-                    <a href="/Members/Suspend?id=@member.MemberId">Suspend</a> |
-                    <a href="/Members/Reactivate?id=@member.MemberId">Reactivate</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-@* Pagination Controls *@
-<div style="margin: 20px 0; text-align: center;">
-    <p>
-        Showing @((Model.Members.PageNumber - 1) * Model.Members.PageSize + 1) -
-        @Math.Min(Model.Members.PageNumber * Model.Members.PageSize, Model.Members.TotalCount)
-        of @Model.Members.TotalCount members
-    </p>
-
-    @if (Model.Members.TotalPages > 1)
+    @if (TempData["SuccessMessage"] != null)
     {
-        <div style="display: inline-block;">
-            @if (Model.Members.HasPreviousPage)
-            {
-                <a href="?pageNumber=1&searchTerm=@Model.SearchTerm" style="padding: 5px 10px; margin: 0 2px; background-color: #007bff; color: white; text-decoration: none; border-radius: 3px;">First</a>
-                <a href="?pageNumber=@(Model.Members.PageNumber - 1)&searchTerm=@Model.SearchTerm" style="padding: 5px 10px; margin: 0 2px; background-color: #007bff; color: white; text-decoration: none; border-radius: 3px;">Previous</a>
-            }
-
-            @for (int i = Math.Max(1, Model.Members.PageNumber - 2); i <= Math.Min(Model.Members.TotalPages, Model.Members.PageNumber + 2); i++)
-            {
-                if (i == Model.Members.PageNumber)
-                {
-                    <span style="padding: 5px 10px; margin: 0 2px; background-color: #28a745; color: white; border-radius: 3px; font-weight: bold;">@i</span>
-                }
-                else
-                {
-                    <a href="?pageNumber=@i&searchTerm=@Model.SearchTerm" style="padding: 5px 10px; margin: 0 2px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 3px;">@i</a>
-                }
-            }
-
-            @if (Model.Members.HasNextPage)
-            {
-                <a href="?pageNumber=@(Model.Members.PageNumber + 1)&searchTerm=@Model.SearchTerm" style="padding: 5px 10px; margin: 0 2px; background-color: #007bff; color: white; text-decoration: none; border-radius: 3px;">Next</a>
-                <a href="?pageNumber=@Model.Members.TotalPages&searchTerm=@Model.SearchTerm" style="padding: 5px 10px; margin: 0 2px; background-color: #007bff; color: white; text-decoration: none; border-radius: 3px;">Last</a>
-            }
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
         </div>
     }
-</div>
 
-<p><a href="/">Back to Home</a></p>
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning">
+            @TempData["WarningMessage"]
+            <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
+        </div>
+    }
+
+    <div class="action-bar">
+        <a href="/Admin/CreateAccount" class="btn-primary">
+            <span class="material-icons">person_add</span>
+            Add New Member
+        </a>
+        
+        <form method="get" class="search-form">
+            <input type="text" name="searchTerm" class="search-input" placeholder="Search members by name or email..." value="@Model.SearchTerm" />
+            <button type="submit" class="btn-secondary">
+                <span class="material-icons">search</span>
+                Search
+            </button>
+            <a href="/Members/Index" class="btn-link">Clear</a>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <table class="members-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Borrowed</th>
+                    <th>Limit</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var member in Model.Members.Items)
+                {
+                    <tr>
+                        <td data-label="ID">@member.MemberId</td>
+                        <td data-label="Name">@member.FirstName @member.LastName</td>
+                        <td data-label="Email">@member.Email</td>
+                        <td data-label="Phone">@member.Phone</td>
+                        <td data-label="Status">
+                            @{
+                                var statusClass = member.Status.ToString().ToLower() switch
+                                {
+                                    "active" => "status-active",
+                                    "suspended" => "status-suspended",
+                                    "pending" => "status-pending",
+                                    _ => "status-active"
+                                };
+                            }
+                            <span class="status-badge @statusClass">@member.Status</span>
+                        </td>
+                        <td data-label="Borrowed">@member.CurrentBorrowedCount</td>
+                        <td data-label="Limit">@member.BorrowingLimit</td>
+                        <td data-label="Actions">
+                            <div class="action-buttons">
+                                <a href="/Members/Edit?id=@member.MemberId" class="action-btn" data-tooltip="Edit">
+                                    <span class="material-icons icon">edit</span>
+                                </a>
+                                <a href="/Members/Details?id=@member.MemberId" class="action-btn" data-tooltip="Details">
+                                    <span class="material-icons icon">visibility</span>
+                                </a>
+                                <a href="/Members/Suspend?id=@member.MemberId" class="action-btn danger" data-tooltip="Suspend">
+                                    <span class="material-icons icon">block</span>
+                                </a>
+                                <a href="/Members/Reactivate?id=@member.MemberId" class="action-btn" data-tooltip="Reactivate">
+                                    <span class="material-icons icon">check_circle</span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-container">
+        <div class="pagination-info">
+            Showing @((Model.Members.PageNumber - 1) * Model.Members.PageSize + 1) -
+            @Math.Min(Model.Members.PageNumber * Model.Members.PageSize, Model.Members.TotalCount)
+            of @Model.Members.TotalCount members
+        </div>
+
+        @if (Model.Members.TotalPages > 1)
+        {
+            <div class="pagination">
+                @if (Model.Members.HasPreviousPage)
+                {
+                    <a href="?pageNumber=1&searchTerm=@Model.SearchTerm" class="page-link">First</a>
+                    <a href="?pageNumber=@(Model.Members.PageNumber - 1)&searchTerm=@Model.SearchTerm" class="page-link">Previous</a>
+                }
+
+                @for (int i = Math.Max(1, Model.Members.PageNumber - 2); i <= Math.Min(Model.Members.TotalPages, Model.Members.PageNumber + 2); i++)
+                {
+                    <a href="?pageNumber=@i&searchTerm=@Model.SearchTerm" class="page-link @(i == Model.Members.PageNumber ? "active" : "")">@i</a>
+                }
+
+                @if (Model.Members.HasNextPage)
+                {
+                    <a href="?pageNumber=@(Model.Members.PageNumber + 1)&searchTerm=@Model.SearchTerm" class="page-link">Next</a>
+                    <a href="?pageNumber=@Model.Members.TotalPages&searchTerm=@Model.SearchTerm" class="page-link">Last</a>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="footer">
+        <a href="/" class="footer-link">
+            <span class="material-icons">arrow_back</span>
+            Back to Home
+        </a>
+    </div>
+</div>

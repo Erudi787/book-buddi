@@ -4,18 +4,124 @@
     ViewData["Title"] = "Reactivate Member";
 }
 
-<h1>Reactivate Member</h1>
+<link rel="stylesheet" href="~/css/member-reactive.css" />
 
-<p>Are you sure you want to reactivate this member?</p>
-<p><strong>@Model.MemberName</strong></p>
+<div class="reactivate-member-container">
+    <div class="page-header">
+        <h1>Reactivate Member</h1>
+        <p>Restore member access and borrowing privileges</p>
+    </div>
 
-<form method="post">
-    <input type="hidden" name="id" value="@Model.MemberId" />
-    <button type="submit">Reactivate</button>
-    <a href="/Members/Index">Cancel</a>
-</form>
+    <div class="success-card">
+        <div class="material-icons success-icon pulse-animation">check_circle</div>
+        <h3 class="success-title">Ready to Reactivate</h3>
+        <p class="success-message">
+            This action will restore the member's full access to library services and borrowing privileges.
+        </p>
+    </div>
 
-@if (!string.IsNullOrEmpty(Model.ErrorMessage))
-{
-    <p style="color: red;">@Model.ErrorMessage</p>
-}
+    <div class="member-info-card">
+        <div class="member-avatar">
+            <span class="material-icons">person</span>
+        </div>
+        <div class="member-name">@Model.MemberName</div>
+        <div class="member-id">Member ID: @Model.MemberId</div>
+        <div class="member-status">Currently Suspended</div>
+    </div>
+
+    <div class="benefits-section">
+        <div class="benefits-title">
+            <span class="material-icons">verified</span>
+            Reactivation Benefits
+        </div>
+        <ul class="benefits-list">
+            <li class="benefit-item">Full access to borrow books and materials</li>
+            <li class="benefit-item">Ability to place reservations and holds</li>
+            <li class="benefit-item">Access to online library resources</li>
+            <li class="benefit-item">Participation in library programs and events</li>
+            <li class="benefit-item">Receipt of library notifications and updates</li>
+        </ul>
+    </div>
+
+    <form method="post" class="reactivate-form">
+        <input type="hidden" name="id" value="@Model.MemberId" />
+
+        <div class="confirmation-message">
+            Are you sure you want to reactivate this member?
+            <span class="member-name-highlight">@Model.MemberName</span>
+            This will restore their full library access immediately.
+        </div>
+
+        <div class="action-buttons">
+            <a href="/Members/Index" class="btn btn-outline">
+                <span class="material-icons">arrow_back</span>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-success" onclick="return confirmReactivation()">
+                <span class="material-icons">check_circle</span>
+                Reactivate Member
+            </button>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="error-message">
+            @Model.ErrorMessage
+        </div>
+    }
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add success animation to the reactivate button
+        const reactivateBtn = document.querySelector('.btn-success');
+        if (reactivateBtn) {
+            reactivateBtn.addEventListener('mouseenter', function() {
+                this.classList.add('pulse-animation');
+            });
+            
+            reactivateBtn.addEventListener('mouseleave', function() {
+                this.classList.remove('pulse-animation');
+            });
+        }
+
+        // Keyboard navigation
+        const actionButtons = document.querySelectorAll('.btn');
+        actionButtons.forEach(button => {
+            button.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+        });
+
+        // Escape key to cancel
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.location.href = '/Members/Index';
+            }
+        });
+
+        // Add focus management for better accessibility
+        const form = document.querySelector('.reactivate-form');
+        if (form) {
+            form.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab' && !e.shiftKey) {
+                    const focusableElements = form.querySelectorAll('button, a, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                    if (e.target === focusableElements[focusableElements.length - 1]) {
+                        e.preventDefault();
+                        focusableElements[0].focus();
+                    }
+                }
+            });
+        }
+    });
+
+    function confirmReactivation() {
+        const memberName = '@Model.MemberName';
+        
+        return confirm(`Are you sure you want to reactivate ${memberName}?\n\nThis will restore their full library access and borrowing privileges immediately.`);
+    }
+</script>

@@ -2,52 +2,225 @@
 @model BookBuddi.Pages.Members.DetailsModel
 @{
     ViewData["Title"] = "Member Details";
+    // Color palette
+    var colorPrimary = "#641B2E";   
+    var colorWarning = "#f59e0b";
+    var colorDanger = "#ef4444";
 }
+<link rel="stylesheet" href="~/css/members-details.css" />
 
-<h1>Member Details</h1>
+<div class="member-details-container">
+    <div class="page-header">
+        <h1>Member Details</h1>
+        <p>View comprehensive member information and status</p>
+    </div>
 
-@if (Model.Member == null)
-{
-    <p>Member not found.</p>
-}
-else
-{
-    <dl>
-        <dt>ID</dt>
-        <dd>@Model.Member.MemberId</dd>
+    @if (Model.Member == null)
+    {
+        <div class="not-found">
+            <div class="material-icons not-found-icon">person_off</div>
+            <h2>Member Not Found</h2>
+            <p>The requested member could not be found in the system.</p>
+            <a href="/Members/Index" class="btn btn-primary">
+                <span class="material-icons">arrow_back</span>
+                Back to Members List
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="member-card">
+            <div class="member-header">
+                <div class="member-avatar">
+                    <span class="material-icons">person</span>
+                </div>
+                <div class="member-name">@Model.Member.FirstName @Model.Member.LastName</div>
+                <div class="member-id">ID: @Model.Member.MemberId</div>
+                <div class="member-status">@Model.Member.Status</div>
+            </div>
 
-        <dt>Name</dt>
-        <dd>@Model.Member.FirstName @Model.Member.LastName</dd>
+            <div class="details-sections">
+                <!-- Personal Information Section -->
+                <div class="section">
+                    <h3 class="section-title">
+                        <span class="material-icons">person</span>
+                        Personal Information
+                    </h3>
+                    <div class="details-grid">
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <span class="material-icons">email</span>
+                                Email Address
+                            </div>
+                            <div class="detail-value highlight">@Model.Member.Email</div>
+                        </div>
 
-        <dt>Email</dt>
-        <dd>@Model.Member.Email</dd>
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <span class="material-icons">phone</span>
+                                Phone Number
+                            </div>
+                            <div class="detail-value">@(string.IsNullOrEmpty(Model.Member.Phone) ? "Not provided" : Model.Member.Phone)</div>
+                        </div>
 
-        <dt>Phone</dt>
-        <dd>@Model.Member.Phone</dd>
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <span class="material-icons">cake</span>
+                                Date of Birth
+                            </div>
+                            <div class="detail-value">@(Model.Member.DateOfBirth?.ToString("MMM dd, yyyy") ?? "Not provided")</div>
+                        </div>
 
-        <dt>Address</dt>
-        <dd>@Model.Member.Address</dd>
+                        <div class="detail-card full-width" style="grid-column: 1 / -1;">
+                            <div class="detail-label">
+                                <span class="material-icons">home</span>
+                                Address
+                            </div>
+                            <div class="detail-value">@(string.IsNullOrEmpty(Model.Member.Address) ? "Not provided" : Model.Member.Address)</div>
+                        </div>
+                    </div>
+                </div>
 
-        <dt>Date of Birth</dt>
-        <dd>@Model.Member.DateOfBirth?.ToString("yyyy-MM-dd")</dd>
+                <!-- Membership Information Section -->
+                <div class="section">
+                    <h3 class="section-title">
+                        <span class="material-icons">card_membership</span>
+                        Membership Information
+                    </h3>
+                    <div class="details-grid">
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <span class="material-icons">event</span>
+                                Membership Date
+                            </div>
+                            <div class="detail-value">@Model.Member.MembershipDate.ToString("MMM dd, yyyy")</div>
+                        </div>
 
-        <dt>Status</dt>
-        <dd>@Model.Member.Status</dd>
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <span class="material-icons">event_available</span>
+                                Membership Expiry
+                            </div>
+                            <div class="detail-value @(Model.Member.MembershipExpiryDate < DateTime.Now ? "danger" : 
+                                                     Model.Member.MembershipExpiryDate < DateTime.Now.AddDays(30) ? "warning" : "success")">
+                                @Model.Member.MembershipExpiryDate.ToString("MMM dd, yyyy")
+                            </div>
+                            <div class="membership-info">
+                                <div class="membership-dates">
+                                    @{
+                                        var daysUntilExpiry = (Model.Member.MembershipExpiryDate - DateTime.Now).Days;
+                                        var membershipStatus = daysUntilExpiry < 0 ? "expired" : 
+                                                              daysUntilExpiry < 30 ? "expiring" : "active";
+                                    }
+                                    @if (membershipStatus == "expired")
+                                    {
+                                        <span>Expired @Math.Abs(daysUntilExpiry) days ago</span>
+                                    }
+                                    else if (membershipStatus == "expiring")
+                                    {
+                                        <span>Expires in @daysUntilExpiry days</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Active for @daysUntilExpiry more days</span>
+                                    }
+                                </div>
+                                <div class="membership-status @($"membership-{membershipStatus}")">
+                                    @membershipStatus.ToUpper()
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <dt>Borrowing Limit</dt>
-        <dd>@Model.Member.BorrowingLimit</dd>
+                <!-- Borrowing Information Section -->
+                <div class="section">
+                    <h3 class="section-title">
+                        <span class="material-icons">local_library</span>
+                        Borrowing Information
+                    </h3>
+                    <div class="details-grid">
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <span class="material-icons">book</span>
+                                Current Borrowed
+                            </div>
+                            <div class="detail-value @(Model.Member.CurrentBorrowedCount > 0 ? "highlight" : "")">
+                                @Model.Member.CurrentBorrowedCount books
+                            </div>
+                        </div>
 
-        <dt>Current Borrowed Count</dt>
-        <dd>@Model.Member.CurrentBorrowedCount</dd>
+                        <div class="detail-card">
+                            <div class="detail-label">
+                                <span class="material-icons">trending_up</span>
+                                Borrowing Limit
+                            </div>
+                            <div class="detail-value">@Model.Member.BorrowingLimit books</div>
+                        </div>
 
-        <dt>Membership Date</dt>
-        <dd>@Model.Member.MembershipDate.ToString("yyyy-MM-dd")</dd>
+                        <div class="detail-card full-width" style="grid-column: 1 / -1;">
+                            <div class="detail-label">
+                                <span class="material-icons">speed</span>
+                                Borrowing Progress
+                            </div>
+                            <div class="borrowing-status">
+                                <div class="progress-container">
+                                    @{
+                                        var progressPercentage = Model.Member.BorrowingLimit > 0 ? 
+                                            (Model.Member.CurrentBorrowedCount * 100) / Model.Member.BorrowingLimit : 0;
+                                        progressPercentage = Math.Min(progressPercentage, 100);
+                                    }
+                                    <div class="progress-bar" style="width: @progressPercentage%; 
+                                         background: @(progressPercentage >= 90 ? colorDanger : progressPercentage >= 70 ? colorWarning : colorPrimary);">
+                                    </div>
+                                </div>
+                                <div class="progress-text">
+                                    @Model.Member.CurrentBorrowedCount of @Model.Member.BorrowingLimit (@progressPercentage%)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <dt>Membership Expiry Date</dt>
-        <dd>@Model.Member.MembershipExpiryDate.ToString("yyyy-MM-dd")</dd>
-    </dl>
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <a href="/Members/Index" class="btn btn-outline">
+                        <span class="material-icons">arrow_back</span>
+                        Back to Members List
+                    </a>
+                    <a href="/Members/Edit?id=@Model.Member.MemberId" class="btn btn-primary">
+                        <span class="material-icons">edit</span>
+                        Edit Member
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
 
-    <p>
-        <a href="/Members/Index">Back to List</a>
-    </p>
-}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add any interactive functionality here
+        const progressBars = document.querySelectorAll('.progress-bar');
+        
+        progressBars.forEach(bar => {
+            // Animate progress bars on load
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 100);
+        });
+
+        // Keyboard navigation for action buttons
+        const actionButtons = document.querySelectorAll('.btn');
+        actionButtons.forEach(button => {
+            button.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+        });
+    });
+</script>

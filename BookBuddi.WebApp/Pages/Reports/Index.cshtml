@@ -1,87 +1,345 @@
 @page
 @model BookBuddi.Pages.Reports.IndexModel
 @{
-    ViewData["Title"] = "Reports";
+    ViewData["Title"] = "Reports"; 
 }
+<link rel="stylesheet" href="~/css/reports-index.css" />
 
-<h1>Reports & Analytics</h1>
 
-<div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-    <h3 style="margin-top: 0;">Detailed Reports</h3>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <a href="/Reports/Borrowing" style="padding: 10px 20px; background: #8A2D3B; color: white; text-decoration: none; border-radius: 5px; font-weight: 600;">📚 Borrowing Report</a>
-        <a href="/Reports/Inventory" style="padding: 10px 20px; background: #8A2D3B; color: white; text-decoration: none; border-radius: 5px; font-weight: 600;">📦 Inventory Report</a>
-        <a href="/Reports/Members" style="padding: 10px 20px; background: #8A2D3B; color: white; text-decoration: none; border-radius: 5px; font-weight: 600;">👥 Members Report</a>
-        <a href="/Reports/Requests" style="padding: 10px 20px; background: #8A2D3B; color: white; text-decoration: none; border-radius: 5px; font-weight: 600;">📝 Requests Report</a>
+<div class="reports-container">
+    <!-- Enhanced Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="header-main">
+                <div class="header-text">
+                    <h1 class="header-title">Library Analytics Dashboard</h1>
+                    <p class="header-subtitle">Real-time insights and comprehensive reports for informed decision-making and library optimization</p>
+                </div>
+                <div class="header-actions">
+                    <a href="/Admin/Index" class="btn btn-primary">
+                        <span class="material-icons">dashboard</span>
+                        Admin Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Critical KPIs - High Priority Metrics -->
+    <div class="critical-kpis">
+        <div class="critical-kpi alert">
+            <div class="kpi-icon">
+                <span class="material-icons">warning</span>
+            </div>
+            <div class="kpi-value">@Model.OverdueTransactions</div>
+            <div class="kpi-label">Overdue Books</div>
+            <div class="kpi-description">Requires immediate attention and follow-up</div>
+        </div>
+
+        <div class="critical-kpi warning">
+            <div class="kpi-icon">
+                <span class="material-icons">payments</span>
+            </div>
+            <div class="kpi-value">$@Model.UnpaidFinesAmount.ToString("F2")</div>
+            <div class="kpi-label">Unpaid Fines</div>
+            <div class="kpi-description">Total outstanding fines across all members</div>
+        </div>
+
+        <div class="critical-kpi">
+            <div class="kpi-icon">
+                <span class="material-icons">schedule</span>
+            </div>
+            <div class="kpi-value">@Model.PendingRequests</div>
+            <div class="kpi-label">Pending Requests</div>
+            <div class="kpi-description">Book requests awaiting approval</div>
+        </div>
+
+        <div class="critical-kpi">
+            <div class="kpi-icon">
+                <span class="material-icons">inventory_2</span>
+            </div>
+            <div class="kpi-value">@Model.AvailableBooks</div>
+            <div class="kpi-label">Books Available</div>
+            <div class="kpi-description">Ready for immediate borrowing</div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="main-content">
+        <!-- Left Column - Main Content -->
+        <div class="main-column">
+            <!-- Report Navigation -->
+            <div class="report-navigation">
+                <h3 class="section-title">
+                    <span class="material-icons">dashboard</span>
+                    Detailed Reports
+                </h3>
+                <div class="report-grid">
+                    <a href="/Reports/Borrowing" class="report-card">
+                        <div class="report-icon">
+                            <span class="material-icons">local_library</span>
+                        </div>
+                        <div class="report-content">
+                            <div class="report-title">Borrowing Analytics</div>
+                            <div class="report-description">Track loans, returns, and borrowing patterns with detailed insights</div>
+                        </div>
+                    </a>
+
+                    <a href="/Reports/Inventory" class="report-card">
+                        <div class="report-icon">
+                            <span class="material-icons">inventory_2</span>
+                        </div>
+                        <div class="report-content">
+                            <div class="report-title">Inventory Management</div>
+                            <div class="report-description">Monitor stock, availability, and catalog health status</div>
+                        </div>
+                    </a>
+
+                    <a href="/Reports/Members" class="report-card">
+                        <div class="report-icon">
+                            <span class="material-icons">groups</span>
+                        </div>
+                        <div class="report-content">
+                            <div class="report-title">Member Analytics</div>
+                            <div class="report-description">Analyze engagement, activity patterns, and member health</div>
+                        </div>
+                    </a>
+
+                    <a href="/Reports/Requests" class="report-card">
+                        <div class="report-icon">
+                            <span class="material-icons">request_quote</span>
+                        </div>
+                        <div class="report-content">
+                            <div class="report-title">Request Intelligence</div>
+                            <div class="report-description">Review approval workflows and request statistics</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Detailed Statistics -->
+            <div class="statistics-section">
+                <h3 class="section-title">
+                    <span class="material-icons">analytics</span>
+                    Comprehensive Statistics
+                </h3>
+                <div class="statistics-grid">
+                    <!-- Inventory Reports -->
+                    <div class="statistics-card">
+                        <div class="statistics-header">
+                            <div class="statistics-icon inventory-icon">
+                                <span class="material-icons">inventory_2</span>
+                            </div>
+                            <h4 class="statistics-title">Collection Health</h4>
+                        </div>
+                        <table class="statistics-table">
+                            <tr class="statistics-row">
+                                <td class="statistics-label">Total Collection Size</td>
+                                <td class="statistics-value highlight">@Model.TotalBooks</td>
+                            </tr>
+                            <tr class="statistics-row">
+                                <td class="statistics-label">Available for Borrowing</td>
+                                <td class="statistics-value success">@Model.AvailableBooks</td>
+                            </tr>
+                            <tr class="statistics-row">
+                                <td class="statistics-label">Currently Loaned Out</td>
+                                <td class="statistics-value info">@Model.BorrowedBooks</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Member Reports -->
+                    <div class="statistics-card">
+                        <div class="statistics-header">
+                            <div class="statistics-icon members-icon">
+                                <span class="material-icons">groups</span>
+                            </div>
+                            <h4 class="statistics-title">Member Base</h4>
+                        </div>
+                        <table class="statistics-table">
+                            <tr class="statistics-row">
+                                <td class="statistics-label">Total Registered Members</td>
+                                <td class="statistics-value highlight">@Model.TotalMembers</td>
+                            </tr>
+                            <tr class="statistics-row">
+                                <td class="statistics-label">Active Members</td>
+                                <td class="statistics-value success">@Model.ActiveMembers</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Borrowing Activity -->
+                    <div class="statistics-card">
+                        <div class="statistics-header">
+                            <div class="statistics-icon borrowing-icon">
+                                <span class="material-icons">local_library</span>
+                            </div>
+                            <h4 class="statistics-title">Circulation Activity</h4>
+                        </div>
+                        <table class="statistics-table">
+                            <tr class="statistics-row">
+                                <td class="statistics-label">Active Loans</td>
+                                <td class="statistics-value">@Model.ActiveTransactions</td>
+                            </tr>
+                            <tr class="statistics-row">
+                                <td class="statistics-label">Overdue Returns</td>
+                                <td class="statistics-value danger">@Model.OverdueTransactions</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Financial Reports -->
+                    <div class="statistics-card">
+                        <div class="statistics-header">
+                            <div class="statistics-icon financial-icon">
+                                <span class="material-icons">payments</span>
+                            </div>
+                            <h4 class="statistics-title">Financial Overview</h4>
+                        </div>
+                        <table class="statistics-table">
+                            <tr class="statistics-row">
+                                <td class="statistics-label">Outstanding Fines Total</td>
+                                <td class="statistics-value danger">$@Model.UnpaidFinesAmount.ToString("F2")</td>
+                            </tr>
+                            <tr class="statistics-row">
+                                <td class="statistics-label">Individual Fine Cases</td>
+                                <td class="statistics-value warning">@Model.UnpaidFinesCount</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Sidebar -->
+        <div class="sidebar">
+            <div class="summary-card">
+                <h4 class="summary-title">
+                    <span class="material-icons">speed</span>
+                    Performance Summary
+                </h4>
+                <ul class="summary-list">
+                    <li class="summary-item">
+                        <span class="summary-label">Collection Utilization</span>
+                        <span class="summary-value">@((Model.BorrowedBooks * 100 / Math.Max(Model.TotalBooks, 1)).ToString("F1"))%</span>
+                    </li>
+                    <li class="summary-item">
+                        <span class="summary-label">Member Activity Rate</span>
+                        <span class="summary-value">@((Model.ActiveMembers * 100 / Math.Max(Model.TotalMembers, 1)).ToString("F1"))%</span>
+                    </li>
+                    <li class="summary-item">
+                        <span class="summary-label">Overdue Rate</span>
+                        <span class="summary-value">@((Model.OverdueTransactions * 100 / Math.Max(Model.ActiveTransactions, 1)).ToString("F1"))%</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="summary-card">
+                <h4 class="summary-title">
+                    <span class="material-icons">trending_up</span>
+                    Quick Metrics
+                </h4>
+                <ul class="summary-list">
+                    <li class="summary-item">
+                        <span class="summary-label">Total Book Requests</span>
+                        <span class="summary-value">@Model.TotalRequests</span>
+                    </li>
+                    <li class="summary-item">
+                        <span class="summary-label">Pending Approvals</span>
+                        <span class="summary-value">@Model.PendingRequests</span>
+                    </li>
+                    <li class="summary-item">
+                        <span class="summary-label">Avg Books per Member</span>
+                        <span class="summary-value">@((Model.BorrowedBooks / Math.Max(Model.ActiveMembers, 1)).ToString("F1"))</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="/" class="btn btn-primary">
+            <span class="material-icons">arrow_back</span>
+            Return to Home Dashboard
+        </a>
     </div>
 </div>
 
-<hr style="margin: 30px 0;" />
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Enhanced hover effects for critical KPIs
+        const criticalKpis = document.querySelectorAll('.critical-kpi');
+        const reportCards = document.querySelectorAll('.report-card');
+        const statisticsCards = document.querySelectorAll('.statistics-card');
 
-<h2 style="color: #555; margin-bottom: 20px;">📊 Quick Overview Statistics</h2>
+        criticalKpis.forEach(kpi => {
+            kpi.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-12px)';
+            });
+            
+            kpi.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
 
-<h3>Inventory Reports</h3>
-<table border="1">
-    <tr>
-        <td><strong>Total Books:</strong></td>
-        <td>@Model.TotalBooks</td>
-    </tr>
-    <tr>
-        <td><strong>Available Books:</strong></td>
-        <td>@Model.AvailableBooks</td>
-    </tr>
-    <tr>
-        <td><strong>Borrowed Books:</strong></td>
-        <td>@Model.BorrowedBooks</td>
-    </tr>
-</table>
+        reportCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-6px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
 
-<h3>Member Reports</h3>
-<table border="1">
-    <tr>
-        <td><strong>Total Members:</strong></td>
-        <td>@Model.TotalMembers</td>
-    </tr>
-    <tr>
-        <td><strong>Active Members:</strong></td>
-        <td>@Model.ActiveMembers</td>
-    </tr>
-</table>
+        statisticsCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
 
-<h3>Borrowing Activity</h3>
-<table border="1">
-    <tr>
-        <td><strong>Active Transactions:</strong></td>
-        <td>@Model.ActiveTransactions</td>
-    </tr>
-    <tr>
-        <td><strong>Overdue Transactions:</strong></td>
-        <td>@Model.OverdueTransactions</td>
-    </tr>
-</table>
+        // Add loading animation for critical metrics
+        const kpiValues = document.querySelectorAll('.kpi-value');
+        kpiValues.forEach(value => {
+            const originalText = value.textContent;
+            value.textContent = '0';
+            
+            setTimeout(() => {
+                let current = 0;
+                const target = parseInt(originalText.replace(/[^0-9]/g, ''));
+                const increment = target / 30;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        value.textContent = originalText;
+                        clearInterval(timer);
+                    } else {
+                        if (originalText.includes('$')) {
+                            value.textContent = '$' + Math.floor(current).toLocaleString();
+                        } else {
+                            value.textContent = Math.floor(current).toLocaleString();
+                        }
+                    }
+                }, 50);
+            }, 500);
+        });
 
-<h3>Financial Reports</h3>
-<table border="1">
-    <tr>
-        <td><strong>Total Unpaid Fines:</strong></td>
-        <td>$@Model.UnpaidFinesAmount.ToString("F2")</td>
-    </tr>
-    <tr>
-        <td><strong>Number of Unpaid Fines:</strong></td>
-        <td>@Model.UnpaidFinesCount</td>
-    </tr>
-</table>
-
-<h3>Book Request Reports</h3>
-<table border="1">
-    <tr>
-        <td><strong>Pending Requests:</strong></td>
-        <td>@Model.PendingRequests</td>
-    </tr>
-    <tr>
-        <td><strong>Total Requests:</strong></td>
-        <td>@Model.TotalRequests</td>
-    </tr>
-</table>
-
-<p><a href="/">Back to Home</a></p>
+        // Keyboard navigation
+        const interactiveElements = document.querySelectorAll('.report-card, .btn, .critical-kpi');
+        interactiveElements.forEach(element => {
+            element.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+            
+            element.setAttribute('tabindex', '0');
+        });
+    });
+</script>

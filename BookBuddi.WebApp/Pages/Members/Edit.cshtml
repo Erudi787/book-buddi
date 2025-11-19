@@ -2,149 +2,332 @@
 @model BookBuddi.Pages.Members.EditModel
 @{
     ViewData["Title"] = "Edit Member";
+    var colorTextSecondary = "#718096";
+    var colorSuccess = "#10b981";
+    var colorWarning = "#f59e0b";
+    var colorDanger = "#ef4444";
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-10 offset-md-1">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Edit Member: @Model.Member.FullName</h3>
+<link rel="stylesheet" href="~/css/members-edit.css" />
+
+
+
+<div class="edit-member-container">
+    <div class="page-header">
+        <h1>Edit Member</h1>
+        <p>Update member information and account settings</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <span class="material-icons">person</span>
+                Editing: @Model.Member.FullName
+            </h2>
+        </div>
+        <div class="card-body">
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger">
+                    <span class="material-icons">error</span>
+                    <span>@Model.ErrorMessage</span>
+                    <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
                 </div>
-                <div class="card-body">
-                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success">
+                    <span class="material-icons">check_circle</span>
+                    <span>@Model.SuccessMessage</span>
+                    <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">×</button>
+                </div>
+            }
+
+            <form method="post">
+                <input type="hidden" asp-for="Member.MemberId" />
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="material-icons">person</span>
+                        Basic Information
+                    </h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label required">First Name</label>
+                            <input type="text" class="form-input" asp-for="Member.FirstName" required 
+                                   placeholder="Enter first name" />
                         </div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="bi bi-check-circle-fill"></i> @Model.SuccessMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        
+                        <div class="form-group">
+                            <label class="form-label required">Last Name</label>
+                            <input type="text" class="form-input" asp-for="Member.LastName" required 
+                                   placeholder="Enter last name" />
                         </div>
-                    }
-
-                    <form method="post">
-                        <input type="hidden" asp-for="Member.MemberId" />
-
-                        <h5 class="text-primary mb-3">Basic Information</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="FirstName" class="form-label">First Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="FirstName" asp-for="Member.FirstName" required />
-                                <span asp-validation-for="Member.FirstName" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="LastName" class="form-label">Last Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="LastName" asp-for="Member.LastName" required />
-                                <span asp-validation-for="Member.LastName" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="Email" class="form-label">Email Address <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" id="Email" asp-for="Member.Email" required />
-                            <span asp-validation-for="Member.Email" class="text-danger"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="Phone" class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" id="Phone" asp-for="Member.Phone" />
-                                <span asp-validation-for="Member.Phone" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="DateOfBirth" class="form-label">Date of Birth</label>
-                                <input type="date" class="form-control" id="DateOfBirth" asp-for="Member.DateOfBirth" />
-                            </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label required">Email Address</label>
+                            <input type="email" class="form-input" asp-for="Member.Email" required 
+                                   placeholder="Enter email address" />
+                            <span class="helper-text">Used for login and notifications</span>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="Address" class="form-label">Address</label>
-                            <textarea class="form-control" id="Address" asp-for="Member.Address" rows="2"></textarea>
-                            <span asp-validation-for="Member.Address" class="text-danger"></span>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-input" asp-for="Member.Phone" 
+                                   placeholder="Enter phone number" />
                         </div>
 
-                        <hr />
-
-                        <h5 class="text-primary mb-3">Membership Details</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="Status" class="form-label">Status</label>
-                                <select class="form-select" id="Status" asp-for="Member.Status" asp-items="Html.GetEnumSelectList<BookBuddi.Resources.Constants.MemberStatus>()">
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="BorrowingLimit" class="form-label">Borrowing Limit</label>
-                                <input type="number" class="form-control" id="BorrowingLimit" asp-for="Member.BorrowingLimit" min="1" max="20" />
-                                <small class="form-text text-muted">Maximum books that can be borrowed at once (1-20)</small>
-                                <span asp-validation-for="Member.BorrowingLimit" class="text-danger"></span>
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" class="form-input" asp-for="Member.DateOfBirth" 
+                                   max="@DateTime.Now.ToString("yyyy-MM-dd")" />
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="MembershipDate" class="form-label">Membership Date</label>
-                                <input type="date" class="form-control" id="MembershipDate" asp-for="Member.MembershipDate" readonly />
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="MembershipExpiryDate" class="form-label">Membership Expiry Date</label>
-                                <input type="date" class="form-control" id="MembershipExpiryDate" asp-for="Member.MembershipExpiryDate" />
-                            </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-textarea" asp-for="Member.Address" 
+                                      placeholder="Enter full address" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="material-icons">card_membership</span>
+                        Membership Details
+                    </h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" asp-for="Member.Status" asp-items="Html.GetEnumSelectList<BookBuddi.Resources.Constants.MemberStatus>()">
+                            </select>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="form-group">
+                            <label class="form-label">Borrowing Limit</label>
+                            <input type="number" class="form-input" asp-for="Member.BorrowingLimit" 
+                                   min="1" max="20" placeholder="Enter borrowing limit" />
+                            <span class="helper-text">Maximum books that can be borrowed at once (1-20)</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Membership Date</label>
+                            <input type="date" class="form-input" asp-for="Member.MembershipDate" readonly />
+                            <span class="helper-text">Original membership date (read-only)</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Membership Expiry Date</label>
+                            <input type="date" class="form-input" asp-for="Member.MembershipExpiryDate" 
+                                   min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            <span class="helper-text">When the membership expires</span>
+                        </div>
+
+                        <div class="form-group">
                             <label class="form-label">Current Borrowed Count</label>
-                            <input type="text" class="form-control" value="@Model.Member.CurrentBorrowedCount" readonly />
-                            <small class="form-text text-muted">Number of books currently borrowed</small>
+                            <input type="text" class="form-input" value="@Model.Member.CurrentBorrowedCount" readonly />
+                            <span class="helper-text">Number of books currently borrowed (read-only)</span>
                         </div>
-
-                        <hr />
-
-                        <h5 class="text-primary mb-3">Change Password (Optional)</h5>
-                        <p class="text-muted small">Leave blank to keep the current password</p>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="NewPassword" class="form-label">New Password</label>
-                                <input type="password" class="form-control" id="NewPassword" asp-for="NewPassword" minlength="8" />
-                                <small class="form-text text-muted">At least 8 characters with uppercase, lowercase, digit, and special character</small>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="ConfirmPassword" class="form-label">Confirm New Password</label>
-                                <input type="password" class="form-control" id="ConfirmPassword" asp-for="ConfirmPassword" minlength="8" />
-                            </div>
-                        </div>
-
-                        <hr />
-
-                        <div class="d-flex justify-content-between">
-                            <a href="/Members/Index" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left"></i> Back to Members
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save"></i> Update Member
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
 
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h6 class="text-muted">Audit Information</h6>
-                    <p class="mb-1"><small><strong>Created By:</strong> @Model.Member.CreatedBy on @Model.Member.CreatedTime.ToString("MMM dd, yyyy hh:mm tt")</small></p>
-                    <p class="mb-0"><small><strong>Last Updated By:</strong> @Model.Member.UpdatedBy on @Model.Member.UpdatedTime.ToString("MMM dd, yyyy hh:mm tt")</small></p>
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="material-icons">lock</span>
+                        Change Password
+                    </h3>
+                    
+                    <p class="helper-text" style="margin-bottom: 16px;">Leave blank to keep the current password</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">New Password</label>
+                            <input type="password" class="form-input" id="NewPassword" asp-for="NewPassword" 
+                                   minlength="8" placeholder="Enter new password" />
+                            <div class="password-strength" id="passwordStrength">
+                                <div class="strength-bar">
+                                    <div class="strength-fill"></div>
+                                </div>
+                                <div class="strength-text" id="strengthText">Password strength</div>
+                            </div>
+                            <div class="password-requirements">
+                                <div class="requirement" id="reqLength">At least 8 characters</div>
+                                <div class="requirement" id="reqUppercase">One uppercase letter</div>
+                                <div class="requirement" id="reqLowercase">One lowercase letter</div>
+                                <div class="requirement" id="reqDigit">One number</div>
+                                <div class="requirement" id="reqSpecial">One special character</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-input" id="ConfirmPassword" asp-for="ConfirmPassword" 
+                                   minlength="8" placeholder="Confirm new password" />
+                            <span class="helper-text" id="passwordMatch">Re-enter the new password</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="/Members/Index" class="btn btn-outline">
+                        <span class="material-icons">arrow_back</span>
+                        Back to Members
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="material-icons">save</span>
+                        Update Member
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="audit-info">
+                <div class="audit-title">
+                    <span class="material-icons">history</span>
+                    Audit Information
+                </div>
+                <div class="audit-details">
+                    <div class="audit-item">
+                        <span class="audit-label">Created By</span>
+                        <span class="audit-value">@Model.Member.CreatedBy on @Model.Member.CreatedTime.ToString("MMM dd, yyyy 'at' hh:mm tt")</span>
+                    </div>
+                    <div class="audit-item">
+                        <span class="audit-label">Last Updated By</span>
+                        <span class="audit-value">@Model.Member.UpdatedBy on @Model.Member.UpdatedTime.ToString("MMM dd, yyyy 'at' hh:mm tt")</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const newPasswordInput = document.getElementById('NewPassword');
+        const confirmPasswordInput = document.getElementById('ConfirmPassword');
+        const passwordStrength = document.getElementById('passwordStrength');
+        const strengthText = document.getElementById('strengthText');
+        const passwordMatch = document.getElementById('passwordMatch');
+        const requirements = {
+            length: document.getElementById('reqLength'),
+            uppercase: document.getElementById('reqUppercase'),
+            lowercase: document.getElementById('reqLowercase'),
+            digit: document.getElementById('reqDigit'),
+            special: document.getElementById('reqSpecial')
+        };
+
+        // Password strength and requirement checking
+        if (newPasswordInput) {
+            newPasswordInput.addEventListener('input', function() {
+                const password = this.value;
+                checkPasswordRequirements(password);
+                updatePasswordStrength(password);
+            });
+        }
+
+        // Password match indicator
+        if (confirmPasswordInput && newPasswordInput) {
+            confirmPasswordInput.addEventListener('input', function() {
+                const newPassword = newPasswordInput.value;
+                const confirmPassword = this.value;
+                
+                if (confirmPassword === '') {
+                    passwordMatch.textContent = 'Re-enter the new password';
+                    passwordMatch.style.color = '@colorTextSecondary';
+                } else if (newPassword === confirmPassword) {
+                    passwordMatch.textContent = 'Passwords match';
+                    passwordMatch.style.color = '@colorSuccess';
+                } else {
+                    passwordMatch.textContent = 'Passwords do not match';
+                    passwordMatch.style.color = '@colorDanger';
+                }
+            });
+        }
+
+        function checkPasswordRequirements(password) {
+            const checks = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                digit: /[0-9]/.test(password),
+                special: /[^A-Za-z0-9]/.test(password)
+            };
+
+            // Update requirement indicators
+            Object.keys(checks).forEach(key => {
+                if (checks[key]) {
+                    requirements[key].classList.add('met');
+                } else {
+                    requirements[key].classList.remove('met');
+                }
+            });
+
+            return checks;
+        }
+
+        function updatePasswordStrength(password) {
+            if (password.length === 0) {
+                passwordStrength.className = 'password-strength';
+                passwordStrength.querySelector('.strength-fill').style.width = '0%';
+                strengthText.textContent = 'Password strength';
+                strengthText.style.color = '@colorTextSecondary';
+                return;
+            }
+
+            const checks = checkPasswordRequirements(password);
+            const metCount = Object.values(checks).filter(Boolean).length;
+            const totalCount = Object.keys(checks).length;
+
+            if (metCount <= 2) {
+                passwordStrength.className = 'password-strength strength-weak';
+                strengthText.textContent = 'Weak password';
+                strengthText.style.color = '@colorDanger';
+            } else if (metCount <= 4) {
+                passwordStrength.className = 'password-strength strength-medium';
+                strengthText.textContent = 'Medium strength';
+                strengthText.style.color = '@colorWarning';
+            } else {
+                passwordStrength.className = 'password-strength strength-strong';
+                strengthText.textContent = 'Strong password';
+                strengthText.style.color = '@colorSuccess';
+            }
+        }
+
+        // Form validation
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const newPassword = newPasswordInput?.value;
+                const confirmPassword = confirmPasswordInput?.value;
+                
+                // Check password match if new password is provided
+                if (newPassword && newPassword !== confirmPassword) {
+                    e.preventDefault();
+                    passwordMatch.textContent = 'Passwords do not match';
+                    passwordMatch.style.color = '@colorDanger';
+                    confirmPasswordInput?.focus();
+                }
+            });
+        }
+
+        // Set maximum date for date of birth to today
+        const dobInput = document.querySelector('input[asp-for="Member.DateOfBirth"]');
+        if (dobInput) {
+            const today = new Date().toISOString().split('T')[0];
+            dobInput.max = today;
+        }
+
+        // Set minimum date for membership expiry to today
+        const expiryInput = document.querySelector('input[asp-for="Member.MembershipExpiryDate"]');
+        if (expiryInput) {
+            const today = new Date().toISOString().split('T')[0];
+            expiryInput.min = today;
+        }
+    });
+</script>

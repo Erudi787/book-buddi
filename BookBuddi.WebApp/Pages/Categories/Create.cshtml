@@ -5,46 +5,151 @@
     var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
 }
 
-<h1>Add New Category</h1>
+<link rel="stylesheet" href="~/css/categories-create.css" />
 
-@if (!isAdmin)
-{
-    <p style="color: red;">Admin access required.</p>
-    <p><a href="/Account/Login">Login as Admin</a></p>
-}
-else
-{
-    <form method="post" style="max-width: 600px;">
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Category Name: *</label><br />
-            <input type="text" name="categoryName" required style="width: 100%; padding: 8px;" maxlength="100" />
-        </div>
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Description:</label><br />
-            <textarea name="description" rows="4" style="width: 100%; padding: 8px;" maxlength="500"></textarea>
-        </div>
-        <div>
-            <button type="submit"
-                style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Create
-                Category</button>
-            <a href="/Categories/Index"
-                style="margin-left: 10px; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px;">Cancel</a>
-        </div>
-    </form>
 
-    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+<div class="page-container">
+    <div class="page-header">
+        <div class="header-content">
+            <h1>Add New Category</h1>
+            <p>Create a new category to organize books in your library system</p>
+        </div>
+    </div>
+
+    @if (!isAdmin)
     {
-        <div
-            style="margin-top: 20px; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px;">
-            @Model.ErrorMessage
+        <div class="access-denied">
+            <div class="access-denied-icon">🔒</div>
+            <h2>Admin Access Required</h2>
+            <p>You need administrator privileges to access this page.</p>
+            <a href="/Account/Login" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Login as Admin
+            </a>
         </div>
     }
-
-    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    else
     {
-        <div
-            style="margin-top: 20px; padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 5px;">
-            @Model.SuccessMessage
+        <div class="main-content">
+            <div class="form-container">
+                <h2 class="form-title">Category Details</h2>
+                <form method="post">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-tag"></i>Category Name
+                        </label>
+                        <input type="text" name="categoryName" class="form-control" required maxlength="100" 
+                               placeholder="Enter category name (e.g., Fiction, Science, History)" />
+                        <div class="char-count"><span id="nameCount">0</span>/100 characters</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label optional">
+                            <i class="fas fa-align-left"></i>Description
+                        </label>
+                        <textarea name="description" rows="4" class="form-control textarea" maxlength="500"
+                                  placeholder="Provide a brief description of this category (optional)"></textarea>
+                        <div class="char-count"><span id="descCount">0</span>/500 characters</div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> Create Category
+                        </button>
+                        <a href="/Categories/Index" class="btn btn-outline">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+
+                <div class="message-container">
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger">
+                            <div class="alert-icon">⚠️</div>
+                            <div>@Model.ErrorMessage</div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success">
+                            <div class="alert-icon">✅</div>
+                            <div>@Model.SuccessMessage</div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <h3 class="sidebar-title">Category Tips</h3>
+                <ul class="tips-list">
+                    <li>
+                        <div class="tip-icon">📝</div>
+                        <div>Use clear, descriptive names that users will easily understand</div>
+                    </li>
+                    <li>
+                        <div class="tip-icon">🔍</div>
+                        <div>Consider how categories will help users find books more efficiently</div>
+                    </li>
+                    <li>
+                        <div class="tip-icon">📚</div>
+                        <div>Think about your library's collection and future growth when creating categories</div>
+                    </li>
+                    <li>
+                        <div class="tip-icon">🔄</div>
+                        <div>You can edit categories later if needed</div>
+                    </li>
+                    <li>
+                        <div class="tip-icon">📊</div>
+                        <div>Categories help with organization and reporting</div>
+                    </li>
+                </ul>
+            </div>
         </div>
     }
+</div>
+
+@section Scripts {
+    <script>
+        // Character counter functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const nameInput = document.querySelector('input[name="categoryName"]');
+            const descInput = document.querySelector('textarea[name="description"]');
+            const nameCount = document.getElementById('nameCount');
+            const descCount = document.getElementById('descCount');
+            
+            if (nameInput && nameCount) {
+                nameInput.addEventListener('input', function() {
+                    nameCount.textContent = this.value.length;
+                });
+                // Initialize count
+                nameCount.textContent = nameInput.value.length;
+            }
+            
+            if (descInput && descCount) {
+                descInput.addEventListener('input', function() {
+                    descCount.textContent = this.value.length;
+                });
+                // Initialize count
+                descCount.textContent = descInput.value.length;
+            }
+            
+            // Form validation enhancement
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const categoryName = nameInput.value.trim();
+                    if (!categoryName) {
+                        e.preventDefault();
+                        nameInput.focus();
+                        // Add visual feedback
+                        nameInput.style.borderColor = '#dc3545';
+                        setTimeout(() => {
+                            nameInput.style.borderColor = '';
+                        }, 2000);
+                    }
+                });
+            }
+        });
+    </script>
 }
