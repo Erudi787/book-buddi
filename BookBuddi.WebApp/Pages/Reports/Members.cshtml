@@ -14,7 +14,6 @@
                 <a href="/Reports/Inventory" class="tab">Inventory</a>
                 <a href="/Reports/Members" class="tab active">Members</a>
                 <a href="/Reports/Requests" class="tab">Request</a>
-                <a href="/Reports/LostBooks" class="tab">Lost Book</a>
             </div>
         </div>
     </div>
@@ -22,8 +21,8 @@
     <!-- Controls: Search, Filter, Export -->
     <div class="controls-top">
         <div class="search-box">
-            <span class="search-icon">🔍</span>
             <input type="text" id="searchBox" placeholder="Search members..." />
+            <span class="search-icon">🔍</span>
         </div>
 
         <div class="filter-controls">
@@ -43,28 +42,28 @@
     <div class="content-layout">
         <!-- Summary Sidebar -->
         <div class="summary-sidebar">
-            <div class="summary-card" data-filter="All"> 
+            <div class="summary-card @(Model.CurrentFilter=="All" ? "highlight-card" : "")" data-filter="All"> 
                 <div class="card-icon">👥</div>
                 <div class="card-text">
                     <h2>@Model.TotalMembers</h2>
                     <p>Total Members</p>
                 </div>
             </div>
-            <div class="summary-card" data-filter="Active"> 
+            <div class="summary-card @(Model.CurrentFilter=="Active" ? "highlight-card" : "")" data-filter="Active"> 
                 <div class="card-icon">✅</div>
                 <div class="card-text">
                     <h2>@Model.ActiveMembers</h2>
                     <p>Active Members</p>
                 </div>
             </div>
-            <div class="summary-card" data-filter="Inactive"> 
+            <div class="summary-card @(Model.CurrentFilter=="Inactive" ? "highlight-card" : "")" data-filter="Inactive"> 
                 <div class="card-icon">❌</div>
                 <div class="card-text">
                     <h2>@Model.InactiveMembers</h2>
                     <p>Inactive Members</p>
                 </div>
             </div>
-            <div class="summary-card"> 
+            <div class="summary-card static-card"> 
                 <div class="card-icon">📚</div>
                 <div class="card-text">
                     <h2>@Model.TotalBooksBorrowed</h2>
@@ -105,6 +104,10 @@
 </div>
 
 <style>
+/* --- Reset & Layout --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Instrument Sans", Roboto, Arial; color: #333; }
+
 .report-container { width:100%; display:flex; flex-direction:column; background:#f5f6fa; }
 .report-header { padding:16px 32px; background:#f4d9a0; }
 .header-left { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
@@ -114,21 +117,21 @@
 .tab { padding:8px 20px; border-radius:999px; text-decoration:none; font-weight:600; font-size:14px; background:#fff; color:#6b6b6b; box-shadow:0 2px 6px rgba(62,45,45,0.04); transition: all 0.15s; }
 .tab.active { background:#7d2e2e; color:#fff; box-shadow:none; }
 
-.controls-top { display:flex; gap:16px; align-items:center; padding:16px 32px; background:#fff; border-bottom:1px solid #eee; flex-wrap:wrap; }
-.search-box { flex:1; position:relative; max-width:420px; }
+.controls-top { display:flex; align-items:center; gap:16px; padding:16px 32px; background:#fff; border-bottom:1px solid #eee; flex-wrap:wrap; }
+.search-box { flex:1 1 auto; position:relative; }
 .search-box input { width:100%; padding:10px 12px 10px 36px; border-radius:999px; border:1px solid #e6e6e6; font-size:14px; }
-.search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#999; }
-.filter-controls { display:flex; gap:12px; }
+.search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#999; }
+.filter-controls { display:flex; gap:12px; align-items:center; }
 .filter-dropdown { padding:10px 36px 10px 14px; border-radius:8px; border:1px solid #e6e6e6; background:#fff; font-size:14px; appearance:none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
 .action-buttons { display:flex; gap:10px; }
 .btn-export { padding:10px 18px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; border:none; }
-.btn-export-pdf { background:#7d2e2e;color:#fff;box-shadow:0 4px 12px rgba(125,46,46,0.12); }
+.btn-export-pdf { background:#7d2e2e;color:#fff; }
 .btn-export-csv { background:#fff;color:#555;border:1px solid #e6e6e6; }
 
 .content-layout { display:flex; flex:1; gap:24px; padding:16px 32px; overflow:hidden; }
-.summary-sidebar { flex:0 0 300px; display:flex; flex-direction:column; gap:18px; }
-.summary-card { display:flex; align-items:center; gap:16px; padding:16px; border-radius:14px; background:#fff; box-shadow:0 6px 18px rgba(31,31,31,0.04); cursor:pointer; transition:all 0.2s; }
-.summary-card .card-icon { width:58px;height:58px;display:flex;align-items:center;justify-content:center;background:#fafafa;border-radius:10px;font-size:28px; }
+.summary-sidebar { flex:0 0 320px; display:flex; flex-direction:column; gap:18px; }
+.summary-card { display:flex; align-items:center; gap:16px; padding:16px; border-radius:14px; background:#fff; box-shadow:0 6px 18px rgba(31,31,31,0.04); transition: all 0.2s; cursor:pointer; min-width:unset; }
+.summary-card .card-icon { width:58px; height:58px; display:flex; align-items:center; justify-content:center; background:#fafafa; border-radius:10px; font-size:28px; }
 .summary-card h2 { font-size:32px; font-weight:800; color:#0b0b0b; }
 .summary-card p { font-size:14px; font-weight:600; color:inherit; opacity:0.95; }
 .summary-card.highlight-card { background:#8A2D3B; color:#fff; }
@@ -140,86 +143,82 @@
 .report-table { width:100%; border-collapse:collapse; min-width:700px; }
 .report-table th, .report-table td { padding:12px; text-align:left; border-bottom:1px solid #eee; }
 .report-table tbody tr:hover { background:#fafafa; }
+
 .status { padding:6px 12px; border-radius:999px; font-weight:600; font-size:13px; }
-.status-active { background:#27ae60; color:#fff; }
-.status-inactive { background:#c0392b; color:#fff; }
+.status-active { background:#27ae60;color:#fff; }
+.status-inactive { background:#fdecea;color:#a42b2b; }
 
 @@media(max-width:880px){.content-layout{flex-direction:column;}.summary-sidebar{width:100%;flex-direction:row;overflow-x:auto;padding-bottom:8px;}.summary-card{min-width:220px;}}
 </style>
 
 <script>
-const searchBox = document.getElementById('searchBox');
-const statusFilter = document.getElementById('statusFilter');
-const tableRows = Array.from(document.querySelectorAll('#membersTable tbody tr'));
-const summaryCards = Array.from(document.querySelectorAll('.summary-sidebar .summary-card'));
-const btnExportCSV = document.querySelector('.btn-export-csv');
-const btnExportPDF = document.querySelector('.btn-export-pdf');
+document.addEventListener('DOMContentLoaded', function() {
+    const searchBox = document.getElementById('searchBox');
+    const statusFilter = document.getElementById('statusFilter');
+    const tableRows = document.querySelectorAll('#membersTable tbody tr');
+    const summaryCards = document.querySelectorAll('.summary-card');
+    const cardFilterMap = ["All","Active","Inactive"];
 
-const cardFilterMap = ["All", "Active", "Inactive"];
+    // Filter Table and Highlight Cards
+    function filterTable() {
+        const searchTerm = searchBox.value.toLowerCase();
+        const statusTerm = statusFilter.value;
 
-function filterTable() {
-    const searchTerm = searchBox.value.toLowerCase();
-    const statusTerm = statusFilter.value;
+        tableRows.forEach(row => {
+            const name = row.cells[1].innerText.toLowerCase();
+            const email = row.cells[2].innerText.toLowerCase();
+            const status = row.cells[4].innerText;
 
-    // Filter table rows
-    let filteredRows = tableRows.filter(row => {
-        const name = row.cells[1].innerText.toLowerCase();
-        const email = row.cells[2].innerText.toLowerCase();
-        const status = row.cells[4].innerText;
+            const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
+            const matchesStatus = statusTerm === "" || status === statusTerm;
 
-        const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
-        const matchesStatus = !statusTerm || status === statusTerm;
+            row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
+        });
 
-        row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
-        return matchesSearch && matchesStatus;
+        // Highlight summary cards based on dropdown selection
+        summaryCards.forEach((card, index) => {
+            const cardFilter = cardFilterMap[index];
+            if ((statusTerm === "" && cardFilter === "All") || statusTerm === cardFilter) {
+                card.classList.add("highlight-card");
+            } else {
+                card.classList.remove("highlight-card");
+            }
+        });
+    }
+
+    // Search & filter events
+    searchBox.addEventListener('input', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+
+    // Export CSV
+    document.querySelector('.btn-export-csv').addEventListener('click', () => {
+        let csvContent = "data:text/csv;charset=utf-8,Member ID,Name,Email,Total Books Borrowed,Status\n";
+        tableRows.forEach(row => {
+            if(row.style.display !== "none") {
+                const rowData = Array.from(row.cells).map(c => `"${c.innerText.replace(/"/g,'""')}"`).join(",");
+                csvContent += rowData + "\n";
+            }
+        });
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "members_report.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     });
 
-
-    // Update card highlights
-    summaryCards.forEach((card, idx) => {
-        const filter = cardFilterMap[idx];
-        if ((statusTerm === "" && filter==="All") || statusTerm === filter) {
-            card.classList.add("highlight-card");
-        } else {
-            card.classList.remove("highlight-card");
-        }
+    // Export PDF
+    document.querySelector('.btn-export-pdf').addEventListener('click', () => {
+        const originalContent = document.body.innerHTML;
+        const tableContent = document.querySelector('.main-content').innerHTML;
+        document.body.innerHTML = tableContent;
+        window.print();
+        document.body.innerHTML = originalContent;
+        window.location.reload();
     });
-}
 
-// Export CSV
-btnExportCSV.addEventListener('click', () => {
-    let csvContent = "data:text/csv;charset=utf-8,Member ID,Name,Email,TotalBooksBorrowed,Status\n";
-    tableRows.forEach(row => {
-        if (row.style.display !== "none") {
-            const rowData = Array.from(row.cells).map(c => `"${c.innerText.replace(/"/g,'""')}"`).join(",");
-            csvContent += rowData + "\n";
-        }
-    });
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a'); link.href = encodedUri; link.download = 'members_report.csv'; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    // Initial filter
+    filterTable();
 });
-
-// Export PDF
-btnExportPDF.addEventListener('click', () => {
-    const original = document.body.innerHTML;
-    const mainContent = document.querySelector('.main-content').innerHTML;
-    document.body.innerHTML = mainContent;
-    window.print();
-    document.body.innerHTML = original;
-    window.location.reload();
-});
-
-// Event listeners
-searchBox.addEventListener('input', filterTable);
-statusFilter.addEventListener('change', filterTable);
-summaryCards.forEach(card => {
-    card.addEventListener('click', () => {
-        const f = card.dataset.filter === "All" ? "" : card.dataset.filter;
-        statusFilter.value = f;
-        filterTable();
-    });
-});
-
-// Initial
-filterTable();
 </script>

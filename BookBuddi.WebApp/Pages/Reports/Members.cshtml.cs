@@ -40,7 +40,7 @@ namespace BookBuddi.WebApp.Pages
                 MemberName = $"{m.FirstName} {m.LastName}",
                 Email = m.Email,
                 TotalBooksBorrowed = m.CurrentBorrowedCount,
-                StatusText = m.Status.ToString(),
+                StatusText = m.Status == MemberStatus.Active ? "Active" : "Inactive",
                 StatusClass = m.Status == MemberStatus.Active ? "status-active" : "status-inactive"
             }).ToList();
 

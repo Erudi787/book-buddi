@@ -14,7 +14,6 @@
                 <a href="/Reports/Inventory" class="tab">Inventory</a>
                 <a href="/Reports/Members" class="tab">Members</a>
                 <a href="/Reports/Requests" class="tab active">Requests</a>
-                <a href="/Reports/LostBooks" class="tab">Lost Book</a>
             </div>
         </div>
     </div>
@@ -167,63 +166,77 @@
 </style>
 
 <script>
-const searchBox = document.getElementById('searchBox');
-const statusFilter = document.getElementById('statusFilter');
-const tableRows = document.querySelectorAll('#requestsTable tbody tr');
-const summaryCards = document.querySelectorAll('.summary-card');
-const cardFilterMap = ["All","Approved","Pending","Rejected"];
-const btnExportCSV = document.querySelector('.btn-export-csv');
-const btnExportPDF = document.querySelector('.btn-export-pdf');
+document.addEventListener('DOMContentLoaded', function() {
+    const searchBox = document.getElementById('searchBox');
+    const statusFilter = document.getElementById('statusFilter');
+    const tableRows = document.querySelectorAll('#requestsTable tbody tr');
+    const summaryCards = document.querySelectorAll('.summary-card');
+    const cardFilterMap = ["All","Approved","Pending","Rejected"];
+    const btnExportCSV = document.querySelector('.btn-export-csv');
+    const btnExportPDF = document.querySelector('.btn-export-pdf');
 
-function filterTable(){
-    const searchTerm = searchBox.value.toLowerCase();
-    const statusTerm = statusFilter.value;
+    // Function to filter table based on searchBox and statusFilter / clicked card
+    function filterTable(filterStatus = null){
+        const searchTerm = searchBox.value.toLowerCase();
+        const statusTerm = filterStatus !== null ? filterStatus : statusFilter.value;
 
-    tableRows.forEach(row=>{
-        const book=row.cells[0].innerText.toLowerCase();
-        const member=row.cells[1].innerText.toLowerCase();
-        const status=row.cells[3].innerText;
+        tableRows.forEach(row => {
+            const book = row.cells[0].innerText.toLowerCase();
+            const member = row.cells[1].innerText.toLowerCase();
+            const status = row.cells[3].innerText;
 
-        const matchesSearch = book.includes(searchTerm) || member.includes(searchTerm);
-        const matchesStatus = !statusTerm || status === statusTerm;
+            const matchesSearch = book.includes(searchTerm) || member.includes(searchTerm);
+            const matchesStatus = !statusTerm || statusTerm === "All" ? true : status === statusTerm;
 
-        row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
-    });
+            row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
+        });
 
-    summaryCards.forEach((card,index)=>{
-        const filter = cardFilterMap[index];
-        if((!statusTerm && filter==="All") || statusTerm===filter){
-            card.classList.add("highlight-card");
-        } else card.classList.remove("highlight-card");
-    });
-}
+        // Highlight the correct summary card
+        summaryCards.forEach((card, index) => {
+            const filter = cardFilterMap[index];
+            if((!statusTerm && filter === "All") || statusTerm === filter){
+                card.classList.add("highlight-card");
+            } else {
+                card.classList.remove("highlight-card");
+            }
+        });
 
-function exportCSV(){
-    let csv="Book Title,Member Name,Request Date,Status\n";
-    tableRows.forEach(row=>{
-        if(row.style.display==="none") return;
-        const rowData=Array.from(row.cells).map(c=>`"${c.innerText.replace(/"/g,'""')}"`).join(",");
-        csv+=rowData+"\n";
-    });
-    const link=document.createElement("a");
-    link.href=encodeURI("data:text/csv;charset=utf-8,"+csv);
-    link.download="requests_report.csv";
-    document.body.appendChild(link); link.click(); link.remove();
-}
+        // Sync dropdown with clicked card
+        if(filterStatus !== null) statusFilter.value = filterStatus;
+    }
 
-function exportPDF(){
-    const content=document.querySelector('.main-content').innerHTML;
-    const original=document.body.innerHTML;
-    document.body.innerHTML=content;
-    window.print();
-    document.body.innerHTML=original;
-    location.reload();
-}
+    // Export CSV
+    function exportCSV(){
+        let csv = "Book Title,Member Name,Request Date,Status\n";
+        tableRows.forEach(row => {
+            if(row.style.display === "none") return;
+            const rowData = Array.from(row.cells).map(c => `"${c.innerText.replace(/"/g,'""')}"`).join(",");
+            csv += rowData + "\n";
+        });
+        const link = document.createElement("a");
+        link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+        link.download = "requests_report.csv";
+        document.body.appendChild(link); 
+        link.click(); 
+        link.remove();
+    }
 
-searchBox.addEventListener('input',filterTable);
-statusFilter.addEventListener('change',filterTable);
-btnExportCSV.addEventListener('click',exportCSV);
-btnExportPDF.addEventListener('click',exportPDF);
+    // Export PDF
+    function exportPDF(){
+        const content = document.querySelector('.main-content').innerHTML;
+        const original = document.body.innerHTML;
+        document.body.innerHTML = content;
+        window.print();
+        document.body.innerHTML = original;
+        location.reload();
+    }
 
-filterTable();
+    // Event listeners
+    searchBox.addEventListener('input', () => filterTable());
+    statusFilter.addEventListener('change', () => filterTable());
+    btnExportCSV.addEventListener('click', exportCSV);
+    btnExportPDF.addEventListener('click', exportPDF);
+
+    filterTable();
+});
 </script>

@@ -4,38 +4,27 @@ using Microsoft.EntityFrameworkCore;
 using BookBuddi.Data;
 using BookBuddi.Data.Models;
 
-namespace BookBuddi.WebApp.Pages
+namespace BookBuddi.Pages.Reports
 {
     public class InventoryModel : PageModel
     {
         private readonly ApplicationDbContext _db;
+
         public InventoryModel(ApplicationDbContext db)
         {
             _db = db;
         }
 
-        // Inventory Data
-        public List<BookInventoryDTO> BookList { get; set; } = new();
+        public List<InventoryDTO> BookList { get; set; } = new();
+
+        // Summary counts
         public int TotalBooks { get; set; }
         public int AvailableBooks { get; set; }
         public int CurrentlyBorrowed { get; set; }
         public int ReservedBooks { get; set; }
-        public int LostBooks { get; set; }
 
-        // Card Highlight
+        // Current filter
         public string CurrentFilter { get; set; } = "All";
-
-        // Add New Book
-        [BindProperty]
-        public BookInventoryDTO NewBook { get; set; } = new(); // <- fixes CS8618
-
-        public class BookInventoryDTO
-        {
-            public string? BookTitle { get; set; }
-            public string? Author { get; set; }
-            public int Available { get; set; }
-            public int Borrowed { get; set; }
-        }
 
         public async Task<IActionResult> OnGet(string filter, string search)
         {
@@ -58,12 +47,10 @@ namespace BookBuddi.WebApp.Pages
             CurrentlyBorrowed = transactions.Count(t => t.ReturnDate == null);
             ReservedBooks = requests.Count(r => r.Status == Resources.Constants.RequestStatus.Pending ||
                                                r.Status == Resources.Constants.RequestStatus.Approved);
-            LostBooks = 0;
 
-            BookList = books.Select(b => new BookInventoryDTO
+            BookList = books.Select(b => new InventoryDTO
             {
                 BookTitle = b.BookTitle,
-                Author = null,
                 Available = b.AvailableCopies,
                 Borrowed = transactions.Count(t => t.BookId == b.BookId && t.ReturnDate == null)
             }).ToList();
@@ -71,51 +58,25 @@ namespace BookBuddi.WebApp.Pages
             if (!string.IsNullOrWhiteSpace(search))
             {
                 search = search.ToLower();
-                BookList = BookList
-                    .Where(b => (b.BookTitle ?? "").ToLower().Contains(search))
-                    .ToList();
+                BookList = BookList.Where(b => (b.BookTitle ?? "").ToLower().Contains(search)).ToList();
             }
 
-            // Apply filter for cards
             BookList = CurrentFilter switch
             {
                 "Available" => BookList.Where(b => b.Available > 0).ToList(),
                 "Borrowed" => BookList.Where(b => b.Borrowed > 0).ToList(),
                 "Reserved" => BookList.Where(b => b.Available == 0 && b.Borrowed == 0).ToList(),
-                "Lost" => new List<BookInventoryDTO>(), // placeholder
                 _ => BookList
             };
 
             return Page();
         }
 
-        // Handle Add New Book form submission
-        public async Task<IActionResult> OnPostAddBook()
+        public class InventoryDTO
         {
-            // Admin authorization check
-            var userRole = HttpContext.Session.GetString("UserRole");
-            if (userRole != "Admin")
-            {
-                TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
-            }
-
-            if (!ModelState.IsValid)
-                return Page();
-
-            var book = new Book
-            {
-                BookTitle = NewBook.BookTitle ?? "",
-                AvailableCopies = NewBook.Available,
-                // Author and other fields can be added when needed
-            };
-
-            _db.Books.Add(book);
-            await _db.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Book added successfully!";
-
-            return RedirectToPage(); // reloads the page
+            public string? BookTitle { get; set; }
+            public int Available { get; set; }
+            public int Borrowed { get; set; }
         }
     }
 }
