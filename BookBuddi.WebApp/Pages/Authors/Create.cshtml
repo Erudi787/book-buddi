@@ -5,35 +5,119 @@
     var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
 }
 
-<h1>Add New Author</h1>
+<link rel="stylesheet" href="~/css/authors-create.css" />
 
-@if (!isAdmin)
-{
-    <p style="color: red;">Admin access required.</p>
-    <p><a href="/Account/Login">Login as Admin</a></p>
-}
-else
-{
-    <form method="post">
-        <div>
-            <label>First Name:</label><br/>
-            <input type="text" name="firstName" required />
-        </div>
-        <div>
-            <label>Last Name:</label><br/>
-            <input type="text" name="lastName" required />
-        </div>
-        <div>
-            <label>Biography:</label><br/>
-            <textarea name="biography" rows="5" cols="50"></textarea>
-        </div>
-        <br/>
-        <button type="submit">Create</button>
-        <a href="/Authors/Index">Cancel</a>
-    </form>
+<div class="page-container">
+    <div class="page-header">
+        <h1>Add New Author</h1>
+        <p>Expand the library collection by adding a new author to the BookBuddi database.</p>
+    </div>
 
-    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    @if (!isAdmin)
     {
-        <p style="color: red;">@Model.ErrorMessage</p>
+        <div class="access-denied">
+            <div class="access-denied-icon">🚫</div>
+            <h2>Admin Access Required</h2>
+            <p>You need administrator privileges to access the author management system.</p>
+            <a href="/Account/Login" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Login as Admin
+            </a>
+        </div>
     }
+    else
+    {
+        <div class="form-container">
+            <form method="post">
+                <div class="form-group">
+                    <label class="form-label" for="firstName">
+                        <i class="fas fa-user"></i> First Name
+                    </label>
+                    <input type="text" id="firstName" name="firstName" class="form-control" placeholder="Enter author's first name" required />
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i> Required field
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="lastName">
+                        <i class="fas fa-user"></i> Last Name
+                    </label>
+                    <input type="text" id="lastName" name="lastName" class="form-control" placeholder="Enter author's last name" required />
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i> Required field
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="biography">
+                        <i class="fas fa-book-open"></i> Biography
+                    </label>
+                    <textarea id="biography" name="biography" class="form-control" placeholder="Provide a brief biography of the author..." rows="5"></textarea>
+                    <div class="form-hint">
+                        <i class="fas fa-lightbulb"></i> Optional but recommended for author profile completeness
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i> Create Author
+                    </button>
+                    <a href="/Authors/Index" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> Back to Authors
+                    </a>
+                </div>
+            </form>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i> @Model.ErrorMessage
+                </div>
+            }
+
+            <!-- Author Preview Section -->
+            <div class="author-preview">
+                <h3><i class="fas fa-eye"></i> Author Preview</h3>
+                <div class="preview-content">
+                    <div class="preview-avatar" id="previewAvatar">A</div>
+                    <div class="preview-details">
+                        <h4 id="previewName">Author Name</h4>
+                        <p id="previewBio">Author biography will appear here once entered.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit-code.js" crossorigin="anonymous"></script>
+    <script>
+        // Real-time preview functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstNameInput = document.getElementById('firstName');
+            const lastNameInput = document.getElementById('lastName');
+            const biographyInput = document.getElementById('biography');
+            const previewName = document.getElementById('previewName');
+            const previewBio = document.getElementById('previewBio');
+            const previewAvatar = document.getElementById('previewAvatar');
+            
+            function updatePreview() {
+                const firstName = firstNameInput.value || 'First';
+                const lastName = lastNameInput.value || 'Last';
+                const bio = biographyInput.value || 'Author biography will appear here once entered.';
+                
+                previewName.textContent = `${firstName} ${lastName}`;
+                previewBio.textContent = bio;
+                previewAvatar.textContent = firstName.charAt(0) + lastName.charAt(0);
+            }
+            
+            firstNameInput.addEventListener('input', updatePreview);
+            lastNameInput.addEventListener('input', updatePreview);
+            biographyInput.addEventListener('input', updatePreview);
+            
+            // Initialize preview
+            updatePreview();
+        });
+    </script>
 }

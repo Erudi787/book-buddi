@@ -4,44 +4,205 @@
     ViewData["Title"] = "Edit Genre";
     var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
 }
+<link rel="stylesheet" href="~/css/genres-edit.css" />
 
-<h1>Edit Genre</h1>
+<div class="page-container">
+    <div class="page-header">
+        <h1>Edit Genre</h1>
+        <p>Update the details of this genre to keep your library catalog organized and up-to-date.</p>
+    </div>
 
-@if (!isAdmin)
-{
-    <p style="color: red;">Admin access required.</p>
-    <p><a href="/Account/Login">Login as Admin</a></p>
-}
-else
-{
-    <form method="post" style="max-width: 600px;">
-        <input type="hidden" asp-for="Genre.GenreId" />
-        <input type="hidden" asp-for="Genre.CreatedBy" />
-        <input type="hidden" asp-for="Genre.CreatedTime" />
-
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Genre Name: *</label><br/>
-            <input type="text" asp-for="Genre.GenreName" required style="width: 100%; padding: 8px;" maxlength="100" />
-        </div>
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Description:</label><br/>
-            <textarea asp-for="Genre.GenreDescription" rows="4" style="width: 100%; padding: 8px;" maxlength="500"></textarea>
-        </div>
-        <div style="margin-bottom: 15px;">
-            <p style="color: #666; font-size: 14px;">
-                Created by: <strong>@Model.Genre.CreatedBy</strong> on @Model.Genre.CreatedTime.ToString("MMM dd, yyyy hh:mm tt")
-            </p>
-        </div>
-        <div>
-            <button type="submit" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Update Genre</button>
-            <a href="/Genres/Index" style="margin-left: 10px; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px;">Cancel</a>
-        </div>
-    </form>
-
-    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    @if (!isAdmin)
     {
-        <div style="margin-top: 20px; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px;">
-            @Model.ErrorMessage
+        <div class="access-denied">
+            <div class="access-denied-icon">🚫</div>
+            <h2>Admin Access Required</h2>
+            <p>You need administrator privileges to edit genres in the library system.</p>
+            <a href="/Account/Login" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Login as Admin
+            </a>
         </div>
     }
+    else
+    {
+        <div class="form-container">
+            <form method="post" id="genreForm">
+                <input type="hidden" asp-for="Genre.GenreId" />
+                <input type="hidden" asp-for="Genre.CreatedBy" />
+                <input type="hidden" asp-for="Genre.CreatedTime" />
+
+                <!-- Metadata Card -->
+                <div class="metadata-card">
+                    <div class="metadata-title">
+                        <i class="fas fa-info-circle"></i>
+                        Genre Information
+                    </div>
+                    <div class="metadata-grid">
+                        <div class="metadata-item">
+                            <span class="metadata-label">Genre ID</span>
+                            <span class="metadata-value">#@Model.Genre.GenreId</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Created By</span>
+                            <span class="metadata-value">@Model.Genre.CreatedBy</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Created Date</span>
+                            <span class="metadata-value">@Model.Genre.CreatedTime.ToString("MMM dd, yyyy")</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Created Time</span>
+                            <span class="metadata-value">@Model.Genre.CreatedTime.ToString("hh:mm tt")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="Genre_GenreName">
+                        <i class="fas fa-tag"></i> Genre Name
+                        <span class="required-marker">*</span>
+                    </label>
+                    <input type="text" asp-for="Genre.GenreName" class="form-control" 
+                           placeholder="Enter genre name (e.g., Science Fiction, Biography)" 
+                           required maxlength="100" />
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i> Required field. Maximum 100 characters.
+                    </div>
+                    <div class="char-counter">
+                        <span id="nameCounter">@(Model.Genre.GenreName?.Length ?? 0)</span>/100 characters
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="Genre_GenreDescription">
+                        <i class="fas fa-align-left"></i> Description
+                    </label>
+                    <textarea asp-for="Genre.GenreDescription" class="form-control" 
+                              placeholder="Provide a brief description of this genre to help users understand what types of books it includes..."
+                              rows="4" maxlength="500"></textarea>
+                    <div class="form-hint">
+                        <i class="fas fa-lightbulb"></i> Optional but recommended for better categorization.
+                    </div>
+                    <div class="char-counter">
+                        <span id="descCounter">@(Model.Genre.GenreDescription?.Length ?? 0)</span>/500 characters
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Genre
+                    </button>
+                    <a href="/Genres/Index" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> Back to Genres
+                    </a>
+                    <a href="/Genres/Delete?id=@Model.Genre.GenreId" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete Genre
+                    </a>
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> Reset Changes
+                    </button>
+                </div>
+            </form>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="message error-message">
+                    <div class="message-icon">⚠️</div>
+                    <div class="message-content">
+                        <div class="message-title">Update Failed</div>
+                        <div>@Model.ErrorMessage</div>
+                    </div>
+                </div>
+            }
+
+            <!-- Genre Preview Section -->
+            <div class="preview-section">
+                <h3><i class="fas fa-eye"></i> Live Preview</h3>
+                <div class="preview-content">
+                    <div class="preview-icon" id="previewIcon">@(Model.Genre.GenreName?.Substring(0, 1).ToUpper() ?? "G")</div>
+                    <div class="preview-details">
+                        <h4 id="previewName">@Model.Genre.GenreName</h4>
+                        <p id="previewDescription">
+                            @if (!string.IsNullOrEmpty(Model.Genre.GenreDescription))
+                            {
+                                @Model.Genre.GenreDescription
+                            }
+                            else
+                            {
+                                <span style="color: #a0aec0; font-style: italic;">Genre description will appear here once entered.</span>
+                            }
+                        </p>
+                        <div style="font-size: 13px; color: #a0aec0; margin-top: 10px;">
+                            <i class="fas fa-sync-alt"></i> Updates in real-time
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit-code.js" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const genreNameInput = document.getElementById('Genre_GenreName');
+            const genreDescInput = document.getElementById('Genre_GenreDescription');
+            const previewName = document.getElementById('previewName');
+            const previewDescription = document.getElementById('previewDescription');
+            const previewIcon = document.getElementById('previewIcon');
+            const nameCounter = document.getElementById('nameCounter');
+            const descCounter = document.getElementById('descCounter');
+            
+            function updatePreview() {
+                const name = genreNameInput.value || 'Genre Name';
+                const description = genreDescInput.value || 'Genre description will appear here once entered.';
+                
+                previewName.textContent = name;
+                previewDescription.textContent = description;
+                previewIcon.textContent = name.charAt(0).toUpperCase();
+                
+                // Update character counters
+                nameCounter.textContent = genreNameInput.value.length;
+                descCounter.textContent = genreDescInput.value.length;
+            }
+            
+            function validateForm() {
+                let isValid = true;
+                
+                // Reset previous errors
+                genreNameInput.classList.remove('error');
+                
+                // Validate genre name
+                if (!genreNameInput.value.trim()) {
+                    genreNameInput.classList.add('error');
+                    isValid = false;
+                }
+                
+                return isValid;
+            }
+            
+            // Event listeners
+            genreNameInput.addEventListener('input', updatePreview);
+            genreDescInput.addEventListener('input', updatePreview);
+            
+            // Form submission validation
+            document.getElementById('genreForm').addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    // Scroll to first error
+                    genreNameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    genreNameInput.focus();
+                }
+            });
+            
+            // Reset form handler
+            document.querySelector('button[type="reset"]').addEventListener('click', function() {
+                setTimeout(updatePreview, 10); // Small delay to ensure reset completes
+            });
+            
+            // Initialize preview and counters
+            updatePreview();
+        });
+    </script>
 }

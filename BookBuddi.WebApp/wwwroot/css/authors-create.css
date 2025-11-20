@@ -1,0 +1,273 @@
+
+    /* ------------------- BASE STYLES ------------------- */
+    body {
+        background-color: #FFFFFF;
+        font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        color: #2d3748;
+        line-height: 1.6;
+    }
+
+    .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    /* ------------------- HEADER STYLES ------------------- */
+    .page-header {
+        margin-bottom: 40px;
+        padding: 30px 40px;
+        background: linear-gradient(135deg, #641B2E 0%, #8B2E4A 100%);
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(100, 27, 46, 0.2);
+        border-radius: 16px;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(251, 219, 147, 0.1) 0%, rgba(251, 219, 147, 0) 70%);
+    }
+
+    .page-header h1 {
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .page-header h1::before {
+        content: '✍️';
+        font-size: 40px;
+        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    }
+
+    .page-header p {
+        font-size: 16px;
+        margin-bottom: 0;
+        opacity: 0.9;
+        max-width: 600px;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* ------------------- ACCESS DENIED STYLES ------------------- */
+    .access-denied {
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 30px;
+    }
+
+    .access-denied-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+        color: #e74a3b;
+    }
+
+    .access-denied h2 {
+        color: #e74a3b;
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+
+    .access-denied p {
+        color: #718096;
+        margin-bottom: 25px;
+        font-size: 16px;
+    }
+
+    /* ------------------- FORM STYLES ------------------- */
+    .form-container {
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #641B2E;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        font-size: 16px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #641B2E;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(100, 27, 46, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .form-hint {
+        font-size: 13px;
+        color: #718096;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* ------------------- BUTTON STYLES ------------------- */
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 14px 28px;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #641B2E, #8B2E4A);
+        color: white;
+        box-shadow: 0 4px 12px rgba(100, 27, 46, 0.3);
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #5a1528, #7a2640);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(100, 27, 46, 0.4);
+        color: white;
+    }
+
+    .btn-outline {
+        background: white;
+        color: #641B2E;
+        border: 1px solid #641B2E;
+    }
+
+    .btn-outline:hover {
+        background: #641B2E;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* ------------------- ERROR MESSAGE STYLES ------------------- */
+    .error-message {
+        background: rgba(231, 74, 59, 0.1);
+        border: 1px solid rgba(231, 74, 59, 0.3);
+        color: #e74a3b;
+        padding: 16px 20px;
+        border-radius: 10px;
+        margin-top: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+    }
+
+    .error-message i {
+        font-size: 18px;
+    }
+
+    /* ------------------- SUCCESS PREVIEW STYLES ------------------- */
+    .author-preview {
+        background: rgba(100, 27, 46, 0.05);
+        border-radius: 12px;
+        padding: 25px;
+        margin-top: 30px;
+        border-left: 4px solid #641B2E;
+    }
+
+    .author-preview h3 {
+        color: #641B2E;
+        margin-bottom: 15px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .author-preview h3 i {
+        font-size: 20px;
+    }
+
+    .preview-content {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+    }
+
+    .preview-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: #641B2E;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    .preview-details h4 {
+        margin: 0 0 8px 0;
+        font-size: 20px;
+        color: #2d3748;
+    }
+
+    .preview-details p {
+        color: #718096;
+        margin: 0;
+        line-height: 1.5;
+    }
