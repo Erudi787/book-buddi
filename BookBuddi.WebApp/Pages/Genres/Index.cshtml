@@ -4,66 +4,135 @@
     ViewData["Title"] = "Genres Management";
     var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
 }
+<link rel="stylesheet" href="~/css/genres-index.css" />
 
-<h1>Genres Management</h1>
-
-@if (!isAdmin)
-{
-    <p style="color: red;">Admin access required to manage genres.</p>
-    <p><a href="/Account/Login">Login as Admin</a></p>
-}
-else
-{
-    <div style="margin-bottom: 20px;">
-        <a href="/Genres/Create" style="padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Add New Genre</a>
+<div class="page-container">
+    <div class="page-header">
+        <h1>Genres Management</h1>
+        <p>Organize and manage book genres to keep your library catalog well-structured and easy to navigate.</p>
     </div>
 
-    <div style="margin-bottom: 20px;">
-        <form method="get">
-            <input type="text" name="searchTerm" value="@Model.SearchTerm" placeholder="Search genres..." style="padding: 8px; width: 300px;" />
-            <button type="submit" style="padding: 8px 15px;">Search</button>
-            @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
-            {
-                <a href="/Genres/Index">Clear</a>
-            }
-        </form>
-    </div>
-
-    @if (Model.Genres.Any())
+    @if (!isAdmin)
     {
-        <table border="1" style="width: 100%; border-collapse: collapse;">
-            <thead style="background-color: #f8f9fa;">
-                <tr>
-                    <th style="padding: 10px;">ID</th>
-                    <th style="padding: 10px;">Genre Name</th>
-                    <th style="padding: 10px;">Description</th>
-                    <th style="padding: 10px;">Created By</th>
-                    <th style="padding: 10px;">Created Date</th>
-                    <th style="padding: 10px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var genre in Model.Genres)
-                {
-                    <tr>
-                        <td style="padding: 10px;">@genre.GenreId</td>
-                        <td style="padding: 10px;"><strong>@genre.GenreName</strong></td>
-                        <td style="padding: 10px;">@(genre.GenreDescription ?? "-")</td>
-                        <td style="padding: 10px;">@genre.CreatedBy</td>
-                        <td style="padding: 10px;">@genre.CreatedTime.ToString("MMM dd, yyyy")</td>
-                        <td style="padding: 10px;">
-                            <a href="/Genres/Edit?id=@genre.GenreId">Edit</a> |
-                            <a href="/Genres/Delete?id=@genre.GenreId" style="color: red;">Delete</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div class="access-denied">
+            <div class="access-denied-icon">🚫</div>
+            <h2>Admin Access Required</h2>
+            <p>You need administrator privileges to access the genres management system.</p>
+            <a href="/Account/Login" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Login as Admin
+            </a>
+        </div>
     }
     else
     {
-        <p>No genres found.</p>
-    }
-}
 
-<p style="margin-top: 20px;"><a href="/">Back to Home</a></p>
+        <!-- Controls Bar -->
+        <div class="controls-bar">
+            <a href="/Genres/Create" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Add New Genre
+            </a>
+
+            <form method="get" class="search-form">
+                <input type="text" name="searchTerm" value="@Model.SearchTerm" class="search-input" placeholder="Search genres by name..." />
+                <button type="submit" class="btn btn-secondary">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                {
+                    <a href="/Genres/Index" class="btn btn-outline">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                }
+            </form>
+        </div>
+
+        @if (Model.Genres.Any())
+        {
+            <div class="table-container">
+                <table class="genres-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Genre Name</th>
+                            <th>Description</th>
+                            <th>Created By</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var genre in Model.Genres)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="genre-id">#@genre.GenreId</span>
+                                </td>
+                                <td>
+                                    <div class="genre-name">@genre.GenreName</div>
+                                </td>
+                                <td>
+                                    <div class="genre-description">
+                                        @if (!string.IsNullOrEmpty(genre.GenreDescription))
+                                        {
+                                            @genre.GenreDescription
+                                        }
+                                        else
+                                        {
+                                            <span style="color: #a0aec0; font-style: italic;">No description</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="genre-meta">@genre.CreatedBy</div>
+                                </td>
+                                <td>
+                                    <div class="genre-meta">@genre.CreatedTime.ToString("MMM dd, yyyy")</div>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="/Genres/Edit?id=@genre.GenreId" class="btn-action btn-edit">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="/Genres/Delete?id=@genre.GenreId" class="btn-action btn-delete">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon">📚</div>
+                <h3>No Genres Found</h3>
+                <p>@(string.IsNullOrWhiteSpace(Model.SearchTerm) ? "Get started by adding your first genre to the library." : "No genres match your search criteria. Try a different search term.")</p>
+                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                {
+                    <a href="/Genres/Index" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> View All Genres
+                    </a>
+                }
+                else
+                {
+                    <a href="/Genres/Create" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i> Add First Genre
+                    </a>
+                }
+            </div>
+        }
+    }
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="/" class="btn btn-outline">
+            <i class="fas fa-home"></i> Back to Home
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit-code.js" crossorigin="anonymous"></script>
+}

@@ -4,42 +4,171 @@
     ViewData["Title"] = "Add Genre";
     var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
 }
+<link rel="stylesheet" href="~/css/genres-create.css" />  
 
-<h1>Add New Genre</h1>
 
-@if (!isAdmin)
-{
-    <p style="color: red;">Admin access required.</p>
-    <p><a href="/Account/Login">Login as Admin</a></p>
-}
-else
-{
-    <form method="post" style="max-width: 600px;">
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Genre Name: *</label><br/>
-            <input type="text" name="genreName" required style="width: 100%; padding: 8px;" maxlength="100" />
-        </div>
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Description:</label><br/>
-            <textarea name="genreDescription" rows="4" style="width: 100%; padding: 8px;" maxlength="500"></textarea>
-        </div>
-        <div>
-            <button type="submit" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Create Genre</button>
-            <a href="/Genres/Index" style="margin-left: 10px; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px;">Cancel</a>
-        </div>
-    </form>
+<div class="page-container">
+    <div class="page-header">
+        <h1>Add New Genre</h1>
+        <p>Create a new book genre to help organize and categorize your library collection effectively.</p>
+    </div>
 
-    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    @if (!isAdmin)
     {
-        <div style="margin-top: 20px; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px;">
-            @Model.ErrorMessage
+        <div class="access-denied">
+            <div class="access-denied-icon">🚫</div>
+            <h2>Admin Access Required</h2>
+            <p>You need administrator privileges to create new genres in the library system.</p>
+            <a href="/Account/Login" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Login as Admin
+            </a>
         </div>
     }
-
-    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    else
     {
-        <div style="margin-top: 20px; padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 5px;">
-            @Model.SuccessMessage
+        <div class="form-container">
+            <form method="post" id="genreForm">
+                <div class="form-group">
+                    <label class="form-label" for="genreName">
+                        <i class="fas fa-tag"></i> Genre Name
+                        <span class="required-marker">*</span>
+                    </label>
+                    <input type="text" id="genreName" name="genreName" class="form-control" 
+                           placeholder="Enter genre name (e.g., Science Fiction, Biography)" 
+                           required maxlength="100" />
+                    <div class="form-hint">
+                        <i class="fas fa-info-circle"></i> Required field. Maximum 100 characters.
+                    </div>
+                    <div class="char-counter">
+                        <span id="nameCounter">0</span>/100 characters
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="genreDescription">
+                        <i class="fas fa-align-left"></i> Description
+                    </label>
+                    <textarea id="genreDescription" name="genreDescription" class="form-control" 
+                              placeholder="Provide a brief description of this genre to help users understand what types of books it includes..."
+                              rows="4" maxlength="500"></textarea>
+                    <div class="form-hint">
+                        <i class="fas fa-lightbulb"></i> Optional but recommended for better categorization.
+                    </div>
+                    <div class="char-counter">
+                        <span id="descCounter">0</span>/500 characters
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i> Create Genre
+                    </button>
+                    <a href="/Genres/Index" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> Back to Genres
+                    </a>
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> Reset Form
+                    </button>
+                </div>
+            </form>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="message error-message">
+                    <div class="message-icon">⚠️</div>
+                    <div class="message-content">
+                        <div class="message-title">Error Creating Genre</div>
+                        <div>@Model.ErrorMessage</div>
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="message success-message">
+                    <div class="message-icon">✅</div>
+                    <div class="message-content">
+                        <div class="message-title">Genre Created Successfully</div>
+                        <div>@Model.SuccessMessage</div>
+                    </div>
+                </div>
+            }
+
+            <!-- Genre Preview Section -->
+            <div class="preview-section">
+                <h3><i class="fas fa-eye"></i> Genre Preview</h3>
+                <div class="preview-content">
+                    <div class="preview-icon" id="previewIcon">G</div>
+                    <div class="preview-details">
+                        <h4 id="previewName">Genre Name</h4>
+                        <p id="previewDescription">Genre description will appear here once entered.</p>
+                        <div class="preview-meta">
+                            <span><i class="fas fa-user"></i> Created by: You</span>
+                            <span><i class="fas fa-calendar"></i> Date: @DateTime.Now.ToString("MMM dd, yyyy")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     }
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit-code.js" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const genreNameInput = document.getElementById('genreName');
+            const genreDescInput = document.getElementById('genreDescription');
+            const previewName = document.getElementById('previewName');
+            const previewDescription = document.getElementById('previewDescription');
+            const previewIcon = document.getElementById('previewIcon');
+            const nameCounter = document.getElementById('nameCounter');
+            const descCounter = document.getElementById('descCounter');
+            
+            function updatePreview() {
+                const name = genreNameInput.value || 'Genre Name';
+                const description = genreDescInput.value || 'Genre description will appear here once entered.';
+                
+                previewName.textContent = name;
+                previewDescription.textContent = description;
+                previewIcon.textContent = name.charAt(0).toUpperCase();
+                
+                // Update character counters
+                nameCounter.textContent = genreNameInput.value.length;
+                descCounter.textContent = genreDescInput.value.length;
+            }
+            
+            function validateForm() {
+                let isValid = true;
+                
+                // Reset previous errors
+                genreNameInput.classList.remove('error');
+                
+                // Validate genre name
+                if (!genreNameInput.value.trim()) {
+                    genreNameInput.classList.add('error');
+                    isValid = false;
+                }
+                
+                return isValid;
+            }
+            
+            // Event listeners
+            genreNameInput.addEventListener('input', updatePreview);
+            genreDescInput.addEventListener('input', updatePreview);
+            
+            // Form submission validation
+            document.getElementById('genreForm').addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    // Scroll to first error
+                    genreNameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    genreNameInput.focus();
+                }
+            });
+            
+            // Initialize preview and counters
+            updatePreview();
+        });
+    </script>
 }
