@@ -4,46 +4,262 @@
     ViewData["Title"] = "Verify Email";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Email Verification</h3>
+<style>
+    :root {
+        --primary-burgundy: #641B2E;
+        --secondary-burgundy: #8B2E4A;
+        --gold: #FBDB93;
+        --success: #28a745;
+        --danger: #dc3545;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .verify-container {
+        width: 100%;
+        max-width: 600px;
+        padding: 20px;
+    }
+
+    .verify-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+    }
+
+    .verify-header {
+        background: linear-gradient(135deg, var(--primary-burgundy) 0%, var(--secondary-burgundy) 100%);
+        padding: 30px;
+        text-align: center;
+    }
+
+    .verify-header h3 {
+        color: white;
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .verify-header i {
+        color: var(--gold);
+        font-size: 32px;
+    }
+
+    .verify-body {
+        padding: 40px;
+    }
+
+    .alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        border: 2px solid;
+    }
+
+    .alert i {
+        font-size: 24px;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        border-color: var(--success);
+        color: #155724;
+    }
+
+    .alert-success i {
+        color: var(--success);
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        border-color: var(--danger);
+        color: #721c24;
+    }
+
+    .alert-danger i {
+        color: var(--danger);
+    }
+
+    .spinner-container {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(100, 27, 46, 0.1);
+        border-top-color: var(--primary-burgundy);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .spinner-text {
+        color: #6c757d;
+        font-size: 16px;
+        margin: 0;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 24px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-burgundy) 0%, var(--secondary-burgundy) 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(100, 27, 46, 0.3);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+        color: white;
+    }
+
+    .logo-link {
+        display: inline-block;
+        margin-bottom: 24px;
+        color: var(--primary-burgundy);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 18px;
+    }
+
+    .logo-link:hover {
+        color: var(--gold);
+    }
+
+    @@media (max-width: 768px) {
+        .verify-header h3 {
+            font-size: 22px;
+        }
+
+        .verify-body {
+            padding: 24px;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="verify-container">
+    <div class="text-center">
+        <a href="/" class="logo-link">
+            <i class="fas fa-book"></i> BookBuddi
+        </a>
+    </div>
+
+    <div class="verify-card">
+        <div class="verify-header">
+            <h3>
+                <i class="fas fa-envelope-open-text"></i>
+                Email Verification
+            </h3>
+        </div>
+        <div class="verify-body">
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Success!</strong><br />
+                        @Model.SuccessMessage
+                    </div>
                 </div>
-                <div class="card-body">
-                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="bi bi-check-circle-fill"></i> @Model.SuccessMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="/Account/Login" class="btn btn-primary">Go to Login</a>
-                        </div>
-                    }
-                    else if (!string.IsNullOrEmpty(Model.ErrorMessage))
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="/Account/Register" class="btn btn-secondary">Register Again</a>
-                            <a href="/Account/Login" class="btn btn-primary">Try to Login</a>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="text-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Verifying...</span>
-                            </div>
-                            <p class="mt-3">Verifying your email address...</p>
-                        </div>
-                    }
+                <div class="button-group">
+                    <a href="/Account/Login" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Go to Login
+                    </a>
                 </div>
-            </div>
+            }
+            else if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Verification Failed</strong><br />
+                        @Model.ErrorMessage
+                    </div>
+                </div>
+                <div class="button-group">
+                    <a href="/Account/Register" class="btn btn-secondary">
+                        <i class="fas fa-user-plus"></i> Register Again
+                    </a>
+                    <a href="/Account/Login" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Try to Login
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                    <p class="spinner-text">
+                        <i class="fas fa-sync-alt fa-spin"></i>
+                        Verifying your email address...
+                    </p>
+                </div>
+            }
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit-code.js" crossorigin="anonymous"></script>
+}

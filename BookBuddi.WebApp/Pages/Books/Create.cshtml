@@ -6,18 +6,21 @@
 
 <link rel="stylesheet" href="~/css/books-create.css" />
 
-<div class="page-container">
-    <div class="page-header">
-        <div class="header-content">
-            <h1>Add New Book</h1>
-            <p>Expand your library collection by adding a new book with detailed information</p>
-        </div>
-    </div>
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
 
-    <div class="main-content">
+    <div class="page-container" style="flex: 1;">
+        <div class="page-header">
+            <div class="header-content">
+                <h1>Add New Book</h1>
+                <p>Expand your library collection by adding a new book with detailed information</p>
+            </div>
+        </div>
+
+        <div class="main-content">
         <div class="form-container">
             <h2 class="form-title">Book Information</h2>
-            <form method="post" id="bookForm">
+            <form method="post" id="bookForm" enctype="multipart/form-data">
                 <div class="form-grid">
                     <div class="form-group full-width">
                         <label class="form-label">
@@ -81,10 +84,31 @@
                         </label>
                         <div class="input-with-icon">
                             <i class="fas fa-boxes input-icon"></i>
-                            <input type="number" asp-for="Book.AvailableCopies" class="form-control" required 
+                            <input type="number" asp-for="Book.AvailableCopies" class="form-control" required
                                    placeholder="Number of copies" min="1" max="100" value="1" />
                         </div>
                         <div class="validation-message">Please enter the number of available copies</div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label optional">
+                            <i class="fas fa-image"></i>Book Cover Image
+                        </label>
+                        <div class="file-upload-container">
+                            <input type="file" asp-for="CoverImageFile" class="form-control file-input"
+                                   accept=".jpg,.jpeg,.png,.webp" id="coverImageInput" />
+                            <div class="file-upload-info">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Choose a cover image or drag and drop</span>
+                                <small>Accepted: JPG, PNG, WEBP (Max 5MB)</small>
+                            </div>
+                        </div>
+                        <div id="imagePreview" class="image-preview" style="display: none;">
+                            <img id="previewImage" src="" alt="Cover preview" />
+                            <button type="button" class="remove-image" id="removeImageBtn">
+                                <i class="fas fa-times"></i> Remove
+                            </button>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -127,12 +151,15 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="/Books/Index" class="btn btn-outline">
-                        <i class="fas fa-times"></i> Cancel
-                    </a>
                     <button type="submit" class="btn btn-primary" id="submitBtn">
                         <i class="fas fa-plus-circle"></i> Create Book
                     </button>
+                    <a href="/Books/Index" class="btn btn-outline">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <a href="/Admin/Index" class="btn btn-secondary">
+                        <i class="fas fa-tachometer-alt"></i> Back to Dashboard
+                    </a>
                 </div>
             </form>
 
@@ -188,6 +215,7 @@
             </div>
         </div>
     </div>
+    </div>
 </div>
 
 <div class="loading-overlay" id="loadingOverlay">
@@ -195,8 +223,173 @@
 </div>
 
 @section Scripts {
+    <style>
+        .file-upload-container {
+            position: relative;
+            border: 2px dashed #8B4049;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-container:hover {
+            border-color: #6d3139;
+            background-color: #fff5f5;
+        }
+
+        .file-upload-container.drag-over {
+            border-color: #d4a574;
+            background-color: #fffbf5;
+        }
+
+        .file-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-info {
+            pointer-events: none;
+        }
+
+        .file-upload-info i {
+            font-size: 2rem;
+            color: #8B4049;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .file-upload-info span {
+            display: block;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .file-upload-info small {
+            display: block;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .image-preview {
+            margin-top: 15px;
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: white;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.3s ease;
+        }
+
+        .remove-image:hover {
+            background: #c82333;
+        }
+    </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Image upload preview
+            const coverImageInput = document.getElementById('coverImageInput');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewImage = document.getElementById('previewImage');
+            const removeImageBtn = document.getElementById('removeImageBtn');
+            const uploadContainer = coverImageInput?.closest('.file-upload-container');
+
+            if (coverImageInput) {
+                coverImageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Validate file size (5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('File size must be less than 5MB');
+                            coverImageInput.value = '';
+                            return;
+                        }
+
+                        // Validate file type
+                        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+                        if (!allowedTypes.includes(file.type)) {
+                            alert('Only JPG, PNG, and WEBP images are allowed');
+                            coverImageInput.value = '';
+                            return;
+                        }
+
+                        // Show preview
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            previewImage.src = e.target.result;
+                            imagePreview.style.display = 'block';
+                            if (uploadContainer) {
+                                uploadContainer.style.display = 'none';
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // Remove image
+                if (removeImageBtn) {
+                    removeImageBtn.addEventListener('click', function() {
+                        coverImageInput.value = '';
+                        imagePreview.style.display = 'none';
+                        if (uploadContainer) {
+                            uploadContainer.style.display = 'block';
+                        }
+                    });
+                }
+
+                // Drag and drop
+                if (uploadContainer) {
+                    uploadContainer.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        this.classList.add('drag-over');
+                    });
+
+                    uploadContainer.addEventListener('dragleave', function(e) {
+                        e.preventDefault();
+                        this.classList.remove('drag-over');
+                    });
+
+                    uploadContainer.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        this.classList.remove('drag-over');
+                        const files = e.dataTransfer.files;
+                        if (files.length > 0) {
+                            coverImageInput.files = files;
+                            coverImageInput.dispatchEvent(new Event('change'));
+                        }
+                    });
+                }
+            }
+
             // Character counters
             const titleInput = document.querySelector('input[asp-for="Book.BookTitle"]');
             const publisherInput = document.querySelector('input[asp-for="Book.Publisher"]');

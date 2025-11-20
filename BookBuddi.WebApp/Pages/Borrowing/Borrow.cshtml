@@ -919,14 +919,11 @@
                 <span>@userName</span>
             </div>
         }
-        @if (userRole == "Member")
-        {
-            <a href="/Account/Logout" class="btn-logout">Logout</a>
-        }
-        else if (userRole == "Admin")
+        @if (userRole == "Admin")
         {
             <a href="/Admin/Index" class="btn-logout">Admin Panel</a>
         }
+        <a href="/Account/Logout" class="btn-logout">Logout</a>
     </div>
 </div>
 
@@ -1136,7 +1133,7 @@
         <script>
             let countdown = 3;
             const countdownElement = document.getElementById('countdown');
-            const interval = setInterval(function() {
+            const interval = setInterval(function () {
                 countdown--;
                 if (countdown > 0) {
                     countdownElement.textContent = countdown;
@@ -1174,31 +1171,36 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
-                <span><strong>Borrowing Period:</strong> You can borrow books for up to <span class="info-highlight">14 days</span> from the date of borrowing.</span>
+                <span><strong>Borrowing Period:</strong> You can borrow books for up to <span class="info-highlight">14
+                        days</span> from the date of borrowing.</span>
             </li>
             <li>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
-                <span><strong>Borrowing Limit:</strong> You can borrow up to <span class="info-highlight">5 books</span> at a time.</span>
+                <span><strong>Borrowing Limit:</strong> You can borrow up to <span class="info-highlight">5 books</span>
+                    at a time.</span>
             </li>
             <li>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
-                <span><strong>Overdue Fines:</strong> Books returned after the due date will incur a fine of <span class="info-highlight">₱50.00 per day</span>.</span>
+                <span><strong>Overdue Fines:</strong> Books returned after the due date will incur a fine of <span
+                        class="info-highlight">₱50.00 per day</span>.</span>
             </li>
             <li>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
-                <span><strong>Unpaid Fines:</strong> You must pay all outstanding fines before borrowing new books.</span>
+                <span><strong>Unpaid Fines:</strong> You must pay all outstanding fines before borrowing new
+                    books.</span>
             </li>
             <li>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
-                <span><strong>Book Condition:</strong> Please return books in the same condition you received them. Damaged books may result in additional charges.</span>
+                <span><strong>Book Condition:</strong> Please return books in the same condition you received them.
+                    Damaged books may result in additional charges.</span>
             </li>
         </ul>
     </div>

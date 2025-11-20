@@ -11,16 +11,21 @@ namespace BookBuddi.Pages.Books
     public class EditModel : PageModel
     {
         private readonly IBookService _bookService;
+        private readonly IFileUploadService _fileUploadService;
         private readonly ApplicationDbContext _context;
 
-        public EditModel(IBookService bookService, ApplicationDbContext context)
+        public EditModel(IBookService bookService, IFileUploadService fileUploadService, ApplicationDbContext context)
         {
             _bookService = bookService;
+            _fileUploadService = fileUploadService;
             _context = context;
         }
 
         [BindProperty]
         public BookViewModel Book { get; set; } = new BookViewModel();
+
+        [BindProperty]
+        public IFormFile? CoverImageFile { get; set; }
 
         public List<Category> Categories { get; set; } = new List<Category>();
         public List<Genre> Genres { get; set; } = new List<Genre>();
@@ -64,6 +69,29 @@ namespace BookBuddi.Pages.Books
 
             try
             {
+                // Handle file upload if provided
+                if (CoverImageFile != null)
+                {
+                    try
+                    {
+                        // Delete old cover image if it exists
+                        if (!string.IsNullOrEmpty(Book.CoverImageUrl))
+                        {
+                            await _fileUploadService.DeleteFileAsync(Book.CoverImageUrl);
+                        }
+
+                        // Upload new cover image
+                        var uploadedPath = await _fileUploadService.UploadBookCoverAsync(CoverImageFile);
+                        Book.CoverImageUrl = uploadedPath;
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorMessage = $"Error uploading cover image: {ex.Message}";
+                        await LoadDropdownsAsync();
+                        return Page();
+                    }
+                }
+
                 var adminName = HttpContext.Session.GetString("AdminName") ?? "Admin";
                 _bookService.UpdateBook(Book, adminName);
                 return RedirectToPage("./Index");

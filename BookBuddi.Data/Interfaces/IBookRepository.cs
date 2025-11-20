@@ -9,6 +9,7 @@ namespace BookBuddi.Data.Interfaces
         Book? GetBookById(int bookId);
         Book? GetBookByISBN(string isbn);
         IEnumerable<Book> SearchBooks(string searchTerm);
+        IEnumerable<Book> AdvancedSearchBooks(string? searchTerm, int? categoryId, int? genreId);
         IEnumerable<Book> GetBooksByCategory(int categoryId);
         IEnumerable<Book> GetBooksByGenre(int genreId);
         IEnumerable<Book> GetBooksByAuthor(int authorId);

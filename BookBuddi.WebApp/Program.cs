@@ -124,6 +124,13 @@ builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<EmailNotificationBackgroundService>();
 
+// Register File Upload Service
+builder.Services.AddScoped<IFileUploadService>(provider =>
+{
+    var env = provider.GetRequiredService<IWebHostEnvironment>();
+    return new FileUploadService(env.WebRootPath);
+});
+
 var app = builder.Build();
 
 // Seed the database

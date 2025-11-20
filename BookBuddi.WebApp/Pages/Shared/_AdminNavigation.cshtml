@@ -1,0 +1,164 @@
+@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+    var userRole = Context.Session.GetString("UserRole");
+}
+
+@if (userRole == "Admin")
+{
+    <style>
+        .admin-nav-sidebar {
+            background: linear-gradient(135deg, #641B2E 0%, #8B2E4A 100%);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 30px;
+            min-width: 250px;
+        }
+
+        .admin-nav-title {
+            color: #FBDB93;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(251, 219, 147, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .admin-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #FBDB93;
+            transform: translateX(5px);
+            color: #FBDB93;
+        }
+
+        .admin-nav-btn.active {
+            background: #FBDB93;
+            color: #641B2E;
+            border-color: #FBDB93;
+        }
+
+        .admin-nav-btn i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .admin-nav-btn.dashboard {
+            background: #FBDB93;
+            color: #641B2E;
+            font-weight: 700;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .admin-nav-btn.dashboard:hover {
+            background: #f0ce7f;
+            transform: translateX(0);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .admin-nav-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-nav-section-title {
+            color: #FBDB93;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+    </style>
+
+    <div class="admin-nav-sidebar">
+        <div class="admin-nav-title">
+            <i class="fas fa-shield-alt"></i> Admin Portal
+        </div>
+
+        <a href="/Admin/Index" class="admin-nav-btn dashboard">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+
+        <div class="admin-nav-section-title">Operations</div>
+        <a href="/Borrowing/Borrow" class="admin-nav-btn @(currentPage.Contains("Borrow") && !currentPage.Contains("Index") ? "active" : "")">
+            <i class="fas fa-sign-out-alt"></i> Process Borrow
+        </a>
+        <a href="/Borrowing/Return" class="admin-nav-btn @(currentPage.Contains("Return") ? "active" : "")">
+            <i class="fas fa-sign-in-alt"></i> Process Return
+        </a>
+        <a href="/Borrowing/Index" class="admin-nav-btn @(currentPage == "/Borrowing/Index" ? "active" : "")">
+            <i class="fas fa-exchange-alt"></i> Borrowing Transactions
+        </a>
+
+        <div class="admin-nav-section">
+            <div class="admin-nav-section-title">Management</div>
+            <a href="/Books/Create" class="admin-nav-btn @(currentPage.Contains("Books/Create") ? "active" : "")">
+                <i class="fas fa-plus-square"></i> Add New Book
+            </a>
+            <a href="/Books/Index" class="admin-nav-btn @(currentPage.Contains("Books") && currentPage != "/Books/Create" ? "active" : "")">
+                <i class="fas fa-book"></i> Manage Books
+            </a>
+            <a href="/Members/Index" class="admin-nav-btn @(currentPage.Contains("Members") ? "active" : "")">
+                <i class="fas fa-users"></i> Manage Members
+            </a>
+            <a href="/Fines/Index" class="admin-nav-btn @(currentPage.Contains("Fines") ? "active" : "")">
+                <i class="fas fa-money-check-alt"></i> Manage Fines
+            </a>
+            <a href="/BookRequests/Index" class="admin-nav-btn @(currentPage.Contains("BookRequests") ? "active" : "")">
+                <i class="fas fa-bell"></i> Book Requests
+            </a>
+            <a href="/Notifications/Index" class="admin-nav-btn @(currentPage.Contains("Notifications") ? "active" : "")">
+                <i class="fas fa-envelope"></i> Notifications
+            </a>
+        </div>
+
+        <div class="admin-nav-section">
+            <div class="admin-nav-section-title">Catalog</div>
+            <a href="/Categories/Index" class="admin-nav-btn @(currentPage.Contains("Categories") ? "active" : "")">
+                <i class="fas fa-tags"></i> Categories
+            </a>
+            <a href="/Genres/Index" class="admin-nav-btn @(currentPage.Contains("Genres") ? "active" : "")">
+                <i class="fas fa-layer-group"></i> Genres
+            </a>
+            <a href="/Authors/Index" class="admin-nav-btn @(currentPage.Contains("Authors") ? "active" : "")">
+                <i class="fas fa-pen-fancy"></i> Authors
+            </a>
+        </div>
+
+        <div class="admin-nav-section">
+            <div class="admin-nav-section-title">System</div>
+            <a href="/Admin/ManageAdmins" class="admin-nav-btn @(currentPage.Contains("ManageAdmins") ? "active" : "")">
+                <i class="fas fa-shield-alt"></i> Manage Admins
+            </a>
+            <a href="/Reports/Index" class="admin-nav-btn @(currentPage.Contains("Reports") ? "active" : "")">
+                <i class="fas fa-chart-line"></i> Reports
+            </a>
+        </div>
+
+        <div class="admin-nav-section">
+            <a href="/" class="admin-nav-btn" style="background: rgba(255,255,255,0.05);">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+    </div>
+}

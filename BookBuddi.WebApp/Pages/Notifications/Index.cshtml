@@ -11,7 +11,7 @@
     string GetTimeAgo(DateTime dateTime)
     {
         var timeSpan = DateTime.Now - dateTime;
-        
+
         if (timeSpan.TotalMinutes < 1)
             return "Just now";
         if (timeSpan.TotalMinutes < 60)
@@ -24,7 +24,7 @@
             return $"{(int)(timeSpan.TotalDays / 7)} weeks ago";
         if (timeSpan.TotalDays < 365)
             return $"{(int)(timeSpan.TotalDays / 30)} months ago";
-        
+
         return $"{(int)(timeSpan.TotalDays / 365)} years ago";
     }
 }
@@ -46,7 +46,7 @@
         align-items: center;
         padding: 15px 40px;
         background: white;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         position: sticky;
         top: 0;
         z-index: 100;
@@ -75,7 +75,7 @@
         font-weight: 500;
         transition: all 0.3s;
         border: 1px solid #e0e0e0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .member-actions a:hover {
@@ -195,7 +195,7 @@
         background: white;
         border-radius: 12px;
         padding: 20px 25px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s, box-shadow 0.3s;
         display: flex;
         gap: 20px;
@@ -205,7 +205,7 @@
 
     .notification-card:hover {
         transform: translateX(5px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .notification-card.unread {
@@ -350,16 +350,22 @@
     }
 
     @@keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
     }
 
     @@keyframes slideUp {
-        from { 
+        from {
             transform: translateY(50px);
             opacity: 0;
         }
-        to { 
+
+        to {
             transform: translateY(0);
             opacity: 1;
         }
@@ -530,10 +536,11 @@
                 <span>@userName</span>
             </div>
         }
-        @if (userRole == "Member")
+        @if (userRole == "Admin")
         {
-            <a href="/Account/Logout" class="btn-logout">Logout</a>
+            <a href="/Admin/Index" class="btn-logout">Admin Panel</a>
         }
+        <a href="/Account/Logout" class="btn-logout">Logout</a>
     </div>
 </div>
 
@@ -574,12 +581,10 @@
             {
                 @foreach (var notification in Model.Notifications.OrderByDescending(n => n.DateCreated))
                 {
-                    <div class="notification-card @(!notification.IsRead ? "unread" : "")" 
-                         data-title="@notification.Title" 
-                         data-message="@notification.Message" 
-                         data-type="@notification.Type"
-                         onclick="openNotificationModal(@notification.NotificationId, '@notification.Type', '@Html.Raw(notification.Title.Replace("'", "\\'"))', '@Html.Raw(notification.Message.Replace("'", "\\'"))', '@notification.DateCreated.ToString("MMM dd, yyyy h:mm tt")', @notification.IsRead.ToString().ToLower(), @notification.NotificationId, @Model.SelectedMemberId)"
-                         style="cursor: pointer;">
+                    <div class="notification-card @(!notification.IsRead ? "unread" : "")" data-title="@notification.Title"
+                        data-message="@notification.Message" data-type="@notification.Type"
+                        onclick="openNotificationModal(@notification.NotificationId, '@notification.Type', '@Html.Raw(notification.Title.Replace("'", "\\'"))', '@Html.Raw(notification.Message.Replace("'", "\\'"))', '@notification.DateCreated.ToString("MMM dd, yyyy h:mm tt")', @notification.IsRead.ToString().ToLower(), @notification.NotificationId, @Model.SelectedMemberId)"
+                        style="cursor: pointer;">
                         <div class="notification-icon">
                             @if (notification.Type == BookBuddi.Resources.Constants.NotificationType.DueReminder)
                             {
@@ -668,7 +673,8 @@
         </div>
         <div class="modal-actions">
             <button class="modal-btn modal-btn-secondary" onclick="closeNotificationModal()">Close</button>
-            <a id="modalMarkReadBtn" href="#" class="modal-btn modal-btn-primary" style="display: none;">Mark as Read</a>
+            <a id="modalMarkReadBtn" href="#" class="modal-btn modal-btn-primary" style="display: none;">Mark as
+                Read</a>
         </div>
     </div>
 </div>
@@ -677,14 +683,14 @@
     function filterNotifications() {
         const searchValue = document.getElementById('searchInput').value.toLowerCase();
         const cards = document.querySelectorAll('.notification-card');
-        
+
         cards.forEach(card => {
             const title = card.getAttribute('data-title').toLowerCase();
             const message = card.getAttribute('data-message').toLowerCase();
             const type = card.getAttribute('data-type').toLowerCase();
-            
+
             const matchesSearch = title.includes(searchValue) || message.includes(searchValue) || type.includes(searchValue);
-            
+
             if (matchesSearch) {
                 card.style.display = 'flex';
             } else {
@@ -700,7 +706,7 @@
         document.getElementById('modalDate').textContent = date;
         document.getElementById('modalStatus').textContent = isRead ? 'Read' : 'Unread';
         document.getElementById('modalId').textContent = '#' + notificationId;
-        
+
         // Show/hide mark as read button
         const markReadBtn = document.getElementById('modalMarkReadBtn');
         if (!isRead) {
@@ -709,7 +715,7 @@
         } else {
             markReadBtn.style.display = 'none';
         }
-        
+
         document.getElementById('notificationModal').classList.add('show');
     }
 
@@ -718,7 +724,7 @@
     }
 
     // Close modal when clicking outside
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         const modal = document.getElementById('notificationModal');
         if (event.target === modal) {
             closeNotificationModal();
@@ -726,7 +732,7 @@
     });
 
     // Close modal with Escape key
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
             closeNotificationModal();
         }

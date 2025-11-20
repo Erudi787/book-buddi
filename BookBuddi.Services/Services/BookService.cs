@@ -4,6 +4,7 @@ using BookBuddi.Data.Models;
 using BookBuddi.Resources.Constants;
 using BookBuddi.Services.Interfaces;
 using BookBuddi.Services.ServiceModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookBuddi.Services.Services
 {
@@ -11,17 +12,66 @@ namespace BookBuddi.Services.Services
     {
         private readonly IBookRepository _bookRepository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public BookService(IBookRepository bookRepository, IMapper mapper)
+        public BookService(IBookRepository bookRepository, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _bookRepository = bookRepository;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public IEnumerable<BookViewModel> GetAllBooks()
         {
-            var books = _bookRepository.GetBooks().ToList();
-            return _mapper.Map<IEnumerable<BookViewModel>>(books);
+            // Get all books (excluding archived)
+            var books = _bookRepository.GetBooks()
+                .Where(b => b.Status != BookStatus.Archived)
+                .ToList();
+            var bookViewModels = _mapper.Map<List<BookViewModel>>(books);
+
+            // Get categories, genres, and authors to populate display names
+            var categoryDict = _unitOfWork.Database.Set<Category>().ToDictionary(c => c.CategoryId, c => c.CategoryName);
+            var genreDict = _unitOfWork.Database.Set<Genre>().ToDictionary(g => g.GenreId, g => g.GenreName);
+
+            // Get book authors
+            var bookIds = books.Select(b => b.BookId).ToList();
+            var bookAuthors = _unitOfWork.Database.Set<BookAuthor>()
+                .Where(ba => bookIds.Contains(ba.BookId))
+                .ToList();
+
+            var authorIds = bookAuthors.Select(ba => ba.AuthorId).Distinct().ToList();
+            var authors = _unitOfWork.Database.Set<Author>()
+                .Where(a => authorIds.Contains(a.AuthorId))
+                .ToDictionary(a => a.AuthorId, a => $"{a.FirstName} {a.LastName}");
+
+            // Group book authors by BookId
+            var bookAuthorsGrouped = bookAuthors
+                .GroupBy(ba => ba.BookId)
+                .ToDictionary(g => g.Key, g => g.Select(ba => ba.AuthorId).ToList());
+
+            // Populate display properties
+            foreach (var bookViewModel in bookViewModels)
+            {
+                if (categoryDict.ContainsKey(bookViewModel.CategoryId))
+                {
+                    bookViewModel.CategoryName = categoryDict[bookViewModel.CategoryId];
+                }
+
+                if (genreDict.ContainsKey(bookViewModel.GenreId))
+                {
+                    bookViewModel.GenreName = genreDict[bookViewModel.GenreId];
+                }
+
+                if (bookAuthorsGrouped.ContainsKey(bookViewModel.BookId))
+                {
+                    var authorNames = bookAuthorsGrouped[bookViewModel.BookId]
+                        .Where(authorId => authors.ContainsKey(authorId))
+                        .Select(authorId => authors[authorId]);
+                    bookViewModel.AuthorNames = string.Join(", ", authorNames);
+                }
+            }
+
+            return bookViewModels;
         }
 
         public BookViewModel? GetBookById(int bookId)
@@ -128,7 +178,22 @@ namespace BookBuddi.Services.Services
             if (book == null)
                 throw new InvalidOperationException("Book not found");
 
-            _bookRepository.DeleteBook(book);
+            // Check if the book has any borrow transaction history
+            var hasTransactions = _unitOfWork.Database.Set<BorrowTransaction>()
+                .Any(bt => bt.BookId == bookId);
+
+            if (hasTransactions)
+            {
+                // Soft delete: Archive the book instead of deleting it
+                book.Status = BookStatus.Archived;
+                book.UpdatedTime = DateTime.Now;
+                _bookRepository.UpdateBook(book);
+            }
+            else
+            {
+                // Hard delete: No transaction history, safe to remove completely
+                _bookRepository.DeleteBook(book);
+            }
         }
 
         public void UpdateBookAvailability(int bookId, int change)

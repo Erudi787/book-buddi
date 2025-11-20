@@ -7,7 +7,10 @@
 
 <link rel="stylesheet" href="~/css/categories-index.css" />
 
-<div class="categories-container">
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
+
+    <div class="categories-container" style="flex: 1;">
     <div class="page-header">
         <h1>Categories Management</h1>
         <p>Organize and manage book categories</p>
@@ -32,9 +35,10 @@
                 <span class="material-icons">add</span>
                 Add New Category
             </a>
-            
+
             <form method="get" class="search-form">
-                <input type="text" name="searchTerm" class="search-input" placeholder="Search categories..." value="@Model.SearchTerm" />
+                <input type="text" name="searchTerm" class="search-input" placeholder="Search categories..."
+                    value="@Model.SearchTerm" />
                 <button type="submit" class="btn-secondary">
                     <span class="material-icons">search</span>
                     Search
@@ -78,7 +82,8 @@
                                         <a href="/Categories/Edit?id=@category.CategoryId" class="action-btn" data-tooltip="Edit">
                                             <span class="material-icons icon">edit</span>
                                         </a>
-                                        <a href="/Categories/Delete?id=@category.CategoryId" class="action-btn danger" data-tooltip="Delete">
+                                        <a href="/Categories/Delete?id=@category.CategoryId" class="action-btn danger"
+                                            data-tooltip="Delete">
                                             <span class="material-icons icon">delete</span>
                                         </a>
                                     </div>
@@ -94,7 +99,7 @@
             <div class="empty-state">
                 <div class="material-icons empty-state-icon">category</div>
                 <h3>No Categories Found</h3>
-                <p>@(!string.IsNullOrWhiteSpace(Model.SearchTerm) ? "No categories match your search criteria." : "Get started by creating your first category.")</p>
+                <p>@(!string.IsNullOrWhiteSpace(Model.SearchTerm) ? "No categories match your search criteria." : "Get started        by creating your first category.")</p>
                 @if (string.IsNullOrWhiteSpace(Model.SearchTerm))
                 {
                     <a href="/Categories/Create" class="btn-primary">
@@ -118,5 +123,6 @@
             <span class="material-icons">arrow_back</span>
             Back to Home
         </a>
+    </div>
     </div>
 </div>

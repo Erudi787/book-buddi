@@ -6,7 +6,10 @@
 
 <link rel="stylesheet" href="~/css/member-reactive.css" />
 
-<div class="reactivate-member-container">
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
+
+    <div class="reactivate-member-container" style="flex: 1;">
     <div class="page-header">
         <h1>Reactivate Member</h1>
         <p>Restore member access and borrowing privileges</p>
@@ -70,6 +73,7 @@
             @Model.ErrorMessage
         </div>
     }
+    </div>
 </div>
 
 <script>

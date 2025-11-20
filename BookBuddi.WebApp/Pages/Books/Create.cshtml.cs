@@ -11,16 +11,21 @@ namespace BookBuddi.Pages.Books
     public class CreateModel : PageModel
     {
         private readonly IBookService _bookService;
+        private readonly IFileUploadService _fileUploadService;
         private readonly ApplicationDbContext _context;
 
-        public CreateModel(IBookService bookService, ApplicationDbContext context)
+        public CreateModel(IBookService bookService, IFileUploadService fileUploadService, ApplicationDbContext context)
         {
             _bookService = bookService;
+            _fileUploadService = fileUploadService;
             _context = context;
         }
 
         [BindProperty]
         public BookViewModel Book { get; set; } = new BookViewModel();
+
+        [BindProperty]
+        public IFormFile? CoverImageFile { get; set; }
 
         public List<Category> Categories { get; set; } = new List<Category>();
         public List<Genre> Genres { get; set; } = new List<Genre>();
@@ -33,7 +38,7 @@ namespace BookBuddi.Pages.Books
             if (userRole != "Admin")
             {
                 TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Admin/Login" : "/Admin/AccessDenied");
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
             }
 
             await LoadDropdownsAsync();
@@ -47,7 +52,7 @@ namespace BookBuddi.Pages.Books
             if (userRole != "Admin")
             {
                 TempData["ErrorMessage"] = "You must be logged in as an administrator to access this page.";
-                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Admin/Login" : "/Admin/AccessDenied");
+                return RedirectToPage(string.IsNullOrEmpty(userRole) ? "/Account/Login" : "/Admin/AccessDenied");
             }
 
             if (!ModelState.IsValid)
@@ -58,6 +63,22 @@ namespace BookBuddi.Pages.Books
 
             try
             {
+                // Handle file upload if provided
+                if (CoverImageFile != null)
+                {
+                    try
+                    {
+                        var uploadedPath = await _fileUploadService.UploadBookCoverAsync(CoverImageFile);
+                        Book.CoverImageUrl = uploadedPath;
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorMessage = $"Error uploading cover image: {ex.Message}";
+                        await LoadDropdownsAsync();
+                        return Page();
+                    }
+                }
+
                 var adminName = HttpContext.Session.GetString("AdminName") ?? "Admin";
                 _bookService.AddBook(Book, adminName);
                 return RedirectToPage("./Index");

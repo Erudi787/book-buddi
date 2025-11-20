@@ -7,7 +7,10 @@
 
 <link rel="stylesheet" href="~/css/categories-edit.css" />
 
-<div class="edit-category-container">
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
+
+    <div class="edit-category-container" style="flex: 1;">
     <div class="page-header">
         <h1>Edit Category</h1>
         <p>Update category information and description</p>
@@ -81,6 +84,7 @@
             </div>
         }
     }
+    </div>
 </div>
 
 <script>

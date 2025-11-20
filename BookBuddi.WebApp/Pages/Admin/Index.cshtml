@@ -2,15 +2,16 @@
 @model BookBuddi.Pages.Admin.DashboardModel
 @{
     ViewData["Title"] = "Admin Dashboard";
-    var colorPrimary = "#641B2E";   
+    var colorPrimary = "#641B2E";
 }
 <link rel="stylesheet" href="~/css/admin-index.css" />
 
 <div class="dashboard-header">
     <div class="header-content">
         <h1>BookBuddi Admin Console</h1>
-        <p>Welcome to your command center. Monitor library performance, manage operations, and track key metrics in real-time.</p>
-        
+        <p>Welcome to your command center. Monitor library performance, manage operations, and track key metrics in
+            real-time.</p>
+
         <div class="header-stats">
             <div class="header-stat">
                 <i class="fas fa-book-open"></i>
@@ -32,7 +33,7 @@
 </div>
 
 <div class="dashboard-container">
-    
+
     <div class="sidebar">
         <div class="sidebar-title">Quick Actions</div>
         <a href="/Borrowing/Borrow" class="quick-action-btn highlight">
@@ -41,32 +42,47 @@
         <a href="/Borrowing/Return" class="quick-action-btn highlight">
             <i class="fas fa-sign-in-alt"></i> Process Return
         </a>
+        <a href="/Borrowing/Index" class="quick-action-btn">
+            <i class="fas fa-exchange-alt"></i> Borrowing Transactions
+        </a>
         <a href="/Books/Create" class="quick-action-btn">
             <i class="fas fa-plus-square"></i> Add New Book
         </a>
-        <a href="/Members/Index" class="quick-action-btn">
-            <i class="fas fa-users"></i> Manage Members
+        <a href="/Authors/Index" class="quick-action-btn">
+            <i class="fas fa-tags"></i> Authors
         </a>
-        <a href="/BookRequests/Index" class="quick-action-btn warning">
-            <i class="fas fa-bell"></i> View Requests 
-            <span style="margin-left: auto; font-weight: 900; color: #e74a3b;">(@Model.PendingRequests)</span>
+        <a href="/Categories/Index" class="quick-action-btn">
+            <i class="fas fa-tags"></i> Categories
         </a>
         <a href="/Reports/Index" class="quick-action-btn">
             <i class="fas fa-chart-line"></i> Full Reports
         </a>
+        <a href="/Genres/Index" class="quick-action-btn">
+            <i class="fas fa-tags"></i> Genres
+        </a>
         <a href="/Admin/ManageAdmins" class="quick-action-btn">
             <i class="fas fa-shield-alt"></i> Manage Admins
         </a>
-        <a href="/Categories/Index" class="quick-action-btn">
-            <i class="fas fa-tags"></i> Manage Catalog
+        <a href="/Books/Index" class="quick-action-btn">
+            <i class="fas fa-plus-square"></i> Manage Books
         </a>
         <a href="/Fines/Index" class="quick-action-btn danger">
             <i class="fas fa-money-check-alt"></i> Manage Fines
         </a>
+        <a href="/Members/Index" class="quick-action-btn">
+            <i class="fas fa-users"></i> Manage Members
+        </a>
+        <a href="/Notifications/Index" class="quick-action-btn">
+            <i class="fas fa-envelope"></i> Notifications
+        </a>
+        <a href="/BookRequests/Index" class="quick-action-btn warning">
+            <i class="fas fa-bell"></i> View Requests
+            <span style="margin-left: auto; font-weight: 900; color: #e74a3b;">(@Model.PendingRequests)</span>
+        </a>
     </div>
 
     <div class="main-content">
-        
+
         <h2 class="section-title">
             <div class="section-icon">📈</div>
             Key Performance Indicators
@@ -79,7 +95,7 @@
             </div>
             <div class="kpi-tile warning">
                 <div class="kpi-tile-icon"><i class="fas fa-hand-holding-usd"></i></div>
-                <div class="kpi-tile-value">$@Model.TotalUnpaidFines.ToString("F2")</div>
+                <div class="kpi-tile-value">₱@Model.TotalUnpaidFines.ToString("F2")</div>
                 <div class="kpi-tile-header">Unpaid Fines</div>
             </div>
             <div class="kpi-tile success">
@@ -99,7 +115,7 @@
             Library Analytics
         </h2>
         <div class="tile-grid">
-            
+
             <div class="category-tile">
                 <div class="tile-header">
                     <i class="fas fa-book-open" style="color: @colorPrimary;"></i>
@@ -124,7 +140,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="category-tile">
                 <div class="tile-header">
                     <i class="fas fa-exchange-alt" style="color: @colorPrimary;"></i>
@@ -174,7 +190,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="category-tile">
                 <div class="tile-header">
                     <i class="fas fa-money-bill-wave" style="color: @colorPrimary;"></i>
@@ -183,15 +199,15 @@
                 <div class="stats-container">
                     <div class="stat-item danger">
                         <span class="stat-label"><i class="fas fa-money-check-alt"></i>Unpaid Fines</span>
-                        <span class="stat-value">$@Model.TotalUnpaidFines.ToString("F2")</span>
+                        <span class="stat-value">₱@Model.TotalUnpaidFines.ToString("F2")</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label"><i class="fas fa-receipt"></i>Collected Today</span>
-                        <span class="stat-value">$@Model.TotalPaidFinesToday.ToString("F2")</span>
+                        <span class="stat-value">₱@Model.TotalPaidFinesToday.ToString("F2")</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label"><i class="fas fa-funnel-dollar"></i>Total Collected</span>
-                        <span class="stat-value">$@Model.TotalFinesCollected.ToString("F2")</span>
+                        <span class="stat-value">₱@Model.TotalFinesCollected.ToString("F2")</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label"><i class="fas fa-list-ol"></i>Outstanding Fines</span>
@@ -231,7 +247,7 @@
                     <span class="activity-detail">
                         <span class="activity-type fine">Fine</span>
                         <i class="fas fa-dollar-sign" style="color: #e74a3b;"></i>
-                        $5.00 Collected
+                        ₱5.00 Collected
                     </span>
                     <span class="activity-meta">Member ID: M-078 | 2 hours ago</span>
                 </li>

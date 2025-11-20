@@ -6,7 +6,10 @@
 }
 <link rel="stylesheet" href="~/css/genres-index.css" />
 
-<div class="page-container">
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
+
+    <div class="page-container" style="flex: 1;">
     <div class="page-header">
         <h1>Genres Management</h1>
         <p>Organize and manage book genres to keep your library catalog well-structured and easy to navigate.</p>
@@ -130,6 +133,7 @@
         <a href="/" class="btn btn-outline">
             <i class="fas fa-home"></i> Back to Home
         </a>
+    </div>
     </div>
 </div>
 

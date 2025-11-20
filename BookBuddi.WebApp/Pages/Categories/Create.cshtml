@@ -7,8 +7,10 @@
 
 <link rel="stylesheet" href="~/css/categories-create.css" />
 
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
 
-<div class="page-container">
+    <div class="page-container" style="flex: 1;">
     <div class="page-header">
         <div class="header-content">
             <h1>Add New Category</h1>
@@ -37,20 +39,20 @@
                         <label class="form-label">
                             <i class="fas fa-tag"></i>Category Name
                         </label>
-                        <input type="text" name="categoryName" class="form-control" required maxlength="100" 
-                               placeholder="Enter category name (e.g., Fiction, Science, History)" />
+                        <input type="text" name="categoryName" class="form-control" required maxlength="100"
+                            placeholder="Enter category name (e.g., Fiction, Science, History)" />
                         <div class="char-count"><span id="nameCount">0</span>/100 characters</div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label optional">
                             <i class="fas fa-align-left"></i>Description
                         </label>
                         <textarea name="description" rows="4" class="form-control textarea" maxlength="500"
-                                  placeholder="Provide a brief description of this category (optional)"></textarea>
+                        placeholder="Provide a brief description of this category (optional)"></textarea>
                         <div class="char-count"><span id="descCount">0</span>/500 characters</div>
                     </div>
-                    
+
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-plus-circle"></i> Create Category
@@ -107,37 +109,38 @@
             </div>
         </div>
     }
+    </div>
 </div>
 
 @section Scripts {
     <script>
         // Character counter functionality
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const nameInput = document.querySelector('input[name="categoryName"]');
             const descInput = document.querySelector('textarea[name="description"]');
             const nameCount = document.getElementById('nameCount');
             const descCount = document.getElementById('descCount');
-            
+
             if (nameInput && nameCount) {
-                nameInput.addEventListener('input', function() {
+                nameInput.addEventListener('input', function () {
                     nameCount.textContent = this.value.length;
                 });
                 // Initialize count
                 nameCount.textContent = nameInput.value.length;
             }
-            
+
             if (descInput && descCount) {
-                descInput.addEventListener('input', function() {
+                descInput.addEventListener('input', function () {
                     descCount.textContent = this.value.length;
                 });
                 // Initialize count
                 descCount.textContent = descInput.value.length;
             }
-            
+
             // Form validation enhancement
             const form = document.querySelector('form');
             if (form) {
-                form.addEventListener('submit', function(e) {
+                form.addEventListener('submit', function (e) {
                     const categoryName = nameInput.value.trim();
                     if (!categoryName) {
                         e.preventDefault();
