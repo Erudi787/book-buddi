@@ -4,9 +4,12 @@
     ViewData["Title"] = "Delete Genre";
     var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
 }
-<link rel="stylesheet" href="~/css/genres-delete.css" />  
+<link rel="stylesheet" href="~/css/genres-delete.css" />
 
-<div class="page-container">
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
+
+    <div class="page-container" style="flex: 1;">
     <div class="page-header">
         <h1>Delete Genre</h1>
         <p>Permanently remove a genre from the BookBuddi library system</p>
@@ -144,6 +147,7 @@
             </div>
         }
     }
+    </div>
 </div>
 
 @section Scripts {

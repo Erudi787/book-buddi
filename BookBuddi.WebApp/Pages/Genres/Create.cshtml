@@ -4,10 +4,13 @@
     ViewData["Title"] = "Add Genre";
     var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
 }
-<link rel="stylesheet" href="~/css/genres-create.css" />  
+<link rel="stylesheet" href="~/css/genres-create.css" />
 
 
-<div class="page-container">
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
+
+    <div class="page-container" style="flex: 1;">
     <div class="page-header">
         <h1>Add New Genre</h1>
         <p>Create a new book genre to help organize and categorize your library collection effectively.</p>
@@ -111,6 +114,7 @@
             </div>
         </div>
     }
+    </div>
 </div>
 
 @section Scripts {

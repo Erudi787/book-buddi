@@ -8,8 +8,14 @@ namespace BookBuddi.Services
     {
         public AutoMapperProfile()
         {
-            // Book mappings
-            CreateMap<Book, BookViewModel>().ReverseMap()
+            // Book mappings - Forward mapping ignores navigation properties (they don't exist on Book model)
+            CreateMap<Book, BookViewModel>()
+                .ForMember(dest => dest.CategoryName, opt => opt.Ignore())
+                .ForMember(dest => dest.GenreName, opt => opt.Ignore())
+                .ForMember(dest => dest.AuthorNames, opt => opt.Ignore());
+
+            // Reverse mapping for creating/updating books
+            CreateMap<BookViewModel, Book>()
                 .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedTime, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())

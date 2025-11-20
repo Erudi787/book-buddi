@@ -24,7 +24,7 @@
         align-items: center;
         padding: 15px 40px;
         background: white;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         position: sticky;
         top: 0;
         z-index: 100;
@@ -53,7 +53,7 @@
         font-weight: 500;
         transition: all 0.3s;
         border: 1px solid #e0e0e0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .member-actions a:hover {
@@ -149,7 +149,7 @@
         right: 0;
         background: white;
         border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
         width: 480px;
         max-height: 600px;
         display: none;
@@ -163,6 +163,7 @@
             opacity: 0;
             transform: translateY(-10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -170,8 +171,13 @@
     }
 
     @@keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
     }
 
     @@keyframes slideUp {
@@ -179,6 +185,7 @@
             opacity: 0;
             transform: translateY(20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -426,7 +433,7 @@
         border-radius: 16px;
         width: 90%;
         max-width: 600px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         animation: slideUp 0.3s ease;
         overflow: hidden;
     }
@@ -605,7 +612,7 @@
         background: white;
         border-radius: 12px;
         padding: 25px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s, box-shadow 0.3s;
         display: flex;
         flex-direction: column;
@@ -614,7 +621,7 @@
 
     .request-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .request-card.pending {
@@ -753,7 +760,7 @@
         background: white;
         border-radius: 12px;
         padding: 25px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         margin-bottom: 30px;
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -797,10 +804,10 @@
 </style>
 
 <div class="top-nav">
-    <div style="display: flex; align-items: center; gap: 10px;">
+    <a href="/" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
         <img src="/assets/logo.svg" alt="BookBuddi Logo" width="30" height="30" />
         <strong>Book Buddi</strong>
-    </div>
+    </a>
     <div class="nav-right">
         @if (userRole == "Member")
         {
@@ -827,47 +834,56 @@
                         @if (Model.UnreadNotificationCount > 0)
                         {
                             <button class="mark-all-read-btn" onclick="markAllAsRead(event)">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
                                     <polyline points="20 6 9 17 4 12"></polyline>
                                 </svg>
                                 Mark All as read
                             </button>
                         }
                     </div>
-                    
+
                     <div class="notification-tabs">
                         <button class="notification-tab active" data-tab="all" onclick="switchTab(event, 'all')">
                             View all <span class="tab-badge">@Model.RecentNotifications.Count()</span>
                         </button>
                         <button class="notification-tab" data-tab="duedate" onclick="switchTab(event, 'duedate')">
-                            Due date <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type == BookBuddi.Resources.Constants.NotificationType.DueReminder)</span>
-                        </button>
-                        <button class="notification-tab" data-tab="request" onclick="switchTab(event, 'request')">
-                            Request <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type == BookBuddi.Resources.Constants.NotificationType.RequestUpdate)</span>
-                        </button>
-                        <button class="notification-tab" data-tab="system" onclick="switchTab(event, 'system')">
-                            System Alerts <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type == BookBuddi.Resources.Constants.NotificationType.OverdueAlert || n.Type == BookBuddi.Resources.Constants.NotificationType.FineIssued || n.Type == BookBuddi.Resources.Constants.NotificationType.General)</span>
-                        </button>
-                    </div>
+                            Due date <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type ==
+                                                            BookBuddi.Resources.Constants.NotificationType.DueReminder)</span>
+                    </button>
+                    <button class="notification-tab" data-tab="request" onclick="switchTab(event, 'request')">
+                        Request <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type ==
+                                                        BookBuddi.Resources.Constants.NotificationType.RequestUpdate)</span>
+                    </button>
+                    <button class="notification-tab" data-tab="system" onclick="switchTab(event, 'system')">
+                        System Alerts <span class="tab-badge">@Model.RecentNotifications.Count(n => n.Type ==
+                                                        BookBuddi.Resources.Constants.NotificationType.OverdueAlert || n.Type ==
+                                                        BookBuddi.Resources.Constants.NotificationType.FineIssued || n.Type ==
+                                                        BookBuddi.Resources.Constants.NotificationType.General)</span>
+                    </button>
+                </div>
 
                     <div class="notification-list" id="notificationList">
-                        @if (Model.RecentNotifications != null && Model.RecentNotifications.Any())
+                    @if (Model.RecentNotifications != null && Model.RecentNotifications.Any())
                         {
                             @foreach (var notification in Model.RecentNotifications.OrderByDescending(n => n.DateCreated))
                             {
-                                var notificationTypeClass = notification.Type == BookBuddi.Resources.Constants.NotificationType.DueReminder ? "duedate" :
-                                                           notification.Type == BookBuddi.Resources.Constants.NotificationType.RequestUpdate ? "request" : "system";
-                                
-                                <div class="notification-card @(!notification.IsRead ? "unread" : "")" 
-                                     data-notification-id="@notification.NotificationId"
-                                     data-notification-type="@notificationTypeClass"
-                                     onclick="openNotificationModal(@notification.NotificationId, '@notification.Title.Replace("'", "\\'")' , '@notification.Message.Replace("'", "\\'")' , '@notification.DateCreated.ToString("MMMM dd, yyyy")', '@notification.DateCreated.ToString("h:mm tt")', @notification.IsRead.ToString().ToLower())">
+                                var notificationTypeClass = notification.Type ==
+                                BookBuddi.Resources.Constants.NotificationType.DueReminder ? "duedate" :
+                                notification.Type == BookBuddi.Resources.Constants.NotificationType.RequestUpdate ? "request" :
+                                "system";
+
+                                <div class="notification-card @(!notification.IsRead ? "unread" : "")"
+                                    data-notification-id="@notification.NotificationId"
+                                    data-notification-type="@notificationTypeClass"
+                                    onclick="openNotificationModal(@notification.NotificationId, '@notification.Title.Replace("'", "\\'")' , '@notification.Message.Replace("'", "\\'")' , '@notification.DateCreated.ToString("MMMM dd, yyyy")', '@notification.DateCreated.ToString("h:mm tt")', @notification.IsRead.ToString().ToLower())">
                                     <div class="notification-indicator @(!notification.IsRead ? "unread" : "read")"></div>
                                     <div class="notification-content">
                                         <div class="notification-title">@notification.Title</div>
                                         <div class="notification-message">@notification.Message</div>
                                         <div class="notification-meta">
-                                            <span class="notification-time">@notification.DateCreated.ToString("MMMM dd, yyyy") @notification.DateCreated.ToString("h:mm tt")</span>
+                                            <span class="notification-time">@notification.DateCreated.ToString("MMMM dd, yyyy")
+                                                @notification.DateCreated.ToString("h:mm tt")</span>
                                         </div>
                                     </div>
                                 </div>
@@ -876,7 +892,8 @@
                         else
                         {
                             <div class="notification-empty">
-                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1">
                                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                                     <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                                 </svg>
@@ -900,10 +917,11 @@
                 <span>@userName</span>
             </div>
         }
-        @if (userRole == "Member")
+        @if (userRole == "Admin")
         {
-            <a href="/Account/Logout" class="btn-logout">Logout</a>
+            <a href="/Admin/Index" class="btn-logout">Admin Panel</a>
         }
+        <a href="/Account/Logout" class="btn-logout">Logout</a>
     </div>
 </div>
 
@@ -922,25 +940,30 @@
             </div>
             <div class="summary-item">
                 <div class="summary-label">Pending</div>
-                <div class="summary-value yellow">@Model.Requests.Count(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending)</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Approved</div>
-                <div class="summary-value green">@Model.Requests.Count(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Approved)</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-label">Rejected</div>
-                <div class="summary-value red">@Model.Requests.Count(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Rejected)</div>
-            </div>
+                <div class="summary-value yellow">@Model.Requests.Count(r => r.Request.Status ==
+                                    BookBuddi.Resources.Constants.RequestStatus.Pending)</div>
         </div>
+        <div class="summary-item">
+            <div class="summary-label">Approved</div>
+            <div class="summary-value green">@Model.Requests.Count(r => r.Request.Status ==
+                                BookBuddi.Resources.Constants.RequestStatus.Approved)</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">Rejected</div>
+            <div class="summary-value red">@Model.Requests.Count(r => r.Request.Status ==
+                                BookBuddi.Resources.Constants.RequestStatus.Rejected)</div>
+        </div>
+    </div>
 
-        @if (Model.Requests.Any(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending))
+    @if (Model.Requests.Any(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending))
         {
             <h2 class="section-title">⏳ Pending Requests</h2>
             <div class="requests-grid">
-                @foreach (var item in Model.Requests.Where(r => r.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending).OrderByDescending(r => r.Request.RequestDate))
+                @foreach (var item in Model.Requests.Where(r => r.Request.Status ==
+                        BookBuddi.Resources.Constants.RequestStatus.Pending).OrderByDescending(r => r.Request.RequestDate))
                 {
-                    <div class="request-card pending" data-title="@item.Request.BookTitle" data-author="@item.Request.AuthorName" data-member="@item.MemberName">
+                    <div class="request-card pending" data-title="@item.Request.BookTitle" data-author="@item.Request.AuthorName"
+                        data-member="@item.MemberName">
                         <div class="request-header">
                             <div>
                                 <div class="book-title">@item.Request.BookTitle</div>
@@ -981,7 +1004,8 @@
             <h2 class="section-title">All Requests History</h2>
             <div class="filters-section">
                 <div class="search-box">
-                    <input type="text" placeholder="Search by book title, author, or member..." id="searchInput" onkeyup="filterRequests()" />
+                    <input type="text" placeholder="Search by book title, author, or member..." id="searchInput"
+                        onkeyup="filterRequests()" />
                 </div>
             </div>
 
@@ -989,11 +1013,13 @@
                 @foreach (var item in Model.Requests.OrderByDescending(r => r.Request.RequestDate))
                 {
                     var statusClass = item.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending ? "pending" :
-                                     item.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Approved ? "approved" : "rejected";
+                    item.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Approved ? "approved" : "rejected";
                     var badgeClass = item.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Pending ? "status-pending" :
-                                    item.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Approved ? "status-approved" : "status-rejected";
+                    item.Request.Status == BookBuddi.Resources.Constants.RequestStatus.Approved ? "status-approved" :
+                    "status-rejected";
 
-                    <div class="request-card @statusClass" data-title="@item.Request.BookTitle" data-author="@item.Request.AuthorName" data-member="@item.MemberName">
+                    <div class="request-card @statusClass" data-title="@item.Request.BookTitle"
+                        data-author="@item.Request.AuthorName" data-member="@item.MemberName">
                         <div class="request-header">
                             <div>
                                 <div class="book-title">@item.Request.BookTitle</div>
@@ -1039,7 +1065,8 @@
             </svg>
             <h3>No book requests yet</h3>
             <p>Can't find a book in our collection? Submit a request and we'll consider adding it!</p>
-            <a href="/BookRequests/Create" class="create-request-btn" style="display: inline-block; margin-top: 20px;">Create New Request</a>
+            <a href="/BookRequests/Create" class="create-request-btn"
+                style="display: inline-block; margin-top: 20px;">Create New Request</a>
         </div>
     }
 </div>
@@ -1078,14 +1105,14 @@
     function filterRequests() {
         const searchValue = document.getElementById('searchInput').value.toLowerCase();
         const cards = document.querySelectorAll('#requestsGrid .request-card');
-        
+
         cards.forEach(card => {
             const title = card.getAttribute('data-title').toLowerCase();
             const author = card.getAttribute('data-author').toLowerCase();
             const member = card.getAttribute('data-member').toLowerCase();
-            
+
             const matchesSearch = title.includes(searchValue) || author.includes(searchValue) || member.includes(searchValue);
-            
+
             if (matchesSearch) {
                 card.style.display = 'flex';
             } else {
@@ -1103,7 +1130,7 @@
 
     function switchTab(event, tabName) {
         event.stopPropagation();
-        
+
         // Update active tab
         const tabs = document.querySelectorAll('.notification-tab');
         tabs.forEach(tab => {
@@ -1132,12 +1159,12 @@
         document.getElementById('modalMessage').textContent = message;
         document.getElementById('modalDate').textContent = date;
         document.getElementById('modalTime').textContent = time;
-        
+
         // Store notification ID for marking as read
         modal.setAttribute('data-notification-id', id);
-        
+
         modal.style.display = 'flex';
-        
+
         // If notification is unread, mark it as read
         if (!isRead) {
             fetch(`/Notifications/MarkAsRead?id=${id}`, { method: 'POST' })
@@ -1151,7 +1178,7 @@
                             indicator.classList.add('read');
                         }
                     }
-                    
+
                     // Update badge count
                     const badge = document.querySelector('.notification-badge');
                     if (badge) {
@@ -1162,7 +1189,7 @@
                             badge.remove();
                         }
                     }
-                    
+
                     // Update tab badges
                     updateTabBadges();
                 });
@@ -1176,7 +1203,7 @@
 
     function markAllAsRead(event) {
         event.stopPropagation();
-        
+
         fetch('/Notifications/MarkAllAsRead', { method: 'POST' })
             .then(() => {
                 // Update UI
@@ -1189,19 +1216,19 @@
                         indicator.classList.add('read');
                     }
                 });
-                
+
                 // Remove badge
                 const badge = document.querySelector('.notification-badge');
                 if (badge) {
                     badge.remove();
                 }
-                
+
                 // Remove mark all as read button
                 const markAllBtn = document.querySelector('.mark-all-read-btn');
                 if (markAllBtn) {
                     markAllBtn.remove();
                 }
-                
+
                 // Update tab badges
                 updateTabBadges();
             });
@@ -1212,7 +1239,7 @@
         const dueDateCount = document.querySelectorAll('.notification-card[data-notification-type="duedate"]').length;
         const requestCount = document.querySelectorAll('.notification-card[data-notification-type="request"]').length;
         const systemCount = document.querySelectorAll('.notification-card[data-notification-type="system"]').length;
-        
+
         document.querySelector('[data-tab="all"] .tab-badge').textContent = allCount;
         document.querySelector('[data-tab="duedate"] .tab-badge').textContent = dueDateCount;
         document.querySelector('[data-tab="request"] .tab-badge').textContent = requestCount;
@@ -1220,17 +1247,17 @@
     }
 
     // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         const dropdown = document.getElementById('notificationDropdown');
         const bell = document.querySelector('.notification-bell');
-        
+
         if (dropdown && bell && !bell.contains(event.target)) {
             dropdown.classList.remove('show');
         }
     });
 
     // Close modal when clicking outside
-    window.onclick = function(event) {
+    window.onclick = function (event) {
         const modal = document.getElementById('notificationModal');
         if (event.target === modal) {
             closeNotificationModal();
@@ -1238,7 +1265,7 @@
     }
 
     // Close modal with escape key
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
             closeNotificationModal();
         }

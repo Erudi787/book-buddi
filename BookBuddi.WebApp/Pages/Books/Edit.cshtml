@@ -5,104 +5,445 @@
     var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
 }
 
-<h1>Edit Book</h1>
+<link rel="stylesheet" href="~/css/books-edit.css" />
 
-@if (!isAdmin)
-{
-    <p style="color: red;">Admin access required.</p>
-    <p><a href="/Account/Login">Login as Admin</a></p>
-}
-else
-{
-    <form method="post" style="max-width: 800px;">
-        <input type="hidden" asp-for="Book.BookId" />
-        <input type="hidden" asp-for="Book.CreatedBy" />
-        <input type="hidden" asp-for="Book.CreatedTime" />
+<div class="page-wrapper">
+    @await Html.PartialAsync("_AdminNavigation")
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Title: *</label><br/>
-            <input type="text" asp-for="Book.BookTitle" required style="width: 100%; padding: 8px;" />
+    <div class="content-wrapper">
+        <div class="page-header">
+            <div class="header-content">
+                <h1><i class="fas fa-edit"></i> Edit Book</h1>
+                <p>Update book information and maintain your library catalog</p>
+            </div>
         </div>
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">ISBN: *</label><br/>
-            <input type="text" asp-for="Book.ISBN" required style="width: 100%; padding: 8px;" />
-        </div>
+        @if (!isAdmin)
+        {
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Admin access required.</strong>
+                <p><a href="/Account/Login">Login as Admin</a></p>
+            </div>
+        }
+        else
+        {
+            <div class="form-container">
+                <h2 class="form-title">Book Information</h2>
+                <form method="post" id="editBookForm" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Book.BookId" />
+                    <input type="hidden" asp-for="Book.CreatedBy" />
+                    <input type="hidden" asp-for="Book.CreatedTime" />
+                    <input type="hidden" asp-for="Book.CoverImageUrl" id="currentCoverUrl" />
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Publisher:</label><br/>
-            <input type="text" asp-for="Book.Publisher" style="width: 100%; padding: 8px;" />
-        </div>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="form-label">
+                                <i class="fas fa-heading"></i>Book Title <span class="required">*</span>
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-book input-icon"></i>
+                                <input type="text" asp-for="Book.BookTitle" class="form-control" required
+                                       placeholder="Enter the complete book title" maxlength="200" />
+                            </div>
+                        </div>
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Publication Date:</label><br/>
-            <input type="date" asp-for="Book.PublicationDate" style="padding: 8px;" />
-        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-barcode"></i>ISBN <span class="required">*</span>
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-hashtag input-icon"></i>
+                                <input type="text" asp-for="Book.ISBN" class="form-control" required
+                                       placeholder="e.g., 978-0123456789" />
+                            </div>
+                        </div>
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Description:</label><br/>
-            <textarea asp-for="Book.Description" rows="4" style="width: 100%; padding: 8px;"></textarea>
-        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-building"></i>Publisher
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-print input-icon"></i>
+                                <input type="text" asp-for="Book.Publisher" class="form-control"
+                                       placeholder="Publisher name" maxlength="100" />
+                            </div>
+                        </div>
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Page Count:</label><br/>
-            <input type="number" asp-for="Book.PageCount" style="padding: 8px;" min="0" />
-        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-alt"></i>Publication Date
+                            </label>
+                            <input type="date" asp-for="Book.PublicationDate" class="form-control"
+                                   max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Available Copies: *</label><br/>
-            <input type="number" asp-for="Book.AvailableCopies" required style="padding: 8px;" min="0" />
-        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-file-alt"></i>Page Count
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-sort-numeric-up input-icon"></i>
+                                <input type="number" asp-for="Book.PageCount" class="form-control"
+                                       placeholder="Number of pages" min="1" max="5000" />
+                            </div>
+                        </div>
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Category: *</label><br/>
-            <select asp-for="Book.CategoryId" required style="width: 100%; padding: 8px;">
-                <option value="">-- Select Category --</option>
-                @foreach (var category in Model.Categories)
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-copy"></i>Available Copies <span class="required">*</span>
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-sort-numeric-up input-icon"></i>
+                                <input type="number" asp-for="Book.AvailableCopies" class="form-control"
+                                       required placeholder="Number of available copies" min="0" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tags"></i>Category <span class="required">*</span>
+                            </label>
+                            <select asp-for="Book.CategoryId" class="form-control" required>
+                                <option value="">-- Select Category --</option>
+                                @foreach (var category in Model.Categories)
+                                {
+                                    <option value="@category.CategoryId">@category.CategoryName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-layer-group"></i>Genre <span class="required">*</span>
+                            </label>
+                            <select asp-for="Book.GenreId" class="form-control" required>
+                                <option value="">-- Select Genre --</option>
+                                @foreach (var genre in Model.Genres)
+                                {
+                                    <option value="@genre.GenreId">@genre.GenreName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-info-circle"></i>Status
+                            </label>
+                            <select asp-for="Book.Status" class="form-control">
+                                <option value="0">Available</option>
+                                <option value="1">Borrowed</option>
+                                <option value="2">Reserved</option>
+                                <option value="3">Lost</option>
+                                <option value="4">Damaged</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label class="form-label">
+                                <i class="fas fa-image"></i>Book Cover Image
+                            </label>
+
+                            @if (!string.IsNullOrEmpty(Model.Book.CoverImageUrl))
+                            {
+                                <div class="current-cover-container" id="currentCoverContainer">
+                                    <label class="current-cover-label">Current Cover:</label>
+                                    <img src="@Model.Book.CoverImageUrl" alt="Current book cover" class="current-cover-image" />
+                                    <button type="button" class="btn-change-cover" id="changeCoverBtn">
+                                        <i class="fas fa-exchange-alt"></i> Change Cover
+                                    </button>
+                                </div>
+                            }
+
+                            <div class="file-upload-container" id="uploadContainer" style="@(string.IsNullOrEmpty(Model.Book.CoverImageUrl) ? "" : "display: none;")">
+                                <input type="file" asp-for="CoverImageFile" class="form-control file-input"
+                                       accept=".jpg,.jpeg,.png,.webp" id="coverImageInput" />
+                                <div class="file-upload-info">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Choose a new cover image or drag and drop</span>
+                                    <small>Accepted: JPG, PNG, WEBP (Max 5MB)</small>
+                                </div>
+                            </div>
+                            <div id="imagePreview" class="image-preview" style="display: none;">
+                                <img id="previewImage" src="" alt="Cover preview" />
+                                <button type="button" class="remove-image" id="removeImageBtn">
+                                    <i class="fas fa-times"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label class="form-label">
+                                <i class="fas fa-align-left"></i>Description
+                            </label>
+                            <textarea asp-for="Book.Description" class="form-control" rows="4"
+                                      placeholder="Enter a brief description of the book..." maxlength="500"></textarea>
+                        </div>
+
+                        <div class="form-group full-width metadata">
+                            <i class="fas fa-info-circle"></i>
+                            Created by <strong>@Model.Book.CreatedBy</strong> on
+                            <strong>@Model.Book.CreatedTime.ToString("MMM dd, yyyy hh:mm tt")</strong>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Book
+                        </button>
+                        <a href="/Books/Delete?id=@Model.Book.BookId" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> Delete Book
+                        </a>
+                        <a href="/Books/Index" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <a href="/Admin/Index" class="btn btn-outline">
+                            <i class="fas fa-tachometer-alt"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
                 {
-                    <option value="@category.CategoryId">@category.CategoryName</option>
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Error:</strong> @Model.ErrorMessage
+                    </div>
                 }
-            </select>
-        </div>
+            </div>
+        }
+    </div>
+</div>
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Genre: *</label><br/>
-            <select asp-for="Book.GenreId" required style="width: 100%; padding: 8px;">
-                <option value="">-- Select Genre --</option>
-                @foreach (var genre in Model.Genres)
-                {
-                    <option value="@genre.GenreId">@genre.GenreName</option>
+@section Scripts {
+    <style>
+        .file-upload-container {
+            position: relative;
+            border: 2px dashed #8B4049;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-container:hover {
+            border-color: #6d3139;
+            background-color: #fff5f5;
+        }
+
+        .file-upload-container.drag-over {
+            border-color: #d4a574;
+            background-color: #fffbf5;
+        }
+
+        .file-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-info {
+            pointer-events: none;
+        }
+
+        .file-upload-info i {
+            font-size: 2rem;
+            color: #8B4049;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .file-upload-info span {
+            display: block;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .file-upload-info small {
+            display: block;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .current-cover-container {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .current-cover-label {
+            display: block;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .current-cover-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-change-cover {
+            background: #8B4049;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .btn-change-cover:hover {
+            background: #6d3139;
+        }
+
+        .image-preview {
+            margin-top: 15px;
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: white;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.3s ease;
+        }
+
+        .remove-image:hover {
+            background: #c82333;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Image upload preview
+            const coverImageInput = document.getElementById('coverImageInput');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewImage = document.getElementById('previewImage');
+            const removeImageBtn = document.getElementById('removeImageBtn');
+            const uploadContainer = document.getElementById('uploadContainer');
+            const currentCoverContainer = document.getElementById('currentCoverContainer');
+            const changeCoverBtn = document.getElementById('changeCoverBtn');
+            const currentCoverUrl = document.getElementById('currentCoverUrl');
+
+            // Change cover button
+            if (changeCoverBtn) {
+                changeCoverBtn.addEventListener('click', function() {
+                    if (currentCoverContainer) {
+                        currentCoverContainer.style.display = 'none';
+                    }
+                    if (uploadContainer) {
+                        uploadContainer.style.display = 'block';
+                    }
+                });
+            }
+
+            if (coverImageInput) {
+                coverImageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Validate file size (5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('File size must be less than 5MB');
+                            coverImageInput.value = '';
+                            return;
+                        }
+
+                        // Validate file type
+                        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+                        if (!allowedTypes.includes(file.type)) {
+                            alert('Only JPG, PNG, and WEBP images are allowed');
+                            coverImageInput.value = '';
+                            return;
+                        }
+
+                        // Show preview
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            previewImage.src = e.target.result;
+                            imagePreview.style.display = 'block';
+                            if (uploadContainer) {
+                                uploadContainer.style.display = 'none';
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // Remove image
+                if (removeImageBtn) {
+                    removeImageBtn.addEventListener('click', function() {
+                        coverImageInput.value = '';
+                        imagePreview.style.display = 'none';
+
+                        // Show upload container or current cover
+                        if (currentCoverUrl && currentCoverUrl.value) {
+                            if (currentCoverContainer) {
+                                currentCoverContainer.style.display = 'block';
+                            }
+                        } else {
+                            if (uploadContainer) {
+                                uploadContainer.style.display = 'block';
+                            }
+                        }
+                    });
                 }
-            </select>
-        </div>
 
-        <div style="margin-bottom: 15px;">
-            <label style="font-weight: bold;">Status:</label><br/>
-            <select asp-for="Book.Status" style="width: 100%; padding: 8px;">
-                <option value="0">Available</option>
-                <option value="1">Borrowed</option>
-                <option value="2">Reserved</option>
-                <option value="3">Lost</option>
-                <option value="4">Damaged</option>
-            </select>
-        </div>
+                // Drag and drop
+                if (uploadContainer) {
+                    uploadContainer.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        this.classList.add('drag-over');
+                    });
 
-        <div style="margin-bottom: 15px;">
-            <p style="color: #666; font-size: 14px;">
-                Created by: <strong>@Model.Book.CreatedBy</strong> on @Model.Book.CreatedTime.ToString("MMM dd, yyyy hh:mm tt")
-            </p>
-        </div>
+                    uploadContainer.addEventListener('dragleave', function(e) {
+                        e.preventDefault();
+                        this.classList.remove('drag-over');
+                    });
 
-        <div>
-            <button type="submit" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Update Book</button>
-            <a href="/Books/Index" style="margin-left: 10px; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px;">Cancel</a>
-        </div>
-    </form>
-
-    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-    {
-        <div style="margin-top: 20px; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px;">
-            @Model.ErrorMessage
-        </div>
-    }
+                    uploadContainer.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        this.classList.remove('drag-over');
+                        const files = e.dataTransfer.files;
+                        if (files.length > 0) {
+                            coverImageInput.files = files;
+                            coverImageInput.dispatchEvent(new Event('change'));
+                        }
+                    });
+                }
+            }
+        });
+    </script>
 }

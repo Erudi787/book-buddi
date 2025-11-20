@@ -892,33 +892,137 @@
     }
 
     .search-bar {
-        display: flex;
-        gap: 10px;
         background: white;
-        padding: 10px;
+        padding: 15px;
         border-radius: 30px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    .search-bar input {
-        flex: 1;
-        border: none;
+    .search-filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .search-input {
+        flex: 2;
+        min-width: 250px;
+        border: 2px solid #e0e0e0;
         padding: 12px 20px;
         font-size: 1rem;
         border-radius: 20px;
+        transition: all 0.3s ease;
     }
 
-    .search-bar input:focus {
+    .search-input:focus {
         outline: none;
+        border-color: #8B4049;
+        box-shadow: 0 0 0 3px rgba(139, 64, 73, 0.1);
     }
 
-    .search-bar button {
-        background: #FBDB93;
+    .search-select {
+        flex: 1;
+        min-width: 150px;
+        border: 2px solid #e0e0e0;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        border-radius: 20px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238B4049' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        padding-right: 40px;
+    }
+
+    .search-select:focus {
+        outline: none;
+        border-color: #8B4049;
+        box-shadow: 0 0 0 3px rgba(139, 64, 73, 0.1);
+    }
+
+    .search-button {
+        background: linear-gradient(135deg, #8B4049 0%, #6d3139 100%);
+        color: white;
         border: none;
         padding: 12px 30px;
         border-radius: 20px;
         cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .search-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 64, 73, 0.3);
+    }
+
+    .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .filter-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, rgba(139, 64, 73, 0.1) 0%, rgba(251, 219, 147, 0.2) 100%);
+        border: 2px solid #FBDB93;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        color: #6d3139;
         font-weight: 500;
+    }
+
+    .filter-tag i {
+        color: #8B4049;
+        font-size: 0.85rem;
+    }
+
+    .remove-filter {
+        color: #8B4049;
+        text-decoration: none;
+        font-size: 1.3rem;
+        line-height: 1;
+        margin-left: 4px;
+        font-weight: bold;
+        transition: color 0.2s ease;
+    }
+
+    .remove-filter:hover {
+        color: #6d3139;
+    }
+
+    .clear-all-filters {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #dc3545;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .clear-all-filters:hover {
+        background: #c82333;
+        color: white;
+        transform: translateY(-1px);
     }
 
     .nav-tabs {
@@ -967,6 +1071,10 @@
         margin-bottom: 30px;
     }
 
+    .book-card-wrapper {
+        position: relative;
+    }
+
     .book-card {
         cursor: pointer;
         transition: all 0.3s ease;
@@ -974,11 +1082,63 @@
         border-radius: 12px;
         padding: 12px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        display: block;
     }
 
     .book-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 12px 24px rgba(139, 64, 73, 0.15);
+    }
+
+    .book-actions {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: flex;
+        gap: 6px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 10;
+    }
+
+    .book-card-wrapper:hover .book-actions {
+        opacity: 1;
+    }
+
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-edit {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #45a049;
+        transform: scale(1.1);
+    }
+
+    .btn-delete {
+        background: #f44336;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #da190b;
+        transform: scale(1.1);
+    }
+
+    .btn-action i {
+        font-size: 14px;
     }
 
     .book-cover {
@@ -1068,13 +1228,55 @@
         padding-left: 8px;
         font-weight: 500;
     }
+
+    /* Responsive Design for Search Filters */
+    @@media (max-width: 768px) {
+        .search-section {
+            padding: 0 20px;
+        }
+
+        .search-filters {
+            flex-direction: column;
+        }
+
+        .search-input,
+        .search-select,
+        .search-button {
+            width: 100%;
+            min-width: 100%;
+        }
+
+        .active-filters {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-tag {
+            justify-content: space-between;
+        }
+
+        .clear-all-filters {
+            justify-content: center;
+        }
+    }
 </style>
 
 <div class="top-nav">
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <img src="/assets/logo.svg" alt="BookBuddi Logo" width="30" height="30" />
-        <strong>Book Buddi</strong>
-    </div>
+    @if (userRole == "Admin")
+    {
+        <a href="/" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
+            <img src="/assets/logo.svg" alt="BookBuddi Logo" width="30" height="30" />
+            <strong>Book Buddi</strong>
+        </a>
+    }
+    else if (userRole == "Member")
+    {
+        <a href="/Books/Index"
+            style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
+            <img src="/assets/logo.svg" alt="BookBuddi Logo" width="30" height="30" />
+            <strong>Book Buddi</strong>
+        </a>
+    }
     <div class="nav-right">
         @if (userRole == "Member")
         {
@@ -1185,14 +1387,11 @@
                 <span>@userName</span>
             </div>
         }
-        @if (userRole == "Member")
-        {
-            <a href="/Account/Logout" class="btn-my-books">Logout</a>
-        }
-        else if (userRole == "Admin")
+        @if (userRole == "Admin")
         {
             <a href="/Admin/Index" class="btn-my-books">Admin Panel</a>
         }
+        <a href="/Account/Logout" class="btn-my-books">Logout</a>
     </div>
 </div>
 
@@ -1227,9 +1426,81 @@
 
 <div class="search-section">
     <form method="get" class="search-bar">
-        <input type="text" name="searchTerm" placeholder="Search for books, authors, or subjects..."
-            value="@Model.SearchTerm" />
-        <button type="submit">Search</button>
+        <div class="search-filters">
+            <input type="text" name="searchTerm"
+                placeholder="Search books, authors, genres, categories, descriptions..." value="@Model.SearchTerm"
+                class="search-input" />
+
+            <select name="categoryId" class="search-select">
+                <option value="">All Categories</option>
+                @foreach (var category in Model.Categories)
+                {
+                    @if (Model.CategoryId == category.CategoryId)
+                    {
+                        <option value="@category.CategoryId" selected="selected">@category.CategoryName</option>
+                    }
+                    else
+                    {
+                        <option value="@category.CategoryId">@category.CategoryName</option>
+                    }
+                }
+            </select>
+
+            <select name="genreId" class="search-select">
+                <option value="">All Genres</option>
+                @foreach (var genre in Model.Genres)
+                {
+                    @if (Model.GenreId == genre.GenreId)
+                    {
+                        <option value="@genre.GenreId" selected="selected">@genre.GenreName</option>
+                    }
+                    else
+                    {
+                        <option value="@genre.GenreId">@genre.GenreName</option>
+                    }
+                }
+            </select>
+
+            <button type="submit" class="search-button">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.SearchTerm) || Model.CategoryId.HasValue || Model.GenreId.HasValue)
+        {
+            <div class="active-filters">
+                @if (!string.IsNullOrEmpty(Model.SearchTerm))
+                {
+                    <span class="filter-tag">
+                        <i class="fas fa-search"></i> "@Model.SearchTerm"
+                        <a href="?@(Model.CategoryId.HasValue ? $"categoryId={Model.CategoryId}" : "")@(Model.GenreId.HasValue ? $"&genreId={Model.GenreId}" : "")"
+                            class="remove-filter">×</a>
+                    </span>
+                }
+                @if (Model.CategoryId.HasValue)
+                {
+                    var categoryName = Model.Categories.FirstOrDefault(c => c.CategoryId ==
+                    Model.CategoryId.Value)?.CategoryName;
+                    <span class="filter-tag">
+                        <i class="fas fa-folder"></i> @categoryName
+                        <a href="?searchTerm=@Model.SearchTerm@(Model.GenreId.HasValue ? $"&genreId={Model.GenreId}" : "")"
+                            class="remove-filter">×</a>
+                    </span>
+                }
+                @if (Model.GenreId.HasValue)
+                {
+                    var genreName = Model.Genres.FirstOrDefault(g => g.GenreId == Model.GenreId.Value)?.GenreName;
+                    <span class="filter-tag">
+                        <i class="fas fa-tag"></i> @genreName
+                        <a href="?searchTerm=@Model.SearchTerm@(Model.CategoryId.HasValue ? $"&categoryId={Model.CategoryId}" : "")"
+                            class="remove-filter">×</a>
+                    </span>
+                }
+                <a href="/Books/Index" class="clear-all-filters">
+                    <i class="fas fa-times-circle"></i> Clear All
+                </a>
+            </div>
+        }
     </form>
 </div>
 
@@ -1247,16 +1518,29 @@
         <div class="book-grid">
             @foreach (var book in Model.Books.Take(6))
             {
-                <a href="/Books/Details?id=@book.BookId" class="book-card" style="text-decoration: none;">
-                    <div class="book-cover">
-                        @if (!string.IsNullOrEmpty(book.CoverImageUrl))
-                        {
-                            <img src="@book.CoverImageUrl" alt="@book.BookTitle" />
-                        }
-                    </div>
-                    <div class="book-title">@book.BookTitle</div>
-                    <div class="book-author">@(book.AuthorNames ?? "Unknown")</div>
-                </a>
+                <div class="book-card-wrapper">
+                    <a href="/Books/Details?id=@book.BookId" class="book-card" style="text-decoration: none;">
+                        <div class="book-cover">
+                            @if (!string.IsNullOrEmpty(book.CoverImageUrl))
+                            {
+                                <img src="@book.CoverImageUrl" alt="@book.BookTitle" />
+                            }
+                        </div>
+                        <div class="book-title">@book.BookTitle</div>
+                        <div class="book-author">@(book.AuthorNames ?? "Unknown")</div>
+                    </a>
+                    @if (userRole == "Admin")
+                    {
+                        <div class="book-actions">
+                            <a href="/Books/Edit?id=@book.BookId" class="btn-action btn-edit" title="Edit Book">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="/Books/Delete?id=@book.BookId" class="btn-action btn-delete" title="Delete Book">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    }
+                </div>
             }
         </div>
     </div>
@@ -1266,16 +1550,29 @@
         <div class="book-grid">
             @foreach (var book in Model.Books.Skip(6).Take(6))
             {
-                <a href="/Books/Details?id=@book.BookId" class="book-card" style="text-decoration: none;">
-                    <div class="book-cover">
-                        @if (!string.IsNullOrEmpty(book.CoverImageUrl))
-                        {
-                            <img src="@book.CoverImageUrl" alt="@book.BookTitle" />
-                        }
-                    </div>
-                    <div class="book-title">@book.BookTitle</div>
-                    <div class="book-author">@(book.AuthorNames ?? "Unknown")</div>
-                </a>
+                <div class="book-card-wrapper">
+                    <a href="/Books/Details?id=@book.BookId" class="book-card" style="text-decoration: none;">
+                        <div class="book-cover">
+                            @if (!string.IsNullOrEmpty(book.CoverImageUrl))
+                            {
+                                <img src="@book.CoverImageUrl" alt="@book.BookTitle" />
+                            }
+                        </div>
+                        <div class="book-title">@book.BookTitle</div>
+                        <div class="book-author">@(book.AuthorNames ?? "Unknown")</div>
+                    </a>
+                    @if (userRole == "Admin")
+                    {
+                        <div class="book-actions">
+                            <a href="/Books/Edit?id=@book.BookId" class="btn-action btn-edit" title="Edit Book">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="/Books/Delete?id=@book.BookId" class="btn-action btn-delete" title="Delete Book">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    }
+                </div>
             }
         </div>
     </div>
@@ -1287,16 +1584,29 @@ else if (Model.Filter == "new")
         <div class="book-grid">
             @foreach (var book in Model.Books)
             {
-                <a href="/Books/Details?id=@book.BookId" class="book-card" style="text-decoration: none;">
-                    <div class="book-cover">
-                        @if (!string.IsNullOrEmpty(book.CoverImageUrl))
-                        {
-                            <img src="@book.CoverImageUrl" alt="@book.BookTitle" />
-                        }
-                    </div>
-                    <div class="book-title">@book.BookTitle</div>
-                    <div class="book-author">@(book.AuthorNames ?? "Unknown")</div>
-                </a>
+                <div class="book-card-wrapper">
+                    <a href="/Books/Details?id=@book.BookId" class="book-card" style="text-decoration: none;">
+                        <div class="book-cover">
+                            @if (!string.IsNullOrEmpty(book.CoverImageUrl))
+                            {
+                                <img src="@book.CoverImageUrl" alt="@book.BookTitle" />
+                            }
+                        </div>
+                        <div class="book-title">@book.BookTitle</div>
+                        <div class="book-author">@(book.AuthorNames ?? "Unknown")</div>
+                    </a>
+                    @if (userRole == "Admin")
+                    {
+                        <div class="book-actions">
+                            <a href="/Books/Edit?id=@book.BookId" class="btn-action btn-edit" title="Edit Book">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="/Books/Delete?id=@book.BookId" class="btn-action btn-delete" title="Delete Book">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    }
+                </div>
             }
         </div>
     </div>
@@ -1308,16 +1618,29 @@ else if (Model.Filter == "popular")
         <div class="book-grid">
             @foreach (var book in Model.Books)
             {
-                <a href="/Books/Details?id=@book.BookId" class="book-card" style="text-decoration: none;">
-                    <div class="book-cover">
-                        @if (!string.IsNullOrEmpty(book.CoverImageUrl))
-                        {
-                            <img src="@book.CoverImageUrl" alt="@book.BookTitle" />
-                        }
-                    </div>
-                    <div class="book-title">@book.BookTitle</div>
-                    <div class="book-author">@(book.AuthorNames ?? "Unknown")</div>
-                </a>
+                <div class="book-card-wrapper">
+                    <a href="/Books/Details?id=@book.BookId" class="book-card" style="text-decoration: none;">
+                        <div class="book-cover">
+                            @if (!string.IsNullOrEmpty(book.CoverImageUrl))
+                            {
+                                <img src="@book.CoverImageUrl" alt="@book.BookTitle" />
+                            }
+                        </div>
+                        <div class="book-title">@book.BookTitle</div>
+                        <div class="book-author">@(book.AuthorNames ?? "Unknown")</div>
+                    </a>
+                    @if (userRole == "Admin")
+                    {
+                        <div class="book-actions">
+                            <a href="/Books/Edit?id=@book.BookId" class="btn-action btn-edit" title="Edit Book">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="/Books/Delete?id=@book.BookId" class="btn-action btn-delete" title="Delete Book">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    }
+                </div>
             }
         </div>
     </div>
@@ -1495,4 +1818,62 @@ else if (Model.Filter == "popular")
             closeNotificationModal();
         }
     });
+
+    // Real-time search functionality
+    let searchTimeout;
+    const searchInput = document.querySelector('input[name="searchTerm"]');
+    const categorySelect = document.querySelector('select[name="categoryId"]');
+    const genreSelect = document.querySelector('select[name="genreId"]');
+
+    function performSearch() {
+        const searchTerm = searchInput ? searchInput.value.trim() : '';
+        const categoryId = categorySelect ? categorySelect.value : '';
+        const genreId = genreSelect ? genreSelect.value : '';
+
+        // Build query string
+        const params = new URLSearchParams();
+        if (searchTerm) params.append('searchTerm', searchTerm);
+        if (categoryId) params.append('categoryId', categoryId);
+        if (genreId) params.append('genreId', genreId);
+
+        // Redirect to search results
+        const queryString = params.toString();
+        if (queryString) {
+            window.location.href = `/Books/Index?${queryString}`;
+        } else {
+            window.location.href = '/Books/Index';
+        }
+    }
+
+    // Add event listeners for real-time search on text input
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(performSearch, 500); // 500ms delay
+        });
+
+        // Also trigger on Enter key
+        searchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                clearTimeout(searchTimeout);
+                performSearch();
+            }
+        });
+    }
+
+    // Add event listeners for dropdowns (immediate search on change)
+    if (categorySelect) {
+        categorySelect.addEventListener('change', function () {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(performSearch, 300);
+        });
+    }
+
+    if (genreSelect) {
+        genreSelect.addEventListener('change', function () {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(performSearch, 300);
+        });
+    }
 </script>

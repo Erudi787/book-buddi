@@ -7,7 +7,10 @@
 }
 <link rel="stylesheet" href="~/css/authors-index.css" />
 
-<div class="page-container">
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
+
+    <div class="page-container" style="flex: 1;">
     <div class="page-header">
         <div class="header-content">
             <h1>Authors Management</h1>
@@ -113,4 +116,5 @@
             }
         </div>
     }
+    </div>
 </div>

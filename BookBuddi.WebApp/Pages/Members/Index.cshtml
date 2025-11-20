@@ -6,7 +6,10 @@
 
 <link rel="stylesheet" href="~/css/member-index.css" />
 
-<div class="members-container">
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
+
+    <div class="members-container" style="flex: 1;">
     <div class="page-header">
         <h1>Members Management</h1>
         <p>Manage library members and their accounts</p>
@@ -56,7 +59,6 @@
         <table class="members-table">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
@@ -70,7 +72,6 @@
                 @foreach (var member in Model.Members.Items)
                 {
                     <tr>
-                        <td data-label="ID">@member.MemberId</td>
                         <td data-label="Name">@member.FirstName @member.LastName</td>
                         <td data-label="Email">@member.Email</td>
                         <td data-label="Phone">@member.Phone</td>
@@ -145,5 +146,6 @@
             <span class="material-icons">arrow_back</span>
             Back to Home
         </a>
+    </div>
     </div>
 </div>

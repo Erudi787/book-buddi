@@ -208,14 +208,13 @@
     }
 
     /* Column widths */
-    .members-table th:nth-child(1), .members-table td:nth-child(1) { width: 80px; } /* ID */
-    .members-table th:nth-child(2), .members-table td:nth-child(2) { width: 180px; } /* Name */
-    .members-table th:nth-child(3), .members-table td:nth-child(3) { width: 200px; } /* Email */
-    .members-table th:nth-child(4), .members-table td:nth-child(4) { width: 120px; } /* Phone */
-    .members-table th:nth-child(5), .members-table td:nth-child(5) { width: 100px; } /* Status */
-    .members-table th:nth-child(6), .members-table td:nth-child(6) { width: 80px; } /* Borrowed */
-    .members-table th:nth-child(7), .members-table td:nth-child(7) { width: 80px; } /* Limit */
-    .members-table th:nth-child(8), .members-table td:nth-child(8) { width: 160px; } /* Actions */
+    .members-table th:nth-child(1), .members-table td:nth-child(1) { width: 200px; } /* Name */
+    .members-table th:nth-child(2), .members-table td:nth-child(2) { width: 250px; } /* Email */
+    .members-table th:nth-child(3), .members-table td:nth-child(3) { width: 120px; } /* Phone */
+    .members-table th:nth-child(4), .members-table td:nth-child(4) { width: 100px; } /* Status */
+    .members-table th:nth-child(5), .members-table td:nth-child(5) { width: 80px; } /* Borrowed */
+    .members-table th:nth-child(6), .members-table td:nth-child(6) { width: 80px; } /* Limit */
+    .members-table th:nth-child(7), .members-table td:nth-child(7) { width: 160px; } /* Actions */
 
     /* ------------------- STATUS BADGES ------------------- */
     .status-badge {

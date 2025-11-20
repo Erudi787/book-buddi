@@ -6,7 +6,10 @@
 }
 <link rel="stylesheet" href="~/css/genres-edit.css" />
 
-<div class="page-container">
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
+
+    <div class="page-container" style="flex: 1;">
     <div class="page-header">
         <h1>Edit Genre</h1>
         <p>Update the details of this genre to keep your library catalog organized and up-to-date.</p>
@@ -140,6 +143,7 @@
             </div>
         </div>
     }
+    </div>
 </div>
 
 @section Scripts {

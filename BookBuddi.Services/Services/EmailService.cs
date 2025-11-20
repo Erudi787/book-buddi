@@ -214,11 +214,13 @@ namespace BookBuddi.Services.Services
     <style>
         body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
         .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-        .header {{ background-color: #4CAF50; color: white; padding: 20px; text-align: center; }}
+        .header {{ background: linear-gradient(135deg, #641B2E 0%, #8B4049 100%); color: white; padding: 20px; text-align: center; }}
+        .logo {{ font-size: 28px; font-weight: bold; color: #FBDB93; margin-bottom: 10px; }}
+        .logo-icon {{ font-size: 32px; }}
         .content {{ background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }}
-        .code-box {{ background-color: #fff; border: 3px dashed #4CAF50; padding: 20px; text-align: center; margin: 30px 0; border-radius: 10px; }}
-        .code {{ font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #4CAF50; font-family: 'Courier New', monospace; }}
-        .button {{ display: inline-block; padding: 12px 30px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }}
+        .code-box {{ background-color: #fff; border: 3px dashed #FBDB93; padding: 20px; text-align: center; margin: 30px 0; border-radius: 10px; }}
+        .code {{ font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #8B4049; font-family: 'Courier New', monospace; }}
+        .button {{ display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #641B2E 0%, #8B4049 100%); color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }}
         .divider {{ text-align: center; margin: 30px 0; color: #999; }}
         .footer {{ text-align: center; margin-top: 30px; font-size: 12px; color: #666; }}
     </style>
@@ -226,6 +228,9 @@ namespace BookBuddi.Services.Services
 <body>
     <div class='container'>
         <div class='header'>
+            <div class='logo'>
+                <span class='logo-icon'>📚</span> BookBuddi
+            </div>
             <h1>Welcome to BookBuddi Library!</h1>
         </div>
         <div class='content'>
@@ -268,15 +273,20 @@ namespace BookBuddi.Services.Services
     <style>
         body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
         .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-        .header {{ background-color: #FF9800; color: white; padding: 20px; text-align: center; }}
+        .header {{ background: linear-gradient(135deg, #641B2E 0%, #8B4049 100%); color: white; padding: 20px; text-align: center; }}
+        .logo {{ font-size: 28px; font-weight: bold; color: #FBDB93; margin-bottom: 10px; }}
+        .logo-icon {{ font-size: 32px; }}
         .content {{ background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }}
-        .button {{ display: inline-block; padding: 12px 30px; background-color: #FF9800; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }}
+        .button {{ display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #641B2E 0%, #8B4049 100%); color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }}
         .footer {{ text-align: center; margin-top: 30px; font-size: 12px; color: #666; }}
     </style>
 </head>
 <body>
     <div class='container'>
         <div class='header'>
+            <div class='logo'>
+                <span class='logo-icon'>📚</span> BookBuddi
+            </div>
             <h1>Password Reset Request</h1>
         </div>
         <div class='content'>
@@ -308,15 +318,20 @@ namespace BookBuddi.Services.Services
     <style>
         body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
         .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-        .header {{ background-color: #2196F3; color: white; padding: 20px; text-align: center; }}
+        .header {{ background: linear-gradient(135deg, #641B2E 0%, #8B4049 100%); color: white; padding: 20px; text-align: center; }}
+        .logo {{ font-size: 28px; font-weight: bold; color: #FBDB93; margin-bottom: 10px; }}
+        .logo-icon {{ font-size: 32px; }}
         .content {{ background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }}
-        .book-info {{ background-color: white; padding: 15px; border-left: 4px solid #2196F3; margin: 20px 0; }}
+        .book-info {{ background-color: white; padding: 15px; border-left: 4px solid #FBDB93; margin: 20px 0; }}
         .footer {{ text-align: center; margin-top: 30px; font-size: 12px; color: #666; }}
     </style>
 </head>
 <body>
     <div class='container'>
         <div class='header'>
+            <div class='logo'>
+                <span class='logo-icon'>📚</span> BookBuddi
+            </div>
             <h1>Book Due Reminder</h1>
         </div>
         <div class='content'>
@@ -347,7 +362,9 @@ namespace BookBuddi.Services.Services
     <style>
         body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
         .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-        .header {{ background-color: #F44336; color: white; padding: 20px; text-align: center; }}
+        .header {{ background: linear-gradient(135deg, #641B2E 0%, #8B4049 100%); color: white; padding: 20px; text-align: center; }}
+        .logo {{ font-size: 28px; font-weight: bold; color: #FBDB93; margin-bottom: 10px; }}
+        .logo-icon {{ font-size: 32px; }}
         .content {{ background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }}
         .book-info {{ background-color: #ffebee; padding: 15px; border-left: 4px solid #F44336; margin: 20px 0; }}
         .footer {{ text-align: center; margin-top: 30px; font-size: 12px; color: #666; }}
@@ -356,6 +373,9 @@ namespace BookBuddi.Services.Services
 <body>
     <div class='container'>
         <div class='header'>
+            <div class='logo'>
+                <span class='logo-icon'>📚</span> BookBuddi
+            </div>
             <h1>⚠️ Overdue Book Alert</h1>
         </div>
         <div class='content'>
@@ -386,15 +406,20 @@ namespace BookBuddi.Services.Services
     <style>
         body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
         .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-        .header {{ background-color: #FF5722; color: white; padding: 20px; text-align: center; }}
+        .header {{ background: linear-gradient(135deg, #641B2E 0%, #8B4049 100%); color: white; padding: 20px; text-align: center; }}
+        .logo {{ font-size: 28px; font-weight: bold; color: #FBDB93; margin-bottom: 10px; }}
+        .logo-icon {{ font-size: 32px; }}
         .content {{ background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }}
-        .fine-info {{ background-color: #fff3e0; padding: 15px; border-left: 4px solid #FF5722; margin: 20px 0; }}
+        .fine-info {{ background-color: #FFF9F0; padding: 15px; border-left: 4px solid #FBDB93; margin: 20px 0; }}
         .footer {{ text-align: center; margin-top: 30px; font-size: 12px; color: #666; }}
     </style>
 </head>
 <body>
     <div class='container'>
         <div class='header'>
+            <div class='logo'>
+                <span class='logo-icon'>📚</span> BookBuddi
+            </div>
             <h1>Fine Issued Notification</h1>
         </div>
         <div class='content'>
@@ -424,15 +449,20 @@ namespace BookBuddi.Services.Services
     <style>
         body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
         .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-        .header {{ background-color: #9C27B0; color: white; padding: 20px; text-align: center; }}
+        .header {{ background: linear-gradient(135deg, #641B2E 0%, #8B4049 100%); color: white; padding: 20px; text-align: center; }}
+        .logo {{ font-size: 28px; font-weight: bold; color: #FBDB93; margin-bottom: 10px; }}
+        .logo-icon {{ font-size: 32px; }}
         .content {{ background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }}
-        .request-info {{ background-color: white; padding: 15px; border-left: 4px solid #9C27B0; margin: 20px 0; }}
+        .request-info {{ background-color: white; padding: 15px; border-left: 4px solid #FBDB93; margin: 20px 0; }}
         .footer {{ text-align: center; margin-top: 30px; font-size: 12px; color: #666; }}
     </style>
 </head>
 <body>
     <div class='container'>
         <div class='header'>
+            <div class='logo'>
+                <span class='logo-icon'>📚</span> BookBuddi
+            </div>
             <h1>Book Request Update</h1>
         </div>
         <div class='content'>
@@ -461,15 +491,20 @@ namespace BookBuddi.Services.Services
     <style>
         body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
         .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-        .header {{ background-color: #FF9800; color: white; padding: 20px; text-align: center; }}
+        .header {{ background: linear-gradient(135deg, #641B2E 0%, #8B4049 100%); color: white; padding: 20px; text-align: center; }}
+        .logo {{ font-size: 28px; font-weight: bold; color: #FBDB93; margin-bottom: 10px; }}
+        .logo-icon {{ font-size: 32px; }}
         .content {{ background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }}
-        .membership-info {{ background-color: white; padding: 15px; border-left: 4px solid #FF9800; margin: 20px 0; }}
+        .membership-info {{ background-color: white; padding: 15px; border-left: 4px solid #FBDB93; margin: 20px 0; }}
         .footer {{ text-align: center; margin-top: 30px; font-size: 12px; color: #666; }}
     </style>
 </head>
 <body>
     <div class='container'>
         <div class='header'>
+            <div class='logo'>
+                <span class='logo-icon'>📚</span> BookBuddi
+            </div>
             <h1>Membership Expiry Reminder</h1>
         </div>
         <div class='content'>
@@ -499,9 +534,9 @@ namespace BookBuddi.Services.Services
     <style>
         body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
         .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-        .header {{ background-color: #4CAF50; color: white; padding: 20px; text-align: center; }}
+        .header {{ background: linear-gradient(135deg, #641B2E 0%, #8B4049 100%); color: white; padding: 20px; text-align: center; }}
         .content {{ background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }}
-        .book-info {{ background-color: white; padding: 15px; border-left: 4px solid #4CAF50; margin: 20px 0; }}
+        .book-info {{ background-color: white; padding: 15px; border-left: 4px solid #FBDB93; margin: 20px 0; }}
         .footer {{ text-align: center; margin-top: 30px; font-size: 12px; color: #666; }}
     </style>
 </head>
@@ -537,9 +572,9 @@ namespace BookBuddi.Services.Services
     <style>
         body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
         .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-        .header {{ background-color: #2196F3; color: white; padding: 20px; text-align: center; }}
+        .header {{ background: linear-gradient(135deg, #641B2E 0%, #8B4049 100%); color: white; padding: 20px; text-align: center; }}
         .content {{ background-color: #f9f9f9; padding: 30px; border-radius: 5px; margin-top: 20px; }}
-        .book-info {{ background-color: white; padding: 15px; border-left: 4px solid #2196F3; margin: 20px 0; }}
+        .book-info {{ background-color: white; padding: 15px; border-left: 4px solid #FBDB93; margin: 20px 0; }}
         .footer {{ text-align: center; margin-top: 30px; font-size: 12px; color: #666; }}
     </style>
 </head>

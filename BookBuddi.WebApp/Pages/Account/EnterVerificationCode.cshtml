@@ -4,81 +4,355 @@
     ViewData["Title"] = "Enter Verification Code";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Verify Your Email</h3>
+<style>
+    :root {
+        --primary-burgundy: #641B2E;
+        --secondary-burgundy: #8B2E4A;
+        --gold: #FBDB93;
+        --success: #28a745;
+        --danger: #dc3545;
+        --info: #17a2b8;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 20px;
+    }
+
+    .verify-container {
+        width: 100%;
+        max-width: 600px;
+    }
+
+    .logo-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        color: var(--primary-burgundy);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 20px;
+        transition: color 0.3s;
+    }
+
+    .logo-link:hover {
+        color: var(--gold);
+    }
+
+    .verify-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+    }
+
+    .verify-header {
+        background: linear-gradient(135deg, var(--primary-burgundy) 0%, var(--secondary-burgundy) 100%);
+        padding: 30px;
+        text-align: center;
+    }
+
+    .verify-header h3 {
+        color: white;
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .verify-header i {
+        color: var(--gold);
+        font-size: 32px;
+    }
+
+    .verify-body {
+        padding: 40px;
+    }
+
+    .alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        border: 2px solid;
+    }
+
+    .alert i {
+        font-size: 24px;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        border-color: var(--success);
+        color: #155724;
+    }
+
+    .alert-success i {
+        color: var(--success);
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        border-color: var(--danger);
+        color: #721c24;
+    }
+
+    .alert-danger i {
+        color: var(--danger);
+    }
+
+    .alert-info {
+        background: #d1ecf1;
+        border-color: var(--info);
+        color: #0c5460;
+    }
+
+    .alert-info i {
+        color: var(--info);
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-burgundy);
+        box-shadow: 0 0 0 3px rgba(100, 27, 46, 0.1);
+    }
+
+    .form-control:read-only {
+        background: #f5f5f5;
+        color: #666;
+    }
+
+    .verification-input {
+        letter-spacing: 10px;
+        font-size: 24px;
+        font-family: 'Courier New', monospace;
+        text-align: center;
+        padding: 16px;
+    }
+
+    .form-text {
+        display: block;
+        margin-top: 8px;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .text-danger {
+        color: var(--danger);
+        font-size: 13px;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 28px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 16px;
+        width: 100%;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-burgundy) 0%, var(--secondary-burgundy) 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(100, 27, 46, 0.3);
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: #666;
+        border: 2px solid #ddd;
+        font-size: 14px;
+        padding: 10px 20px;
+        width: auto;
+    }
+
+    .btn-outline:hover {
+        background: #f5f5f5;
+        border-color: #ccc;
+    }
+
+    .divider {
+        margin: 30px 0;
+        border: none;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .mb-2 {
+        margin-bottom: 12px;
+    }
+
+    .mb-3 {
+        margin-bottom: 20px;
+    }
+
+    .mt-3 {
+        margin-top: 20px;
+    }
+
+    .text-muted {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .text-muted a {
+        color: var(--primary-burgundy);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .text-muted a:hover {
+        color: var(--secondary-burgundy);
+        text-decoration: underline;
+    }
+
+    @@media (max-width: 768px) {
+        .verify-header h3 {
+            font-size: 22px;
+        }
+
+        .verify-body {
+            padding: 24px;
+        }
+
+        .verification-input {
+            font-size: 20px;
+            letter-spacing: 8px;
+        }
+    }
+</style>
+
+<div class="verify-container">
+    <div class="text-center">
+        <a href="/" class="logo-link">
+            <i class="fas fa-book"></i> BookBuddi
+        </a>
+    </div>
+
+    <div class="verify-card">
+        <div class="verify-header">
+            <h3>
+                <i class="fas fa-envelope-open-text"></i>
+                Verify Your Email
+            </h3>
+        </div>
+        <div class="verify-body">
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Success!</strong><br />
+                        @Model.SuccessMessage
+                    </div>
                 </div>
-                <div class="card-body">
-                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="bi bi-check-circle-fill"></i> @Model.SuccessMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="/Account/Login" class="btn btn-primary">Go to Login</a>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info" role="alert">
-                            <i class="bi bi-envelope-fill"></i> A verification code has been sent to your email address.
-                        </div>
-
-                        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-                        {
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMessage
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        }
-
-                        <form method="post" id="verificationForm">
-                            <div class="mb-3">
-                                <label asp-for="Email" class="form-label">Email Address</label>
-                                <input asp-for="Email" class="form-control" readonly />
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="VerificationCode" class="form-label">Verification Code</label>
-                                <input asp-for="VerificationCode"
-                                       class="form-control form-control-lg text-center"
-                                       style="letter-spacing: 10px; font-size: 24px; font-family: 'Courier New', monospace;"
-                                       maxlength="6"
-                                       placeholder="000000"
-                                       autocomplete="off"
-                                       autofocus />
-                                <span asp-validation-for="VerificationCode" class="text-danger"></span>
-                                <small class="form-text text-muted">Enter the 6-digit code from your email</small>
-                            </div>
-
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="bi bi-check-circle"></i> Verify Email
-                                </button>
-                            </div>
-                        </form>
-
-                        <hr class="my-4">
-
-                        <div class="text-center">
-                            <p class="mb-2">Didn't receive the code?</p>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" id="resendButton">
-                                <i class="bi bi-arrow-clockwise"></i> Resend Code
-                            </button>
-                        </div>
-
-                        <div class="text-center mt-3">
-                            <small class="text-muted">
-                                Having trouble? <a href="/Account/Register">Register again</a> or <a href="/">Return home</a>
-                            </small>
-                        </div>
-                    }
+                <a href="/Account/Login" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Go to Login
+                </a>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-envelope"></i>
+                    <div>
+                        A verification code has been sent to your email address.
+                    </div>
                 </div>
-            </div>
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Error</strong><br />
+                            @Model.ErrorMessage
+                        </div>
+                    </div>
+                }
+
+                <form method="post" id="verificationForm">
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email Address</label>
+                        <input asp-for="Email" class="form-control" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="VerificationCode" class="form-label">Verification Code</label>
+                        <input asp-for="VerificationCode"
+                               class="form-control verification-input"
+                               maxlength="6"
+                               placeholder="000000"
+                               autocomplete="off"
+                               autofocus />
+                        <span asp-validation-for="VerificationCode" class="text-danger"></span>
+                        <small class="form-text">Enter the 6-digit code from your email</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check-circle"></i> Verify Email
+                    </button>
+                </form>
+
+                <hr class="divider">
+
+                <div class="text-center">
+                    <p class="mb-2">Didn't receive the code?</p>
+                    <button type="button" class="btn btn-outline" id="resendButton">
+                        <i class="fas fa-redo"></i> Resend Code
+                    </button>
+                </div>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">
+                        Having trouble? <a href="/Account/Register">Register again</a> or <a href="/">Return home</a>
+                    </small>
+                </div>
+            }
         </div>
     </div>
 </div>

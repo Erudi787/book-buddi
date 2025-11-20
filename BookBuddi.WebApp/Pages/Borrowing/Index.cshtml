@@ -740,10 +740,10 @@
 </style>
 
 <div class="top-nav">
-    <div style="display: flex; align-items: center; gap: 10px;">
+    <a href="/" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
         <img src="/assets/logo.svg" alt="BookBuddi Logo" width="30" height="30" />
         <strong>Book Buddi</strong>
-    </div>
+    </a>
     <div class="nav-right">
         @if (userRole == "Member")
         {
@@ -854,10 +854,11 @@
                 <span>@userName</span>
             </div>
         }
-        @if (userRole == "Member")
+        @if (userRole == "Admin")
         {
-            <a href="/Account/Logout" class="btn-logout">Logout</a>
+            <a href="/Admin/Index" class="btn-logout">Admin Panel</a>
         }
+        <a href="/Account/Logout" class="btn-logout">Logout</a>
     </div>
 </div>
 
@@ -1044,7 +1045,15 @@
                         @if (item.Transaction.Status == BookBuddi.Resources.Constants.TransactionStatus.Active ||
                                         item.Transaction.Status == BookBuddi.Resources.Constants.TransactionStatus.Overdue)
                         {
-                            <a href="/Borrowing/Return?id=@item.Transaction.TransactionId" class="action-btn">Return Book</a>
+                            @* Only show Return Book button for Members, or for Admins viewing their own transactions *@
+                            @if (userRole == "Member" || (userRole == "Admin" && item.Transaction.MemberId == HttpContext.Session.GetInt32("MemberId")))
+                            {
+                                <a href="/Borrowing/Return?id=@item.Transaction.TransactionId" class="action-btn">Return Book</a>
+                            }
+                            else
+                            {
+                                <a href="/Books/Details?id=@item.Transaction.BookId" class="action-btn">View Details</a>
+                            }
                         }
                         else
                         {

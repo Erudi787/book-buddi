@@ -44,6 +44,17 @@ namespace BookBuddi.Pages.Borrowing
                 return NotFound();
             }
 
+            // Authorization check for Members - they can only return their own books
+            if (userRole == "Member")
+            {
+                var memberId = HttpContext.Session.GetInt32("MemberId");
+                if (!memberId.HasValue || Transaction.MemberId != memberId.Value)
+                {
+                    TempData["ErrorMessage"] = "You can only return books that you have borrowed.";
+                    return RedirectToPage("/Borrowing/Index");
+                }
+            }
+
             // Get book title
             var book = _bookService.GetBookById(Transaction.BookId);
             if (book != null)
@@ -69,6 +80,24 @@ namespace BookBuddi.Pages.Borrowing
             {
                 TempData["ErrorMessage"] = "You must be logged in to access this page.";
                 return RedirectToPage("/Account/Login");
+            }
+
+            // Authorization check for Members - they can only return their own books
+            if (userRole == "Member")
+            {
+                var transaction = _borrowingService.GetTransactionById(id);
+                var memberId = HttpContext.Session.GetInt32("MemberId");
+
+                if (transaction == null)
+                {
+                    return NotFound();
+                }
+
+                if (!memberId.HasValue || transaction.MemberId != memberId.Value)
+                {
+                    TempData["ErrorMessage"] = "You can only return books that you have borrowed.";
+                    return RedirectToPage("/Borrowing/Index");
+                }
             }
 
             try
