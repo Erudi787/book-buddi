@@ -35,10 +35,10 @@
         </div>
 
         <div class="action-buttons">
-            <button class="btn-export btn-export-pdf">Export PDF</button>
+            <button class="btn-export btn-export-pdf" onclick="exportPDF()">Export PDF</button>
             <button class="btn-export btn-export-csv">Export CSV</button>
         </div>
-    </div>
+    </div> 
 
     <div class="content-layout">
         <!-- Sidebar with Summary Cards -->
@@ -199,20 +199,48 @@
 @@media(max-width:880px){.content-layout{flex-direction:column;}.summary-sidebar{width:100%;flex-direction:row;overflow-x:auto;padding-bottom:8px;}.summary-card{min-width:220px;}}
 </style>
 
+<!-- jsPDF library for PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+
+<script>
+    // Export PDF - defined globally to be accessible by onclick
+    function exportPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const tableRows = document.querySelectorAll('#requestsTable tbody tr');
+
+        doc.text("Book Requests Report", 14, 20);
+
+        const head = [['Book Title', 'Member Name', 'Request Date', 'Status']];
+        const body = [];
+        tableRows.forEach(row => {
+            if (row.style.display !== 'none') {
+                const rowData = [row.cells[0].innerText, row.cells[1].innerText, row.cells[2].innerText, row.cells[3].innerText];
+                body.push(rowData);
+            }
+        });
+
+        doc.autoTable({ head: head, body: body, startY: 30 });
+        doc.save('requests_report.pdf');
+    }
+</script>
+
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const searchBox = document.getElemenById('searchBox');
+    const searchBox = document.getElementById('searchBox');
     const statusFilter = document.getElementById('statusFilter');
     const tableRows = document.querySelectorAll('#requestsTable tbody tr');
     const summaryCards = document.querySelectorAll('.summary-card');
-    const cardFilterMap = ["All","Approved","Pending","Rejected"];
     const btnExportCSV = document.querySelector('.btn-export-csv');
-    const btnExportPDF = document.querySelector('.btn-export-pdf');
 
     // Function to filter table based on searchBox and statusFilter / clicked card
     function filterTable(filterStatus = null){
-        const searchTerm = searchBox.value.toLowercase();
+        const searchTerm = searchBox.value.toLowerCase();
         const statusTerm = filterStatus !== null ? filterStatus : statusFilter.value;
+        let visibleRowCount = 0;
 
         tableRows.forEach(row => {
             const book = row.cells[0].innerText.toLowerCase();
@@ -223,12 +251,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const matchesStatus = !statusTerm || statusTerm === "All" ? true : status === statusTerm;
 
             row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
+            if (row.style.display !== "none") {
+                visibleRowCount++;
+            }
         });
 
         // Highlight the correct summary card
-        summaryCards.forEach((card, index) => {
-            const filter = cardFilterMap[index];
-            if ((!statusTerm && filter === "All") || statusTerm === filter) {
+        summaryCards.forEach(card => {
+            if ((!statusTerm && card.dataset.filter === "All") || statusTerm === card.dataset.filter) {
                 card.classList.add("highlight-card");
             } else {
                 card.classList.remove("highlight-card");
@@ -236,7 +266,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Sync dropdown with clicked card
-        if (filterStatus !== null) statusFilter.value = filterStatus;
+        if (filterStatus !== null) {
+            statusFilter.value = filterStatus === "All" ? "" : filterStatus;
+        }
     }
 
     // Export CSV
@@ -244,7 +276,9 @@ document.addEventListener('DOMContentLoaded', function() {
         let csv = "Book Title,Member Name,Request Date,Status\n";
         tableRows.forEach(row => {
             if (row.style.display === "none") return;
-            const rowData = Array.from(row.cells).map(c => `"${c.innerText.replace(/"/g,'""')}"`).join(",");
+            // Select all cells except the last one (Action)
+            const cells = Array.from(row.cells).slice(0, -1);
+            const rowData = cells.map(c => `"${c.innerText.replace(/"/g, '""')}"`).join(",");
             csv += rowData + "\n";
         });
         const link = document.createElement("a");
@@ -255,22 +289,22 @@ document.addEventListener('DOMContentLoaded', function() {
         link.remove();
     }
 
-    // Export PDF
-    function exportPDF(){
-        const content = document.querySelector('.main-content').innerHTML;
-        const original = document.body.innerHTML;
-        document.body.innerHTML = content;
-        window.print();
-        document.body.innerHTML = original;
-        location.reload();
-    }
-
     // Event listeners
     searchBox.addEventListener('input',() => filterTable());
     statusFilter.addEventListener('change',() => filterTable());
+    summaryCards.forEach(card => card.addEventListener('click', () => filterTable(card.dataset.filter)));
     btnExportCSV.addEventListener('click', exportCSV);
-    btnExportPDF.addEventListener('click', exportPDF);
-
+    
     filterTable();
 });
+</script>
+<script>
+    function exportPDF() {
+        const originalContent = document.body.innerHTML;
+        const tableContent = document.querySelector('.main-content').innerHTML;
+        document.body.innerHTML = tableContent;
+        window.print();
+        document.body.innerHTML = originalContent;
+        window.location.reload(); // reload to restore scripts/events
+    }
 </script>
