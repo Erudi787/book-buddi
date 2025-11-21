@@ -99,8 +99,12 @@
                     </tbody>
                 </table>
             </div>
+            <div class="action-buttons" style="justify-content: center; margin-top: 20px;">
+                <a href="/Reports/Index" class="return-back-btn">
+                    Return to Analytics
+                </a>
+            </div>
         </div>
-    </div>
 </div>
 
 <style>
@@ -147,6 +151,34 @@ body { font-family: "Instrument Sans", Roboto, Arial; color: #333; }
 .status { padding:6px 12px; border-radius:999px; font-weight:600; font-size:13px; }
 .status-active { background:#27ae60;color:#fff; }
 .status-inactive { background:#fdecea;color:#a42b2b; }
+
+/* Back Button */
+.return-back-btn {
+    margin: 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #7d2e2e;
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(125, 46, 46, 0.18);
+    transition: all 0.2s ease-in-out;
+}
+
+.return-back-btn:hover {
+    background: #6b2626;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(125, 46, 46, 0.25);
+}
+
+.return-back-btn .material-icons {
+    font-size: 20px;
+}
+
 
 @@media(max-width:880px){.content-layout{flex-direction:column;}.summary-sidebar{width:100%;flex-direction:row;overflow-x:auto;padding-bottom:8px;}.summary-card{min-width:220px;}}
 </style>
