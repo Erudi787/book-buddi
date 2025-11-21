@@ -22,5 +22,8 @@ namespace BookBuddi.Data.Models
         public DateTime CreatedTime { get; set; }
         public string UpdatedBy { get; set; } = string.Empty;
         public DateTime UpdatedTime { get; set; }
+
+        // Navigation properties
+        public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
     }
 }

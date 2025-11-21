@@ -208,6 +208,37 @@ namespace BookBuddi.Data
             };
             context.Fines.Add(fine);
             await context.SaveChangesAsync();
+
+            // Seed Ratings
+            var ratings = new Rating[]
+            {
+                // Member 1 (John Doe) ratings
+                new Rating { BookId = 1, MemberId = 1, Score = 5, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-5), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-5) },
+                new Rating { BookId = 2, MemberId = 1, Score = 4, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-12), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-12) },
+                new Rating { BookId = 7, MemberId = 1, Score = 5, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-8), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-8) },
+
+                // Member 2 (Jane Smith) ratings
+                new Rating { BookId = 1, MemberId = 2, Score = 4, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-3), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-3) },
+                new Rating { BookId = 3, MemberId = 2, Score = 5, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-15), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-15) },
+                new Rating { BookId = 8, MemberId = 2, Score = 5, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-7), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-7) },
+                new Rating { BookId = 10, MemberId = 2, Score = 4, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-10), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-10) },
+
+                // Member 3 (Robert Johnson) ratings
+                new Rating { BookId = 2, MemberId = 3, Score = 3, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-20), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-20) },
+                new Rating { BookId = 3, MemberId = 3, Score = 5, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-18), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-18) },
+                new Rating { BookId = 4, MemberId = 3, Score = 4, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-14), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-14) },
+                new Rating { BookId = 5, MemberId = 3, Score = 5, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-11), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-11) },
+
+                // Member 5 (Michael Brown) ratings
+                new Rating { BookId = 1, MemberId = 5, Score = 5, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-2), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-2) },
+                new Rating { BookId = 4, MemberId = 5, Score = 3, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-9), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-9) },
+                new Rating { BookId = 6, MemberId = 5, Score = 2, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-13), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-13) },
+                new Rating { BookId = 7, MemberId = 5, Score = 4, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-6), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-6) },
+                new Rating { BookId = 8, MemberId = 5, Score = 5, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-4), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-4) },
+                new Rating { BookId = 9, MemberId = 5, Score = 4, CreatedBy = "System", CreatedTime = DateTime.Now.AddDays(-1), UpdatedBy = "System", UpdatedTime = DateTime.Now.AddDays(-1) }
+            };
+            context.Ratings.AddRange(ratings);
+            await context.SaveChangesAsync();
         }
     }
 }

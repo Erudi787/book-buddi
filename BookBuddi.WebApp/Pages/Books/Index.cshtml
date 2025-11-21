@@ -1176,6 +1176,20 @@
         font-weight: 500;
     }
 
+    .book-rating {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .book-rating .rating-count {
+        font-size: 0.75rem;
+        color: #999;
+    }
+
     .footer {
         background: linear-gradient(180deg, #FBDB93 0%, #f9d078 100%);
         padding: 60px 40px 40px;
@@ -1594,6 +1608,12 @@ else if (Model.Filter == "new")
                         </div>
                         <div class="book-title">@book.BookTitle</div>
                         <div class="book-author">@(book.AuthorNames ?? "Unknown")</div>
+                        @if (book.TotalRatings > 0)
+                        {
+                            <div class="book-rating">
+                                ⭐ @book.AverageRating.ToString("0.0") <span class="rating-count">(@book.TotalRatings)</span>
+                            </div>
+                        }
                     </a>
                     @if (userRole == "Admin")
                     {
@@ -1628,6 +1648,12 @@ else if (Model.Filter == "popular")
                         </div>
                         <div class="book-title">@book.BookTitle</div>
                         <div class="book-author">@(book.AuthorNames ?? "Unknown")</div>
+                        @if (book.TotalRatings > 0)
+                        {
+                            <div class="book-rating">
+                                ⭐ @book.AverageRating.ToString("0.0") <span class="rating-count">(@book.TotalRatings)</span>
+                            </div>
+                        }
                     </a>
                     @if (userRole == "Admin")
                     {

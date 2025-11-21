@@ -77,6 +77,22 @@ namespace BookBuddi.Services
                 .ForMember(dest => dest.CreatedTime, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedTime, opt => opt.Ignore());
+
+            // Rating mappings
+            CreateMap<Rating, RatingViewModel>()
+                .ForMember(dest => dest.BookTitle, opt => opt.MapFrom(src => src.Book.BookTitle))
+                .ForMember(dest => dest.BookCoverUrl, opt => opt.MapFrom(src => src.Book.CoverImageUrl))
+                .ForMember(dest => dest.MemberName, opt => opt.MapFrom(src => src.Member.FirstName + " " + src.Member.LastName))
+                .ForMember(dest => dest.RatedDate, opt => opt.MapFrom(src => src.CreatedTime));
+
+            CreateMap<CreateRatingModel, Rating>()
+                .ForMember(dest => dest.RatingId, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedTime, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedTime, opt => opt.Ignore())
+                .ForMember(dest => dest.Book, opt => opt.Ignore())
+                .ForMember(dest => dest.Member, opt => opt.Ignore());
         }
     }
 }

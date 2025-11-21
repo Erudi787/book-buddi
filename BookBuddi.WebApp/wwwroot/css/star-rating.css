@@ -1,0 +1,316 @@
+/* Star Rating Component Styles */
+.star-rating-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.star-rating-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+}
+
+.stars {
+    display: flex;
+    gap: 4px;
+}
+
+.star {
+    font-size: 2rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.star.filled {
+    color: #FBDB93;
+}
+
+.star.half-filled {
+    background: linear-gradient(90deg, #FBDB93 50%, #ddd 50%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.star:hover,
+.star.hover {
+    color: #f9d078;
+    transform: scale(1.1);
+}
+
+.star.interactive:hover ~ .star {
+    color: #ddd;
+}
+
+.rating-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.rating-count {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Rating Distribution Bars */
+.rating-distribution {
+    margin-top: 20px;
+}
+
+.rating-distribution-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.distribution-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.distribution-label {
+    min-width: 40px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.distribution-bar {
+    flex: 1;
+    height: 20px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.distribution-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8B4049 0%, #FBDB93 100%);
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+.distribution-percent {
+    min-width: 45px;
+    text-align: right;
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Rating Modal */
+.rating-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.rating-modal.show {
+    display: flex;
+}
+
+.rating-modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.rating-modal-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.rating-modal-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 10px 0;
+}
+
+.rating-modal-header p {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+}
+
+.rating-modal-stars {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 25px 0;
+}
+
+.rating-modal-stars .star {
+    font-size: 3rem;
+}
+
+.rating-modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.btn-rate-submit,
+.btn-rate-cancel {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+}
+
+.btn-rate-submit {
+    background: linear-gradient(135deg, #8B4049 0%, #a85252 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 64, 73, 0.3);
+}
+
+.btn-rate-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 64, 73, 0.4);
+}
+
+.btn-rate-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-rate-cancel {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.btn-rate-cancel:hover {
+    background: #e0e0e0;
+}
+
+/* Rating Cards (for My Ratings page) */
+.ratings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.rating-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+}
+
+.rating-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(139, 64, 73, 0.15);
+}
+
+.rating-card-cover {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, #8B4049 0%, #FBDB93 100%);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.rating-card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.rating-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.rating-card-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.rating-card-date {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 15px;
+}
+
+.rating-card-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.rating-card-actions button {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-edit-rating {
+    background: #FBDB93;
+    color: #333;
+}
+
+.btn-edit-rating:hover {
+    background: #f9d078;
+}
+
+.btn-delete-rating {
+    background: #fee;
+    color: #c33;
+}
+
+.btn-delete-rating:hover {
+    background: #fcc;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .star {
+        font-size: 1.5rem;
+    }
+
+    .rating-modal-stars .star {
+        font-size: 2.5rem;
+    }
+
+    .ratings-grid {
+        grid-template-columns: 1fr;
+    }
+}

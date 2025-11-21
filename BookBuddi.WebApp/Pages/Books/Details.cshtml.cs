@@ -9,18 +9,23 @@ namespace BookBuddi.Pages.Books
     {
         private readonly IBookService _bookService;
         private readonly INotificationService _notificationService;
+        private readonly IRatingService _ratingService;
 
-        public DetailsModel(IBookService bookService, INotificationService notificationService)
+        public DetailsModel(IBookService bookService, INotificationService notificationService, IRatingService ratingService)
         {
             _bookService = bookService;
             _notificationService = notificationService;
+            _ratingService = ratingService;
         }
 
         public BookViewModel? Book { get; set; }
         public IEnumerable<NotificationViewModel> RecentNotifications { get; set; } = new List<NotificationViewModel>();
         public int UnreadNotificationCount { get; set; }
+        public BookRatingStatsViewModel? RatingStats { get; set; }
+        public RatingViewModel? UserRating { get; set; }
+        public bool CanRate { get; set; }
 
-        public IActionResult OnGet(int id)
+        public async Task<IActionResult> OnGetAsync(int id)
         {
             Book = _bookService.GetBookById(id);
 
@@ -29,7 +34,10 @@ namespace BookBuddi.Pages.Books
                 return NotFound();
             }
 
-            // Load notifications for members
+            // Load rating stats
+            RatingStats = await _ratingService.GetBookRatingStatsAsync(id);
+
+            // Load notifications and ratings for members
             var userRole = HttpContext.Session.GetString("UserRole");
             if (userRole == "Member")
             {
@@ -39,6 +47,12 @@ namespace BookBuddi.Pages.Books
                     var allNotifications = _notificationService.GetNotificationsByMember(memberId.Value);
                     RecentNotifications = allNotifications.OrderByDescending(n => n.DateCreated).Take(5);
                     UnreadNotificationCount = allNotifications.Count(n => !n.IsRead);
+
+                    // Load user's rating if exists
+                    UserRating = await _ratingService.GetMemberRatingForBookAsync(memberId.Value, id);
+                    
+                    // User can rate if logged in as member
+                    CanRate = true;
                 }
             }
 

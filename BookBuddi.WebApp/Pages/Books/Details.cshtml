@@ -1165,6 +1165,38 @@
                         </div>
                     </div>
 
+                    @if (Model.RatingStats != null)
+                    {
+                        <div class="book-rating-section">
+                            <div class="rating-display">
+                                <div class="rating-stars" data-rating="@Model.RatingStats.AverageRating">
+                                    <div class="stars"></div>
+                                </div>
+                                <span class="rating-value">@Model.RatingStats.AverageRating.ToString("0.0")</span>
+                                <span class="rating-count">(@Model.RatingStats.TotalRatings @(Model.RatingStats.TotalRatings == 1 ? "rating" : "ratings"))</span>
+                            </div>
+
+                            @if (Model.UserRating != null)
+                            {
+                                <div class="user-rating-info">
+                                    <span>Your rating:</span>
+                                    <div class="stars-small">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <span class="star @(i <= Model.UserRating.Score ? "filled" : "")">★</span>
+                                        }
+                                    </div>
+                                    <button onclick="showRatingModal(@Model.Book.BookId, '@Model.Book.BookTitle', @Model.UserRating.Score, @Model.UserRating.RatingId)" class="btn-edit-rating-small">Edit</button>
+                                    <button onclick="deleteRating(@Model.UserRating.RatingId)" class="btn-delete-rating-small">Delete</button>
+                                </div>
+                            }
+                            else if (Model.CanRate)
+                            {
+                                <button onclick="showRatingModal(@Model.Book.BookId, '@Model.Book.BookTitle')" class="btn-rate">Rate This Book</button>
+                            }
+                        </div>
+                    }
+
                     <div class="book-actions">
                         @if (userRole == "Member" && Model.Book.Status == BookBuddi.Resources.Constants.BookStatus.Available
                                             && Model.Book.AvailableCopies > 0)
@@ -1186,6 +1218,50 @@
                         <h2 class="section-title">Description</h2>
                         <div class="description-text">
                             @Model.Book.Description
+                        </div>
+                    </div>
+                }
+
+                @if (Model.RatingStats != null && Model.RatingStats.TotalRatings > 0)
+                {
+                    <div class="details-section">
+                        <h2 class="section-title">Rating Distribution</h2>
+                        <div class="rating-distribution">
+                            <div class="distribution-row">
+                                <span class="distribution-label">5★</span>
+                                <div class="distribution-bar">
+                                    <div class="distribution-fill" style="width: @Model.RatingStats.FiveStarPercent%"></div>
+                                </div>
+                                <span class="distribution-percent">@Model.RatingStats.FiveStarPercent%</span>
+                            </div>
+                            <div class="distribution-row">
+                                <span class="distribution-label">4★</span>
+                                <div class="distribution-bar">
+                                    <div class="distribution-fill" style="width: @Model.RatingStats.FourStarPercent%"></div>
+                                </div>
+                                <span class="distribution-percent">@Model.RatingStats.FourStarPercent%</span>
+                            </div>
+                            <div class="distribution-row">
+                                <span class="distribution-label">3★</span>
+                                <div class="distribution-bar">
+                                    <div class="distribution-fill" style="width: @Model.RatingStats.ThreeStarPercent%"></div>
+                                </div>
+                                <span class="distribution-percent">@Model.RatingStats.ThreeStarPercent%</span>
+                            </div>
+                            <div class="distribution-row">
+                                <span class="distribution-label">2★</span>
+                                <div class="distribution-bar">
+                                    <div class="distribution-fill" style="width: @Model.RatingStats.TwoStarPercent%"></div>
+                                </div>
+                                <span class="distribution-percent">@Model.RatingStats.TwoStarPercent%</span>
+                            </div>
+                            <div class="distribution-row">
+                                <span class="distribution-label">1★</span>
+                                <div class="distribution-bar">
+                                    <div class="distribution-fill" style="width: @Model.RatingStats.OneStarPercent%"></div>
+                                </div>
+                                <span class="distribution-percent">@Model.RatingStats.OneStarPercent%</span>
+                            </div>
                         </div>
                     </div>
                 }
@@ -1221,3 +1297,77 @@
         </div>
     }
 </div>
+
+<!-- Rating Modal -->
+<div id="ratingModal" class="rating-modal">
+    <div class="rating-modal-content">
+        <div class="rating-modal-header">
+            <h3>Rate This Book</h3>
+            <p class="book-title-display"></p>
+        </div>
+        <div class="rating-modal-body">
+            <div id="ratingModalStars" class="rating-modal-stars">
+                <span class="star interactive">☆</span>
+                <span class="star interactive">☆</span>
+                <span class="star interactive">☆</span>
+                <span class="star interactive">☆</span>
+                <span class="star interactive">☆</span>
+            </div>
+            <p class="rating-hint">Click a star to rate</p>
+        </div>
+        <div class="rating-modal-actions">
+            <button type="button" class="btn btn-primary btn-rate-submit" onclick="submitRating()">Submit Rating</button>
+            <button type="button" class="btn btn-secondary btn-rate-cancel" onclick="closeRatingModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="~/css/star-rating.css" />
+    <script src="~/js/star-rating.js"></script>
+}
+
+<style>
+    .btn-rate {
+        background: #8B4049;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-rate:hover {
+        background: #6d3139;
+    }
+
+    .btn-edit-rating-small,
+    .btn-delete-rating-small {
+        padding: 6px 12px;
+        font-size: 13px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-edit-rating-small {
+        background: #8B4049;
+        color: white;
+    }
+
+    .btn-edit-rating-small:hover {
+        background: #6d3139;
+    }
+
+    .btn-delete-rating-small {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-delete-rating-small:hover {
+        background: #c82333;
+    }
+</style>
