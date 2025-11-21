@@ -95,10 +95,17 @@
                                 <td>@r.RequestDate.ToString("MMM dd, yyyy")</td>
                                 <td><span class="status @(r.StatusClass)">@r.StatusText</span></td>
                                 <td>
-                                    <div class="action-icons">
-                                        <button class="icon-btn approve-btn" title="Approve">✓</button>
-                                        <button class="icon-btn delete-btn" title="Delete">×</button>
-                                    </div>
+                                    @if (r.IsPending)
+                                    {
+                                        <div class="action-icons">
+                                            <a href="/BookRequests/Approve?id=@r.RequestId&returnUrl=/Reports/Requests" class="icon-btn approve-btn" title="Approve">✓</a>
+                                            <a href="/BookRequests/Reject?id=@r.RequestId&returnUrl=/Reports/Requests" class="icon-btn reject-btn" title="Reject">×</a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="no-action">—</span>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -162,9 +169,12 @@
 .status-pending { background:#fff4e6;color:#7a4e00; }
 .status-rejected { background:#fdecea;color:#a42b2b; }
 
-.icon-btn { width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;font-size:18px;margin-right:4px; }
+.icon-btn { width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;font-size:18px;margin-right:4px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;transition:all 0.2s; }
 .approve-btn { background:#27ae60;color:#fff; }
-.delete-btn { background:#e74c3c;color:#fff; }
+.approve-btn:hover { background:#219a52;transform:scale(1.05); }
+.reject-btn { background:#e74c3c;color:#fff; }
+.reject-btn:hover { background:#c0392b;transform:scale(1.05); }
+.no-action { color:#999;font-size:14px; }
 
 /* Back Button */
 
@@ -201,7 +211,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const searchBox = document.getElemenById('searchBox');
+    const searchBox = document.getElementById('searchBox');
     const statusFilter = document.getElementById('statusFilter');
     const tableRows = document.querySelectorAll('#requestsTable tbody tr');
     const summaryCards = document.querySelectorAll('.summary-card');
@@ -211,8 +221,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to filter table based on searchBox and statusFilter / clicked card
     function filterTable(filterStatus = null){
-        const searchTerm = searchBox.value.toLowercase();
-        const statusTerm = filterStatus !== null ? filterStatus : statusFilter.value;
+        const searchTerm = searchBox ? searchBox.value.toLowerCase() : '';
+        const statusTerm = filterStatus !== null ? filterStatus : (statusFilter ? statusFilter.value : '');
 
         tableRows.forEach(row => {
             const book = row.cells[0].innerText.toLowerCase();
@@ -236,40 +246,70 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Sync dropdown with clicked card
-        if (filterStatus !== null) statusFilter.value = filterStatus;
+        if (filterStatus !== null && statusFilter) statusFilter.value = filterStatus;
     }
 
-    // Export CSV
+    // Export CSV - only export first 4 columns (exclude Action column)
     function exportCSV(){
         let csv = "Book Title,Member Name,Request Date,Status\n";
         tableRows.forEach(row => {
             if (row.style.display === "none") return;
-            const rowData = Array.from(row.cells).map(c => `"${c.innerText.replace(/"/g,'""')}"`).join(",");
+            // Only take first 4 columns, exclude Action column
+            const cells = Array.from(row.cells).slice(0, 4);
+            const rowData = cells.map(c => `"${c.innerText.replace(/"/g,'""')}"`).join(",");
             csv += rowData + "\n";
         });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
-        link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+        link.href = URL.createObjectURL(blob);
         link.download = "requests_report.csv";
-        document.body.appendChild(link); 
+        document.body.appendChild(link);
         link.click();
         link.remove();
+        URL.revokeObjectURL(link.href);
     }
 
-    // Export PDF
+    // Export PDF - print only the table content
     function exportPDF(){
-        const content = document.querySelector('.main-content').innerHTML;
-        const original = document.body.innerHTML;
-        document.body.innerHTML = content;
-        window.print();
-        document.body.innerHTML = original;
-        location.reload();
+        var printContent = document.querySelector('.table-container').innerHTML;
+        var printWindow = window.open('', '_blank');
+        var html = '<html><head><title>Book Requests Report<\/title>';
+        html += '<st' + 'yle>';
+        html += 'body { font-family: Arial, sans-serif; padding: 20px; }';
+        html += 'h1 { color: #7d2e2e; margin-bottom: 20px; }';
+        html += 'table { width: 100%; border-collapse: collapse; }';
+        html += 'th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }';
+        html += 'th { background: #7d2e2e; color: white; }';
+        html += 'tr:hover { background: #f5f5f5; }';
+        html += '.status { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }';
+        html += '.status-approved { background: #27ae60; color: white; }';
+        html += '.status-pending { background: #fff4e6; color: #7a4e00; }';
+        html += '.status-rejected { background: #fdecea; color: #a42b2b; }';
+        html += '.action-icons, .no-action { display: none; }';
+        html += 'th:last-child, td:last-child { display: none; }';
+        html += '<\/st' + 'yle><\/head><body>';
+        html += '<h1>Book Requests Report<\/h1>';
+        html += '<p>Generated on: ' + new Date().toLocaleDateString() + '<\/p>';
+        html += printContent;
+        html += '<\/body><\/html>';
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.onload = function() {
+            printWindow.print();
+            printWindow.close();
+        };
     }
 
     // Event listeners
-    searchBox.addEventListener('input',() => filterTable());
-    statusFilter.addEventListener('change',() => filterTable());
-    btnExportCSV.addEventListener('click', exportCSV);
-    btnExportPDF.addEventListener('click', exportPDF);
+    if (searchBox) searchBox.addEventListener('input', () => filterTable());
+    if (statusFilter) statusFilter.addEventListener('change', () => filterTable());
+    if (btnExportCSV) btnExportCSV.addEventListener('click', exportCSV);
+    if (btnExportPDF) btnExportPDF.addEventListener('click', exportPDF);
+
+    // Summary card click handlers
+    summaryCards.forEach((card, index) => {
+        card.addEventListener('click', () => filterTable(cardFilterMap[index]));
+    });
 
     filterTable();
 });

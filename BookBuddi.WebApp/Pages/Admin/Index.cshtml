@@ -227,48 +227,52 @@
                 Latest Transactions
             </div>
             <ul>
-                <li>
-                    <span class="activity-detail">
-                        <span class="activity-type borrow">Borrow</span>
-                        <i class="fas fa-book" style="color: @colorPrimary;"></i>
-                        The Great Gatsby
-                    </span>
-                    <span class="activity-meta">Member ID: M-105 | 5 min ago</span>
-                </li>
-                <li>
-                    <span class="activity-detail">
-                        <span class="activity-type return">Return</span>
-                        <i class="fas fa-book" style="color: #d4a862;"></i>
-                        Moby Dick
-                    </span>
-                    <span class="activity-meta">Member ID: M-210 | 1 hour ago</span>
-                </li>
-                <li>
-                    <span class="activity-detail">
-                        <span class="activity-type fine">Fine</span>
-                        <i class="fas fa-dollar-sign" style="color: #e74a3b;"></i>
-                        ₱5.00 Collected
-                    </span>
-                    <span class="activity-meta">Member ID: M-078 | 2 hours ago</span>
-                </li>
-                <li>
-                    <span class="activity-detail">
-                        <span class="activity-type borrow">Borrow</span>
-                        <i class="fas fa-book" style="color: @colorPrimary;"></i>
-                        Pride and Prejudice
-                    </span>
-                    <span class="activity-meta">Member ID: M-112 | 4 hours ago</span>
-                </li>
-                <li>
-                    <span class="activity-detail">
-                        <span class="activity-type return">Return</span>
-                        <i class="fas fa-book" style="color: #d4a862;"></i>
-                        1984
-                    </span>
-                    <span class="activity-meta">Member ID: M-180 | 1 day ago</span>
-                </li>
+                @if (Model.RecentActivities.Any())
+                {
+                    @foreach (var activity in Model.RecentActivities)
+                    {
+                        var timeAgo = GetTimeAgo(activity.Timestamp);
+                        <li>
+                            <span class="activity-detail">
+                                <span class="activity-type @activity.Type.ToLower()">@activity.Type</span>
+                                @if (activity.Type == "Fine")
+                                {
+                                    <i class="fas fa-dollar-sign" style="color: #e74a3b;"></i>
+                                    <span>₱@activity.Amount?.ToString("F2") Collected</span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-book" style="color: @(activity.Type == "Return" ? "#d4a862" : colorPrimary);"></i>
+                                    <span>@activity.Description</span>
+                                }
+                            </span>
+                            <span class="activity-meta">@activity.MemberName | @timeAgo</span>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li>
+                        <span class="activity-detail">
+                            <i class="fas fa-info-circle" style="color: #6c757d;"></i>
+                            <span>No recent activity</span>
+                        </span>
+                    </li>
+                }
             </ul>
         </div>
+
+        @{
+            string GetTimeAgo(DateTime timestamp)
+            {
+                var diff = DateTime.Now - timestamp;
+                if (diff.TotalMinutes < 1) return "Just now";
+                if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes} min ago";
+                if (diff.TotalHours < 24) return $"{(int)diff.TotalHours} hour{((int)diff.TotalHours > 1 ? "s" : "")} ago";
+                if (diff.TotalDays < 7) return $"{(int)diff.TotalDays} day{((int)diff.TotalDays > 1 ? "s" : "")} ago";
+                return timestamp.ToString("MMM dd, yyyy");
+            }
+        }
 
         <div class="action-buttons">
             <a href="/" class="btn btn-outline">

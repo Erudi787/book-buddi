@@ -412,16 +412,16 @@
 </div>
 
 <div class="page-container">
-    <a href="/Borrowing/Index" class="back-button">
+    <a href="@(userRole == "Admin" ? "/Admin/Index" : "/Borrowing/Index")" class="back-button">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
-        Back to My Borrowing
+        @(userRole == "Admin" ? "Back to Admin Panel" : "Back to My Borrowing")
     </a>
 
     <div class="page-header">
-        <h1>Return Book</h1>
-        <p>Confirm book return details</p>
+        <h1>@(Model.IsSelectionMode ? "Process Return" : "Return Book")</h1>
+        <p>@(Model.IsSelectionMode ? "Select a transaction to process return" : "Confirm book return details")</p>
     </div>
 
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
@@ -436,7 +436,80 @@
         </div>
     }
 
-    @if (Model.Transaction == null)
+    @if (Model.IsSelectionMode)
+    {
+        <!-- Admin Transaction Selection Mode -->
+        <div class="return-card">
+            <div class="form-group">
+                <label>Filter by Member (Optional)</label>
+                <select onchange="window.location.href='/Borrowing/Return?memberId=' + this.value">
+                    <option value="">-- All Members --</option>
+                    @foreach (var member in Model.Members)
+                    {
+                        <option value="@member.MemberId" selected="@(member.MemberId == Model.SelectedMemberId)">
+                            @member.FirstName @member.LastName (@member.Email)
+                        </option>
+                    }
+                </select>
+                <div class="help-text">Filter transactions by member or view all active borrowings</div>
+            </div>
+        </div>
+
+        @if (Model.ActiveTransactions.Any())
+        {
+            <div class="return-card" style="padding: 20px;">
+                <h3 style="margin: 0 0 20px 0; color: #333;">Active Borrowings (@Model.ActiveTransactions.Count)</h3>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    @foreach (var item in Model.ActiveTransactions)
+                    {
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: @(item.IsOverdue ? "#fff3cd" : "#f8f9fa"); border-radius: 12px; border-left: 4px solid @(item.IsOverdue ? "#dc3545" : "#28a745");">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; font-size: 1.1rem; color: #333; margin-bottom: 5px;">@item.BookTitle
+                                </div>
+                                <div style="font-size: 0.9rem; color: #666; margin-bottom: 8px;">Borrowed by: @item.MemberName</div>
+                                <div style="display: flex; gap: 15px; font-size: 0.85rem; color: #888;">
+                                    <span>Borrowed: @item.Transaction.BorrowDate.ToString("MMM dd, yyyy")</span>
+                                    <span>Due: @item.Transaction.DueDate.ToString("MMM dd, yyyy")</span>
+                                </div>
+                                @if (item.IsOverdue)
+                                {
+                                    <div style="margin-top: 8px;">
+                                        <span
+                                            style="background: #dc3545; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">
+                                            Overdue by @item.DaysOverdue day@(item.DaysOverdue > 1 ? "s" : "") - Fine:
+                                            ₱@((item.DaysOverdue * 50).ToString("N2"))
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                            <a href="/Borrowing/Return?id=@item.Transaction.TransactionId" class="btn-primary"
+                                style="padding: 12px 24px; white-space: nowrap;">
+                                Process Return
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="return-card">
+                <div class="not-found-container">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        <line x1="10" y1="8" x2="16" y2="8"></line>
+                        <line x1="10" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    <h2>No Active Borrowings</h2>
+                    <p>@(Model.SelectedMemberId.HasValue ? "This member has no active borrowings to return." : "There are no active borrowings to process.")</p>
+                    <a href="/Admin/Index" class="btn-primary">Back to Admin Panel</a>
+                </div>
+            </div>
+        }
+    }
+    else if (Model.Transaction == null)
     {
         <div class="return-card">
             <div class="not-found-container">
@@ -448,7 +521,8 @@
                 </svg>
                 <h2>Transaction Not Found</h2>
                 <p>The borrowing transaction could not be found.</p>
-                <a href="/Borrowing/Index" class="btn-primary">Back to My Borrowing</a>
+                <a href="@(userRole == "Admin" ? "/Admin/Index" : "/Borrowing/Index")" class="btn-primary">@(userRole ==
+                                    "Admin" ? "Back to Admin Panel" : "Back to My Borrowing")</a>
             </div>
         </div>
     }
@@ -482,7 +556,8 @@
                         <p>
                             This book is <span class="overdue-days">@daysOverdue day@(daysOverdue > 1 ? "s" : "")
                                 overdue</span>.
-                            A fine of <strong style="color: #dc3545; font-size: 1.1em;">₱@fineAmount.ToString("N2")</strong> (₱50.00 per day) will be applied to your account upon return.
+                            A fine of <strong style="color: #dc3545; font-size: 1.1em;">₱@fineAmount.ToString("N2")</strong>
+                            (₱50.00 per day) will be applied to your account upon return.
                         </p>
                     </div>
                 </div>
@@ -539,7 +614,7 @@
                     <button type="submit" class="@(isOverdue ? "btn-danger" : "btn-primary")">
                         Confirm Return
                     </button>
-                    <a href="/Borrowing/Index" class="btn-secondary">Cancel</a>
+                    <a href="/Borrowing/Return" class="btn-secondary">Cancel</a>
                 </div>
             </form>
         </div>
