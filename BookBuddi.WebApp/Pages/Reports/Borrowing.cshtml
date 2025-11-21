@@ -199,80 +199,104 @@ body { font-family: "Instrument Sans", Roboto, Arial; color: #333; }
 </style>
 
 <script>
-const searchBox = document.getElementById('searchBox');
-const statusFilter = document.getElementById('statusFilter');
-const tableRows = document.querySelectorAll('#borrowTable tbody tr');
-const summaryCards = document.querySelectorAll('.summary-card');
-const cardFilterMap = ["All", "Returned", "Active", "Overdue"];
-const btnExportCSV = document.querySelector('.btn-export-csv');
-const btnExportPDF = document.querySelector('.btn-export-pdf');
+document.addEventListener('DOMContentLoaded', function() {
+    const searchBox = document.getElementById('searchBox');
+    const statusFilter = document.getElementById('statusFilter');
+    const tableRows = document.querySelectorAll('#borrowTable tbody tr');
+    const summaryCards = document.querySelectorAll('.summary-card');
+    const cardFilterMap = ["All", "Returned", "Active", "Overdue"];
+    const btnExportCSV = document.querySelector('.btn-export-csv');
+    const btnExportPDF = document.querySelector('.btn-export-pdf');
 
-function filterTable() {
-    const searchTerm = searchBox.value.toLowerCase();
-    const statusTerm = statusFilter.value;
+    function filterTable(filterStatus = null) {
+        const searchTerm = searchBox ? searchBox.value.toLowerCase() : '';
+        const statusTerm = filterStatus !== null ? filterStatus : (statusFilter ? statusFilter.value : '');
 
-    // Filter table rows
-    tableRows.forEach(row => {
-        const bookTitle = row.cells[0].innerText.toLowerCase();
-        const borrower = row.cells[1].innerText.toLowerCase();
-        const status = row.cells[4].innerText;
+        // Filter table rows
+        tableRows.forEach(row => {
+            const bookTitle = row.cells[0].innerText.toLowerCase();
+            const borrower = row.cells[1].innerText.toLowerCase();
+            const status = row.cells[4].innerText;
 
-        const matchesSearch = bookTitle.includes(searchTerm) || borrower.includes(searchTerm);
-        const matchesStatus = statusTerm === "" || status === statusTerm;
+            const matchesSearch = bookTitle.includes(searchTerm) || borrower.includes(searchTerm);
+            const matchesStatus = !statusTerm || statusTerm === "All" ? true : status === statusTerm;
 
-        row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
-    });
+            row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
+        });
 
-    // Update summary card highlights
+        // Update summary card highlights
+        summaryCards.forEach((card, index) => {
+            const cardFilter = cardFilterMap[index];
+            if ((!statusTerm && cardFilter === "All") || statusTerm === cardFilter) {
+                card.classList.add("highlight-card");
+            } else {
+                card.classList.remove("highlight-card");
+            }
+        });
+
+        // Sync dropdown with clicked card
+        if (filterStatus !== null && statusFilter) statusFilter.value = filterStatus;
+    }
+
+    // Export CSV
+    function exportCSV() {
+        let csv = "Book Title,Borrower,Borrow Date,Return Date,Status\n";
+        tableRows.forEach(row => {
+            if (row.style.display === "none") return;
+            const rowData = Array.from(row.cells).map(c => `"${c.innerText.replace(/"/g,'""')}"`).join(",");
+            csv += rowData + "\n";
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "borrowing_report.csv";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(link.href);
+    }
+
+    // Export PDF - print only the table content
+    function exportPDF() {
+        var printContent = document.querySelector('.table-container').innerHTML;
+        var printWindow = window.open('', '_blank');
+        var html = '<html><head><title>Borrowing Report<\/title>';
+        html += '<st' + 'yle>';
+        html += 'body { font-family: Arial, sans-serif; padding: 20px; }';
+        html += 'h1 { color: #7d2e2e; margin-bottom: 20px; }';
+        html += 'table { width: 100%; border-collapse: collapse; }';
+        html += 'th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }';
+        html += 'th { background: #7d2e2e; color: white; }';
+        html += 'tr:hover { background: #f5f5f5; }';
+        html += '.status { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }';
+        html += '.status-returned { background: #27ae60; color: white; }';
+        html += '.status-active { background: #3498db; color: white; }';
+        html += '.status-overdue { background: #e74c3c; color: white; }';
+        html += '<\/st' + 'yle><\/head><body>';
+        html += '<h1>Borrowing Report<\/h1>';
+        html += '<p>Generated on: ' + new Date().toLocaleDateString() + '<\/p>';
+        html += printContent;
+        html += '<\/body><\/html>';
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.onload = function() {
+            printWindow.print();
+            printWindow.close();
+        };
+    }
+
+    // Event Listeners
+    if (searchBox) searchBox.addEventListener('input', () => filterTable());
+    if (statusFilter) statusFilter.addEventListener('change', () => filterTable());
+    if (btnExportCSV) btnExportCSV.addEventListener('click', exportCSV);
+    if (btnExportPDF) btnExportPDF.addEventListener('click', exportPDF);
+
+    // Summary card click handlers
     summaryCards.forEach((card, index) => {
-        const cardFilter = cardFilterMap[index];
-        if ((statusTerm === "" && cardFilter === "All") || statusTerm === cardFilter) {
-            card.classList.add("highlight-card");
-        } else {
-            card.classList.remove("highlight-card");
-        }
-    });
-}
-
-// --- Export CSV ---
-function exportCSV() {
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Book Title,Borrower,Borrow Date,Return Date,Status\n";
-
-    tableRows.forEach(row => {
-        if (row.style.display !== "none") {
-            const rowData = Array.from(row.cells)
-                .map(cell => `"${cell.innerText.replace(/"/g, '""')}"`)
-                .join(",");
-            csvContent += rowData + "\n";
-        }
+        card.addEventListener('click', () => filterTable(cardFilterMap[index]));
     });
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "borrowing_report.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-// --- Export PDF (basic print to PDF) ---
-function exportPDF() {
-    const originalContent = document.body.innerHTML;
-    const tableContent = document.querySelector('.main-content').innerHTML;
-    document.body.innerHTML = tableContent;
-    window.print();
-    document.body.innerHTML = originalContent;
-    window.location.reload(); // reload to restore scripts/events
-}
-
-// --- Event Listeners ---
-searchBox.addEventListener('input', filterTable);
-statusFilter.addEventListener('change', filterTable);
-btnExportCSV.addEventListener('click', exportCSV);
-btnExportPDF.addEventListener('click', exportPDF);
-
-// Initial table/card state
-filterTable();
+    // Initial table/card state
+    filterTable();
+});
 </script>

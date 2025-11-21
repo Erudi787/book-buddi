@@ -35,36 +35,36 @@
         </div>
 
         <div class="action-buttons">
-            <button class="btn-export btn-export-pdf" onclick="exportPDF()">Export PDF</button>
+            <button class="btn-export btn-export-pdf">Export PDF</button>
             <button class="btn-export btn-export-csv">Export CSV</button>
         </div>
-    </div> 
+    </div>
 
     <div class="content-layout">
         <!-- Sidebar with Summary Cards -->
         <div class="summary-sidebar">
-            <div class="summary-card @(Model.CurrentFilter=="All" ? "highlight-card" : "")" data-filter="All">
+            <div class="summary-card @(Model.CurrentFilter == "All" ? "highlight-card" : "")" data-filter="All">
                 <div class="card-icon">📚</div>
                 <div class="card-text">
                     <h2>@Model.TotalRequests</h2>
                     <p>Total Requests</p>
                 </div>
             </div>
-            <div class="summary-card @(Model.CurrentFilter=="Approved" ? "highlight-card" : "")" data-filter="Approved">
+            <div class="summary-card @(Model.CurrentFilter == "Approved" ? "highlight-card" : "")" data-filter="Approved">
                 <div class="card-icon">✅</div>
                 <div class="card-text">
                     <h2>@Model.ApprovedRequests</h2>
                     <p>Approved</p>
                 </div>
             </div>
-            <div class="summary-card @(Model.CurrentFilter=="Pending" ? "highlight-card" : "")" data-filter="Pending">
+            <div class="summary-card @(Model.CurrentFilter == "Pending" ? "highlight-card" : "")" data-filter="Pending">
                 <div class="card-icon">⏳</div>
                 <div class="card-text">
                     <h2>@Model.PendingRequests</h2>
                     <p>Pending</p>
                 </div>
             </div>
-            <div class="summary-card @(Model.CurrentFilter=="Rejected" ? "highlight-card" : "")" data-filter="Rejected">
+            <div class="summary-card @(Model.CurrentFilter == "Rejected" ? "highlight-card" : "")" data-filter="Rejected">
                 <div class="card-icon">❌</div>
                 <div class="card-text">
                     <h2>@Model.RejectedRequests</h2>
@@ -95,10 +95,19 @@
                                 <td>@r.RequestDate.ToString("MMM dd, yyyy")</td>
                                 <td><span class="status @(r.StatusClass)">@r.StatusText</span></td>
                                 <td>
-                                    <div class="action-icons">
-                                        <button class="icon-btn approve-btn" title="Approve">✓</button>
-                                        <button class="icon-btn delete-btn" title="Delete">×</button>
-                                    </div>
+                                    @if (r.IsPending)
+                                    {
+                                        <div class="action-icons">
+                                            <a href="/BookRequests/Approve?id=@r.RequestId&returnUrl=/Reports/Requests"
+                                                class="icon-btn approve-btn" title="Approve">✓</a>
+                                            <a href="/BookRequests/Reject?id=@r.RequestId&returnUrl=/Reports/Requests"
+                                                class="icon-btn reject-btn" title="Reject">×</a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="no-action">—</span>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -111,200 +120,497 @@
                 </a>
             </div>
         </div>
-</div>
+    </div>
 
-<style>
-* { box-sizing: border-box; margin:0; padding:0; font-family: "Instrument Sans", Roboto, Arial; color:#333; }
-.report-container { width:100%; height:100vh; display:flex; flex-direction:column; background:#f5f6fa; }
-.report-container { width: 100%; height: 100vh; display: flex; flex-direction: column; background: #f5f6fa; }
-.report-header { padding:16px 32px; background:#f4d9a0; }
-.header-left { display:flex; align-items:center; gap:24px; }
-.report-title { font-size:28px; font-weight:700; color:#2f2f2f; }
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Instrument Sans", Roboto, Arial;
+            color: #333;
+        }
 
-.tab-navigation { display:flex; gap:12px; }
-.tab { padding:8px 20px; border-radius:999px; text-decoration:none; font-weight:600; font-size:14px; background:#fff; color:#6b6b6b; box-shadow:0 2px 6px rgba(62,45,45,0.04); transition: all 0.15s; }
-.tab:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(62,45,45,0.08); }
-.tab.active { background:#7d2e2e; color:#fff; box-shadow:none; }
-.tab.active { background: #7d2e2e; color: #fff; box-shadow: none; }
-.controls-top { display:flex; gap:16px; align-items:center; padding:16px 32px; background:#fff; border-bottom:1px solid #eee; }
-.search-box { flex:1; position:relative; }
-.search-box input { width:100%; padding:10px 12px 10px 36px; border-radius:999px; border:1px solid #e6e6e6; font-size:14px; }
-.search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#999; }
+        .report-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f5f6fa;
+        }
 
-.filter-controls { display:flex; gap:12px; align-items:center; }
-.filter-dropdown { padding:10px 36px 10px 14px; border-radius:8px; border:1px solid #e6e6e6; background:#fff; font-size:14px; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
+        .report-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f5f6fa;
+        }
 
-.action-buttons { display:flex; gap:10px; }
-.btn-export { padding:10px 18px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; border:none; }
-.btn-export-pdf { background:#7d2e2e;color:#fff;box-shadow:0 4px 12px rgba(125,46,46,0.12); }
-.btn-export-csv { background:#fff;color:#555;border:1px solid #e6e6e6; }
-.btn-export-csv { background: #fff; color: #555; border: 1px solid #e6e6e6; }
-.content-layout { display:flex; flex:1; gap:24px; padding:16px 32px; overflow:hidden; }
-.summary-sidebar { flex:0 0 320px; display:flex; flex-direction:column; gap:18px; }
-.summary-card { display:flex; align-items:center; gap:16px; padding:16px; border-radius:14px; background:#fff; box-shadow:0 6px 18px rgba(31,31,31,0.04); transition: all 0.2s; cursor:pointer; }
-.summary-card .card-icon { width:58px;height:58px;display:flex;align-items:center;justify-content:center;background:#fafafa;border-radius:10px;font-size:28px; }
-.summary-card h2 { font-size:32px; font-weight:800; color:#0b0b0b; }
-.summary-card p { font-size:14px; font-weight:600; color:inherit; opacity:0.95; }
+        .report-header {
+            padding: 16px 32px;
+            background: #f4d9a0;
+        }
 
-.highlight-card { background: #8A2D3B; color: #fff; }
-.highlight-card .card-icon { background: rgba(255,255,255,0.12); font-size:30px; color:#fff; }
-.highlight-card h2, .highlight-card p { color:#fff; }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
 
-.main-content { flex: 1; display: flex; flex-direction: column; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 20px rgba(15,15,15,0.03); }
-.table-container { flex:1; overflow:auto; padding:20px; }
-.report-table { width:100%; border-collapse:collapse; min-width:700px; }
-.report-table th, .report-table td { padding:12px; text-align:left; border-bottom:1px solid #eee; }
-.report-table tbody tr:hover { background:#fafafa; }
+        .report-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2f2f2f;
+        }
 
-.status { padding:6px 12px; border-radius:999px; font-weight:600; font-size:13px; }
-.status-approved { background:#27ae60;color:#fff; }
-.status-approved { background: #27ae60; color: #fff; }
-.status-pending { background:#fff4e6;color:#7a4e00; }
-.status-rejected { background:#fdecea;color:#a42b2b; }
+        .tab-navigation {
+            display: flex;
+            gap: 12px;
+        }
 
-.icon-btn { width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;font-size:18px;margin-right:4px; }
-.approve-btn { background:#27ae60;color:#fff; }
-.delete-btn { background:#e74c3c;color:#fff; }
+        .tab {
+            padding: 8px 20px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            background: #fff;
+            color: #6b6b6b;
+            box-shadow: 0 2px 6px rgba(62, 45, 45, 0.04);
+            transition: all 0.15s;
+        }
 
-/* Back Button */
+        .tab:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(62, 45, 45, 0.08);
+        }
 
-.return-back-btn {
-    margin: 0 auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #7d2e2e;
-    color: #fff;
-    padding: 14px 28px;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 14px;
-    text-decoration: none;
-    box-shadow: 0 4px 12px rgba(125, 46, 46, 0.18);
-    transition: all 0.2s ease-in-out;
-}
+        .tab.active {
+            background: #7d2e2e;
+            color: #fff;
+            box-shadow: none;
+        }
 
-.return-back-btn:hover {
-    background: #6b2626;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(125, 46, 46, 0.25);
-}
+        .tab.active {
+            background: #7d2e2e;
+            color: #fff;
+            box-shadow: none;
+        }
 
-.return-back-btn.material-icons {
-    font-size: 20px;
-}
+        .controls-top {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            padding: 16px 32px;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-box {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border-radius: 999px;
+            border: 1px solid #e6e6e6;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .filter-dropdown {
+            padding: 10px 36px 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #e6e6e6;
+            background: #fff;
+            font-size: 14px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-export {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-export-pdf {
+            background: #7d2e2e;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(125, 46, 46, 0.12);
+        }
+
+        .btn-export-csv {
+            background: #fff;
+            color: #555;
+            border: 1px solid #e6e6e6;
+        }
+
+        .btn-export-csv {
+            background: #fff;
+            color: #555;
+            border: 1px solid #e6e6e6;
+        }
+
+        .content-layout {
+            display: flex;
+            flex: 1;
+            gap: 24px;
+            padding: 16px 32px;
+            overflow: hidden;
+        }
+
+        .summary-sidebar {
+            flex: 0 0 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .summary-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 6px 18px rgba(31, 31, 31, 0.04);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .summary-card .card-icon {
+            width: 58px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            border-radius: 10px;
+            font-size: 28px;
+        }
+
+        .summary-card h2 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #0b0b0b;
+        }
+
+        .summary-card p {
+            font-size: 14px;
+            font-weight: 600;
+            color: inherit;
+            opacity: 0.95;
+        }
+
+        .highlight-card {
+            background: #8A2D3B;
+            color: #fff;
+        }
+
+        .highlight-card .card-icon {
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 30px;
+            color: #fff;
+        }
+
+        .highlight-card h2,
+        .highlight-card p {
+            color: #fff;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(15, 15, 15, 0.03);
+        }
+
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        .report-table th,
+        .report-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .report-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .status-approved {
+            background: #27ae60;
+            color: #fff;
+        }
+
+        .status-approved {
+            background: #27ae60;
+            color: #fff;
+        }
+
+        .status-pending {
+            background: #fff4e6;
+            color: #7a4e00;
+        }
+
+        .status-rejected {
+            background: #fdecea;
+            color: #a42b2b;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-right: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .approve-btn {
+            background: #27ae60;
+            color: #fff;
+        }
+
+        .approve-btn:hover {
+            background: #219a52;
+            transform: scale(1.05);
+        }
+
+        .reject-btn {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        .reject-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .no-action {
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Back Button */
+
+        .return-back-btn {
+            margin: 0 auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #7d2e2e;
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(125, 46, 46, 0.18);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .return-back-btn:hover {
+            background: #6b2626;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(125, 46, 46, 0.25);
+        }
+
+        .return-back-btn.material-icons {
+            font-size: 20px;
+        }
 
 
-@@media(max-width:1100px){.content-layout{padding:16px;gap:14px;}.summary-sidebar{width:260px;}}
-@@media(max-width:880px){.content-layout{flex-direction:column;}.summary-sidebar{width:100%;flex-direction:row;overflow-x:auto;padding-bottom:8px;}.summary-card{min-width:220px;}}
-</style>
-
-<!-- jsPDF library for PDF generation -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-
-
-<script>
-    // Export PDF - defined globally to be accessible by onclick
-    function exportPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const tableRows = document.querySelectorAll('#requestsTable tbody tr');
-
-        doc.text("Book Requests Report", 14, 20);
-
-        const head = [['Book Title', 'Member Name', 'Request Date', 'Status']];
-        const body = [];
-        tableRows.forEach(row => {
-            if (row.style.display !== 'none') {
-                const rowData = [row.cells[0].innerText, row.cells[1].innerText, row.cells[2].innerText, row.cells[3].innerText];
-                body.push(rowData);
+        @@media(max-width:1100px) {
+            .content-layout {
+                padding: 16px;
+                gap: 14px;
             }
-        });
 
-        doc.autoTable({ head: head, body: body, startY: 30 });
-        doc.save('requests_report.pdf');
-    }
-</script>
+            .summary-sidebar {
+                width: 260px;
+            }
+        }
 
+        @@media(max-width:880px) {
+            .content-layout {
+                flex-direction: column;
+            }
+
+            .summary-sidebar {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 8px;
+            }
+
+            .summary-card {
+                min-width: 220px;
+            }
+        }
+    </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const searchBox = document.getElementById('searchBox');
-    const statusFilter = document.getElementById('statusFilter');
-    const tableRows = document.querySelectorAll('#requestsTable tbody tr');
-    const summaryCards = document.querySelectorAll('.summary-card');
-    const btnExportCSV = document.querySelector('.btn-export-csv');
+    var searchBox = document.getElementById('searchBox');
+    var statusFilter = document.getElementById('statusFilter');
+    var tableRows = document.querySelectorAll('#requestsTable tbody tr');
+    var summaryCards = document.querySelectorAll('.summary-card');
+    var cardFilterMap = ["All", "Approved", "Pending", "Rejected"];
+    var btnExportCSV = document.querySelector('.btn-export-csv');
+    var btnExportPDF = document.querySelector('.btn-export-pdf');
 
-    // Function to filter table based on searchBox and statusFilter / clicked card
-    function filterTable(filterStatus = null){
-        const searchTerm = searchBox.value.toLowerCase();
-        const statusTerm = filterStatus !== null ? filterStatus : statusFilter.value;
-        let visibleRowCount = 0;
+    function filterTable(filterStatus) {
+        var searchTerm = searchBox ? searchBox.value.toLowerCase() : '';
+        var statusTerm = (filterStatus !== undefined && filterStatus !== null) ? filterStatus : (statusFilter ? statusFilter.value : '');
 
-        tableRows.forEach(row => {
-            const book = row.cells[0].innerText.toLowerCase();
-            const member = row.cells[1].innerText.toLowerCase();
-            const status = row.cells[3].innerText;
+        for (var i = 0; i < tableRows.length; i++) {
+            var row = tableRows[i];
+            var book = row.cells[0].innerText.toLowerCase();
+            var member = row.cells[1].innerText.toLowerCase();
+            var status = row.cells[3].innerText;
 
-            const matchesSearch = book.includes(searchTerm) || member.includes(searchTerm);
-            const matchesStatus = !statusTerm || statusTerm === "All" ? true : status === statusTerm;
+            var matchesSearch = book.indexOf(searchTerm) !== -1 || member.indexOf(searchTerm) !== -1;
+            var matchesStatus = !statusTerm || statusTerm === "All" || status === statusTerm;
 
             row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
-            if (row.style.display !== "none") {
-                visibleRowCount++;
-            }
-        });
+        }
 
-        // Highlight the correct summary card
-        summaryCards.forEach(card => {
-            if ((!statusTerm && card.dataset.filter === "All") || statusTerm === card.dataset.filter) {
+        for (var j = 0; j < summaryCards.length; j++) {
+            var card = summaryCards[j];
+            var cardFilter = cardFilterMap[j];
+            if ((!statusTerm && cardFilter === "All") || statusTerm === cardFilter) {
                 card.classList.add("highlight-card");
             } else {
                 card.classList.remove("highlight-card");
             }
-        });
+        }
 
         // Sync dropdown with clicked card
-        if (filterStatus !== null) {
-            statusFilter.value = filterStatus === "All" ? "" : filterStatus;
-        }
+        if (filterStatus !== undefined && filterStatus !== null && statusFilter) statusFilter.value = filterStatus;
     }
 
-    // Export CSV
-    function exportCSV(){
-        let csv = "Book Title,Member Name,Request Date,Status\n";
-        tableRows.forEach(row => {
+    // Export CSV - only export first 4 columns (exclude Action column)
+    function exportCSV() {
+        var csv = "Book Title,Member Name,Request Date,Status\n";
+        tableRows.forEach(function(row) {
             if (row.style.display === "none") return;
-            // Select all cells except the last one (Action)
-            const cells = Array.from(row.cells).slice(0, -1);
-            const rowData = cells.map(c => `"${c.innerText.replace(/"/g, '""')}"`).join(",");
+            var cells = Array.from(row.cells).slice(0, 4);
+            var rowData = cells.map(function(c) {
+                return '"' + c.innerText.replace(/"/g, '""') + '"';
+            }).join(",");
             csv += rowData + "\n";
         });
-        const link = document.createElement("a");
-        link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        var link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
         link.download = "requests_report.csv";
-        document.body.appendChild(link); 
+        document.body.appendChild(link);
         link.click();
         link.remove();
+        URL.revokeObjectURL(link.href);
     }
 
-    // Event listeners
-    searchBox.addEventListener('input',() => filterTable());
-    statusFilter.addEventListener('change',() => filterTable());
-    summaryCards.forEach(card => card.addEventListener('click', () => filterTable(card.dataset.filter)));
-    btnExportCSV.addEventListener('click', exportCSV);
-    
+    // Export PDF - print only the table content
+    function exportPDF() {
+        var printContent = document.querySelector('.table-container').innerHTML;
+        var printWindow = window.open('', '_blank');
+        var html = '<html><head><title>Book Requests Report<\/title>';
+        html += '<st' + 'yle>';
+        html += 'body { font-family: Arial, sans-serif; padding: 20px; }';
+        html += 'h1 { color: #7d2e2e; margin-bottom: 20px; }';
+        html += 'table { width: 100%; border-collapse: collapse; }';
+        html += 'th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }';
+        html += 'th { background: #7d2e2e; color: white; }';
+        html += 'tr:hover { background: #f5f5f5; }';
+        html += '.status { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }';
+        html += '.status-approved { background: #27ae60; color: white; }';
+        html += '.status-pending { background: #fff4e6; color: #7a4e00; }';
+        html += '.status-rejected { background: #fdecea; color: #a42b2b; }';
+        html += '.action-icons, .no-action { display: none; }';
+        html += 'th:last-child, td:last-child { display: none; }';
+        html += '<\/st' + 'yle><\/head><body>';
+        html += '<h1>Book Requests Report<\/h1>';
+        html += '<p>Generated on: ' + new Date().toLocaleDateString() + '<\/p>';
+        html += printContent;
+        html += '<\/body><\/html>';
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.onload = function() {
+            printWindow.print();
+            printWindow.close();
+        };
+    }
+
+    // Event Listeners
+    if (searchBox) searchBox.addEventListener('input', function() { filterTable(); });
+    if (statusFilter) statusFilter.addEventListener('change', function() { filterTable(); });
+    if (btnExportCSV) btnExportCSV.addEventListener('click', exportCSV);
+    if (btnExportPDF) btnExportPDF.addEventListener('click', exportPDF);
+
+    // Summary card click handlers
+    for (var i = 0; i < summaryCards.length; i++) {
+        (function(index) {
+            summaryCards[index].addEventListener('click', function() {
+                filterTable(cardFilterMap[index]);
+            });
+        })(i);
+    }
+
+    // Initial state
     filterTable();
 });
-</script>
-<script>
-    function exportPDF() {
-        const originalContent = document.body.innerHTML;
-        const tableContent = document.querySelector('.main-content').innerHTML;
-        document.body.innerHTML = tableContent;
-        window.print();
-        document.body.innerHTML = originalContent;
-        window.location.reload(); // reload to restore scripts/events
-    }
 </script>

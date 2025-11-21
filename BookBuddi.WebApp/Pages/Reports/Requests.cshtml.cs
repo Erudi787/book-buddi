@@ -38,13 +38,15 @@ namespace BookBuddi.WebApp.Pages
 
             RequestList = requests.Select(r => new RequestDTO
             {
+                RequestId = r.RequestId,
                 BookTitle = r.BookTitle,
                 MemberName = members.FirstOrDefault(m => m.MemberId == r.MemberId)?.FirstName + " " +
                              members.FirstOrDefault(m => m.MemberId == r.MemberId)?.LastName ?? "-",
                 RequestDate = r.RequestDate,
                 StatusText = r.Status.ToString(),
                 StatusClass = r.Status == RequestStatus.Pending ? "status-pending" :
-                              r.Status == RequestStatus.Approved ? "status-approved" : "status-rejected"
+                              r.Status == RequestStatus.Approved ? "status-approved" : "status-rejected",
+                IsPending = r.Status == RequestStatus.Pending
             }).ToList();
 
             return Page();
@@ -52,11 +54,13 @@ namespace BookBuddi.WebApp.Pages
 
         public class RequestDTO
         {
+            public int RequestId { get; set; }
             public string? BookTitle { get; set; }
             public string? MemberName { get; set; }
             public DateTime RequestDate { get; set; }
             public string? StatusText { get; set; }
             public string? StatusClass { get; set; }
+            public bool IsPending { get; set; }
         }
     }
 }

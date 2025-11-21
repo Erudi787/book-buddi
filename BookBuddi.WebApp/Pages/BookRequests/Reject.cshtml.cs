@@ -14,7 +14,7 @@ namespace BookBuddi.Pages.BookRequests
             _requestService = requestService;
         }
 
-        public IActionResult OnGet(int id)
+        public IActionResult OnGet(int id, string? returnUrl)
         {
             // Admin authorization check
             var userRole = HttpContext.Session.GetString("UserRole");
@@ -26,6 +26,12 @@ namespace BookBuddi.Pages.BookRequests
 
             var adminName = HttpContext.Session.GetString("AdminName") ?? "Admin";
             _requestService.RejectRequest(id, "Rejected by admin", adminName);
+
+            // Redirect back to the page that initiated the action
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
             return RedirectToPage("./Index");
         }
     }

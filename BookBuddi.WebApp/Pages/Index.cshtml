@@ -604,13 +604,46 @@
             right: 20px;
         }
     }
+
+    .logo-link {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        padding: 10px 20px;
+        background: white;
+        border-radius: 50px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s;
+    }
+
+    .logo-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .logo-link img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .logo-link strong {
+        color: #333;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
 </style>
 
 <!-- Top Navigation -->
 <div class="top-nav">
     <div class="nav-logo">
-        <img src="/assets/logo.svg" alt="Book Buddi Logo" />
-        <strong>Book Buddi</strong>
+        <a href="/" class="logo-link">
+            <img src="/assets/logo.svg" alt="Book Buddi Logo" />
+            <strong>Book Buddi</strong>
+        </a>
     </div>
     <div class="nav-auth-buttons">
         @if (string.IsNullOrEmpty(userRole))

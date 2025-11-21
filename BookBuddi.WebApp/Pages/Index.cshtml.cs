@@ -34,6 +34,13 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(string? searchTerm, int? categoryId, int? genreId)
     {
+        // Restrict Members from accessing landing page - redirect to Books/Index
+        var userRole = HttpContext.Session.GetString("UserRole");
+        if (userRole == "Member")
+        {
+            return RedirectToPage("/Books/Index");
+        }
+
         SearchTerm = searchTerm;
         CategoryId = categoryId;
         GenreId = genreId;
@@ -94,8 +101,15 @@ public class IndexModel : PageModel
     }
 
     // AJAX endpoint for smooth search
-    public JsonResult OnGetSearchBooks(string? searchTerm, int? categoryId, int? genreId)
+    public IActionResult OnGetSearchBooks(string? searchTerm, int? categoryId, int? genreId)
     {
+        // Restrict Members from accessing this endpoint
+        var userRole = HttpContext.Session.GetString("UserRole");
+        if (userRole == "Member")
+        {
+            return new JsonResult(new { success = false, message = "Access denied" });
+        }
+
         var allBooks = _bookService.GetAllBooks();
 
         // Apply search term filter

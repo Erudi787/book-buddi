@@ -190,11 +190,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const tableRows = document.querySelectorAll('#membersTable tbody tr');
     const summaryCards = document.querySelectorAll('.summary-card');
     const cardFilterMap = ["All","Active","Inactive"];
+    const btnExportCSV = document.querySelector('.btn-export-csv');
+    const btnExportPDF = document.querySelector('.btn-export-pdf');
 
     // Filter Table and Highlight Cards
-    function filterTable() {
-        const searchTerm = searchBox.value.toLowerCase();
-        const statusTerm = statusFilter.value;
+    function filterTable(filterStatus = null) {
+        const searchTerm = searchBox ? searchBox.value.toLowerCase() : '';
+        const statusTerm = filterStatus !== null ? filterStatus : (statusFilter ? statusFilter.value : '');
 
         tableRows.forEach(row => {
             const name = row.cells[1].innerText.toLowerCase();
@@ -202,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const status = row.cells[4].innerText;
 
             const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
-            const matchesStatus = statusTerm === "" || status === statusTerm;
+            const matchesStatus = !statusTerm || statusTerm === "All" ? true : status === statusTerm;
 
             row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
         });
@@ -210,44 +212,72 @@ document.addEventListener('DOMContentLoaded', function() {
         // Highlight summary cards based on dropdown selection
         summaryCards.forEach((card, index) => {
             const cardFilter = cardFilterMap[index];
-            if ((statusTerm === "" && cardFilter === "All") || statusTerm === cardFilter) {
+            if ((!statusTerm && cardFilter === "All") || statusTerm === cardFilter) {
                 card.classList.add("highlight-card");
             } else {
                 card.classList.remove("highlight-card");
             }
         });
+
+        // Sync dropdown with clicked card
+        if (filterStatus !== null && statusFilter) statusFilter.value = filterStatus;
     }
 
-    // Search & filter events
-    searchBox.addEventListener('input', filterTable);
-    statusFilter.addEventListener('change', filterTable);
-
     // Export CSV
-    document.querySelector('.btn-export-csv').addEventListener('click', () => {
-        let csvContent = "data:text/csv;charset=utf-8,Member ID,Name,Email,Total Books Borrowed,Status\n";
+    function exportCSV() {
+        let csv = "Member ID,Name,Email,Total Books Borrowed,Status\n";
         tableRows.forEach(row => {
-            if(row.style.display !== "none") {
-                const rowData = Array.from(row.cells).map(c => `"${c.innerText.replace(/"/g,'""')}"`).join(",");
-                csvContent += rowData + "\n";
-            }
+            if (row.style.display === "none") return;
+            const rowData = Array.from(row.cells).map(c => `"${c.innerText.replace(/"/g,'""')}"`).join(",");
+            csv += rowData + "\n";
         });
-        const encodedUri = encodeURI(csvContent);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "members_report.csv");
+        link.href = URL.createObjectURL(blob);
+        link.download = "members_report.csv";
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
-    });
+        link.remove();
+        URL.revokeObjectURL(link.href);
+    }
 
-    // Export PDF
-    document.querySelector('.btn-export-pdf').addEventListener('click', () => {
-        const originalContent = document.body.innerHTML;
-        const tableContent = document.querySelector('.main-content').innerHTML;
-        document.body.innerHTML = tableContent;
-        window.print();
-        document.body.innerHTML = originalContent;
-        window.location.reload();
+    // Export PDF - print only the table content
+    function exportPDF() {
+        var printContent = document.querySelector('.table-container').innerHTML;
+        var printWindow = window.open('', '_blank');
+        var html = '<html><head><title>Members Report<\/title>';
+        html += '<st' + 'yle>';
+        html += 'body { font-family: Arial, sans-serif; padding: 20px; }';
+        html += 'h1 { color: #7d2e2e; margin-bottom: 20px; }';
+        html += 'table { width: 100%; border-collapse: collapse; }';
+        html += 'th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }';
+        html += 'th { background: #7d2e2e; color: white; }';
+        html += 'tr:hover { background: #f5f5f5; }';
+        html += '.status { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }';
+        html += '.status-active { background: #27ae60; color: white; }';
+        html += '.status-inactive { background: #e74c3c; color: white; }';
+        html += '<\/st' + 'yle><\/head><body>';
+        html += '<h1>Members Report<\/h1>';
+        html += '<p>Generated on: ' + new Date().toLocaleDateString() + '<\/p>';
+        html += printContent;
+        html += '<\/body><\/html>';
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.onload = function() {
+            printWindow.print();
+            printWindow.close();
+        };
+    }
+
+    // Event Listeners
+    if (searchBox) searchBox.addEventListener('input', () => filterTable());
+    if (statusFilter) statusFilter.addEventListener('change', () => filterTable());
+    if (btnExportCSV) btnExportCSV.addEventListener('click', exportCSV);
+    if (btnExportPDF) btnExportPDF.addEventListener('click', exportPDF);
+
+    // Summary card click handlers
+    summaryCards.forEach((card, index) => {
+        card.addEventListener('click', () => filterTable(cardFilterMap[index]));
     });
 
     // Initial filter

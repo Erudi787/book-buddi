@@ -56,6 +56,19 @@ namespace BookBuddi.Pages.Admin
         public int TotalGenres { get; set; }
         public int TotalAuthors { get; set; }
 
+        // Recent Activity Feed
+        public List<ActivityItem> RecentActivities { get; set; } = new();
+
+        public class ActivityItem
+        {
+            public string Type { get; set; } = ""; // "Borrow", "Return", "Fine"
+            public string Description { get; set; } = "";
+            public string MemberName { get; set; } = "";
+            public int MemberId { get; set; }
+            public DateTime Timestamp { get; set; }
+            public decimal? Amount { get; set; }
+        }
+
         public async Task<IActionResult> OnGetAsync()
         {
             // Admin-only check
@@ -116,6 +129,45 @@ namespace BookBuddi.Pages.Admin
             TotalCategories = await _context.Set<Data.Models.Category>().CountAsync();
             TotalGenres = await _context.Set<Data.Models.Genre>().CountAsync();
             TotalAuthors = await _context.Set<Data.Models.Author>().CountAsync();
+
+            // Recent Activity Feed - Get recent borrowings and returns using joins
+            var recentBorrows = await (from t in _context.BorrowTransactions
+                                       join m in _context.Members on t.MemberId equals m.MemberId
+                                       join b in _context.Books on t.BookId equals b.BookId
+                                       orderby t.BorrowDate descending
+                                       select new ActivityItem
+                                       {
+                                           Type = t.Status == TransactionStatus.Active ? "Borrow" : "Return",
+                                           Description = b.BookTitle,
+                                           MemberName = m.FirstName + " " + m.LastName,
+                                           MemberId = t.MemberId,
+                                           Timestamp = t.Status == TransactionStatus.Active ? t.BorrowDate : (t.ReturnDate ?? t.BorrowDate)
+                                       })
+                                       .Take(10)
+                                       .ToListAsync();
+
+            var recentFines = await (from f in _context.Fines
+                                     join m in _context.Members on f.MemberId equals m.MemberId
+                                     where f.Status == FineStatus.Paid
+                                     orderby f.UpdatedTime descending
+                                     select new ActivityItem
+                                     {
+                                         Type = "Fine",
+                                         Description = "Fine Collected",
+                                         MemberName = m.FirstName + " " + m.LastName,
+                                         MemberId = f.MemberId,
+                                         Timestamp = f.UpdatedTime,
+                                         Amount = f.Amount
+                                     })
+                                     .Take(5)
+                                     .ToListAsync();
+
+            // Combine and sort by timestamp
+            RecentActivities = recentBorrows
+                .Concat(recentFines)
+                .OrderByDescending(a => a.Timestamp)
+                .Take(10)
+                .ToList();
 
             return Page();
         }
