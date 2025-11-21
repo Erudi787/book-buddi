@@ -35,7 +35,7 @@
         </div>
 
         <div class="action-buttons">
-            <button class="btn-export btn-export-pdf" onclick="exportPDF()">Export PDF</button>
+            <button class="btn-export btn-export-pdf">Export PDF</button>
             <button class="btn-export btn-export-csv">Export CSV</button>
         </div>
     </div>
@@ -503,147 +503,114 @@
         }
     </style>
 
-    <!-- jsPDF library for PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var searchBox = document.getElementById('searchBox');
+    var statusFilter = document.getElementById('statusFilter');
+    var tableRows = document.querySelectorAll('#requestsTable tbody tr');
+    var summaryCards = document.querySelectorAll('.summary-card');
+    var cardFilterMap = ["All", "Approved", "Pending", "Rejected"];
+    var btnExportCSV = document.querySelector('.btn-export-csv');
+    var btnExportPDF = document.querySelector('.btn-export-pdf');
 
+    function filterTable(filterStatus) {
+        var searchTerm = searchBox ? searchBox.value.toLowerCase() : '';
+        var statusTerm = (filterStatus !== undefined && filterStatus !== null) ? filterStatus : (statusFilter ? statusFilter.value : '');
 
-    <script>
-        // Export PDF - defined globally to be accessible by onclick
-        function exportPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const tableRows = document.querySelectorAll('#requestsTable tbody tr');
+        for (var i = 0; i < tableRows.length; i++) {
+            var row = tableRows[i];
+            var book = row.cells[0].innerText.toLowerCase();
+            var member = row.cells[1].innerText.toLowerCase();
+            var status = row.cells[3].innerText;
 
-            doc.text("Book Requests Report", 14, 20);
+            var matchesSearch = book.indexOf(searchTerm) !== -1 || member.indexOf(searchTerm) !== -1;
+            var matchesStatus = !statusTerm || statusTerm === "All" || status === statusTerm;
 
-            const head = [['Book Title', 'Member Name', 'Request Date', 'Status']];
-            const body = [];
-            tableRows.forEach(row => {
-                if (row.style.display !== 'none') {
-                    const rowData = [row.cells[0].innerText, row.cells[1].innerText, row.cells[2].innerText, row.cells[3].innerText];
-                    body.push(rowData);
-                }
-            });
-
-            doc.autoTable({ head: head, body: body, startY: 30 });
-            doc.save('requests_report.pdf');
+            row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
         }
-    </script>
 
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchBox = document.getElementById('searchBox');
-            const statusFilter = document.getElementById('statusFilter');
-            const tableRows = document.querySelectorAll('#requestsTable tbody tr');
-            const summaryCards = document.querySelectorAll('.summary-card');
-            const btnExportCSV = document.querySelector('.btn-export-csv');
-
-            // Function to filter table based on searchBox and statusFilter / clicked card
-            function filterTable(filterStatus = null) {
-                const searchTerm = searchBox ? searchBox.value.toLowerCase() : '';
-                const statusTerm = filterStatus !== null ? filterStatus : (statusFilter ? statusFilter.value : '');
-
-                tableRows.forEach(row => {
-                    const book = row.cells[0].innerText.toLowerCase();
-                    const member = row.cells[1].innerText.toLowerCase();
-                    const status = row.cells[3].innerText;
-
-                    const matchesSearch = book.includes(searchTerm) || member.includes(searchTerm);
-                    const matchesStatus = !statusTerm || statusTerm === "All" ? true : status === statusTerm;
-
-                    row.style.display = (matchesSearch && matchesStatus) ? "" : "none";
-                    if (row.style.display !== "none") {
-                        visibleRowCount++;
-                    }
-                });
-
-                // Highlight the correct summary card
-                summaryCards.forEach(card => {
-                    if ((!statusTerm && card.dataset.filter === "All") || statusTerm === card.dataset.filter) {
-                        card.classList.add("highlight-card");
-                    } else {
-                        card.classList.remove("highlight-card");
-                    }
-                });
-
-                // Sync dropdown with clicked card
-                if (filterStatus !== null && statusFilter) statusFilter.value = filterStatus;
+        for (var j = 0; j < summaryCards.length; j++) {
+            var card = summaryCards[j];
+            var cardFilter = cardFilterMap[j];
+            if ((!statusTerm && cardFilter === "All") || statusTerm === cardFilter) {
+                card.classList.add("highlight-card");
+            } else {
+                card.classList.remove("highlight-card");
             }
+        }
 
-            // Export CSV - only export first 4 columns (exclude Action column)
-            function exportCSV() {
-                let csv = "Book Title,Member Name,Request Date,Status\n";
-                tableRows.forEach(row => {
-                    if (row.style.display === "none") return;
-                    // Only take first 4 columns, exclude Action column
-                    const cells = Array.from(row.cells).slice(0, 4);
-                    const rowData = cells.map(c => `"${c.innerText.replace(/"/g, '""')}"`).join(",");
-                    csv += rowData + "\n";
-                });
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = "requests_report.csv";
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-                URL.revokeObjectURL(link.href);
-            }
+        // Sync dropdown with clicked card
+        if (filterStatus !== undefined && filterStatus !== null && statusFilter) statusFilter.value = filterStatus;
+    }
 
-            // Export PDF - print only the table content
-            function exportPDF() {
-                var printContent = document.querySelector('.table-container').innerHTML;
-                var printWindow = window.open('', '_blank');
-                var html = '<html><head><title>Book Requests Report<\/title>';
-                html += '<st' + 'yle>';
-                html += 'body { font-family: Arial, sans-serif; padding: 20px; }';
-                html += 'h1 { color: #7d2e2e; margin-bottom: 20px; }';
-                html += 'table { width: 100%; border-collapse: collapse; }';
-                html += 'th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }';
-                html += 'th { background: #7d2e2e; color: white; }';
-                html += 'tr:hover { background: #f5f5f5; }';
-                html += '.status { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }';
-                html += '.status-approved { background: #27ae60; color: white; }';
-                html += '.status-pending { background: #fff4e6; color: #7a4e00; }';
-                html += '.status-rejected { background: #fdecea; color: #a42b2b; }';
-                html += '.action-icons, .no-action { display: none; }';
-                html += 'th:last-child, td:last-child { display: none; }';
-                html += '<\/st' + 'yle><\/head><body>';
-                html += '<h1>Book Requests Report<\/h1>';
-                html += '<p>Generated on: ' + new Date().toLocaleDateString() + '<\/p>';
-                html += printContent;
-                html += '<\/body><\/html>';
-                printWindow.document.write(html);
-                printWindow.document.close();
-                printWindow.onload = function () {
-                    printWindow.print();
-                    printWindow.close();
-                };
-            }
-
-            // Event listeners
-            if (searchBox) searchBox.addEventListener('input', () => filterTable());
-            if (statusFilter) statusFilter.addEventListener('change', () => filterTable());
-            if (btnExportCSV) btnExportCSV.addEventListener('click', exportCSV);
-            if (btnExportPDF) btnExportPDF.addEventListener('click', exportPDF);
-
-            // Summary card click handlers
-            summaryCards.forEach((card, index) => {
-                card.addEventListener('click', () => filterTable(cardFilterMap[index]));
-            });
-
-            filterTable();
+    // Export CSV - only export first 4 columns (exclude Action column)
+    function exportCSV() {
+        var csv = "Book Title,Member Name,Request Date,Status\n";
+        tableRows.forEach(function(row) {
+            if (row.style.display === "none") return;
+            var cells = Array.from(row.cells).slice(0, 4);
+            var rowData = cells.map(function(c) {
+                return '"' + c.innerText.replace(/"/g, '""') + '"';
+            }).join(",");
+            csv += rowData + "\n";
         });
-    </script>
-    <script>
-        function exportPDF() {
-            const originalContent = document.body.innerHTML;
-            const tableContent = document.querySelector('.main-content').innerHTML;
-            document.body.innerHTML = tableContent;
-            window.print();
-            document.body.innerHTML = originalContent;
-            window.location.reload(); // reload to restore scripts/events
-        }
-    </script>
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        var link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "requests_report.csv";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(link.href);
+    }
+
+    // Export PDF - print only the table content
+    function exportPDF() {
+        var printContent = document.querySelector('.table-container').innerHTML;
+        var printWindow = window.open('', '_blank');
+        var html = '<html><head><title>Book Requests Report<\/title>';
+        html += '<st' + 'yle>';
+        html += 'body { font-family: Arial, sans-serif; padding: 20px; }';
+        html += 'h1 { color: #7d2e2e; margin-bottom: 20px; }';
+        html += 'table { width: 100%; border-collapse: collapse; }';
+        html += 'th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }';
+        html += 'th { background: #7d2e2e; color: white; }';
+        html += 'tr:hover { background: #f5f5f5; }';
+        html += '.status { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }';
+        html += '.status-approved { background: #27ae60; color: white; }';
+        html += '.status-pending { background: #fff4e6; color: #7a4e00; }';
+        html += '.status-rejected { background: #fdecea; color: #a42b2b; }';
+        html += '.action-icons, .no-action { display: none; }';
+        html += 'th:last-child, td:last-child { display: none; }';
+        html += '<\/st' + 'yle><\/head><body>';
+        html += '<h1>Book Requests Report<\/h1>';
+        html += '<p>Generated on: ' + new Date().toLocaleDateString() + '<\/p>';
+        html += printContent;
+        html += '<\/body><\/html>';
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.onload = function() {
+            printWindow.print();
+            printWindow.close();
+        };
+    }
+
+    // Event Listeners
+    if (searchBox) searchBox.addEventListener('input', function() { filterTable(); });
+    if (statusFilter) statusFilter.addEventListener('change', function() { filterTable(); });
+    if (btnExportCSV) btnExportCSV.addEventListener('click', exportCSV);
+    if (btnExportPDF) btnExportPDF.addEventListener('click', exportPDF);
+
+    // Summary card click handlers
+    for (var i = 0; i < summaryCards.length; i++) {
+        (function(index) {
+            summaryCards[index].addEventListener('click', function() {
+                filterTable(cardFilterMap[index]);
+            });
+        })(i);
+    }
+
+    // Initial state
+    filterTable();
+});
+</script>
