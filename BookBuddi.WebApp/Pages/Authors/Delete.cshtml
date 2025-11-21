@@ -1,0 +1,198 @@
+@page
+@model BookBuddi.Pages.Authors.DeleteModel
+@{
+    ViewData["Title"] = "Delete Author";
+    var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
+}
+<link rel="stylesheet" href="~/css/authors-delete.css" />
+
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
+
+    <div class="page-container">
+        <div class="page-header">
+            <h1>Delete Author</h1>
+            <p>Permanently remove an author from the BookBuddi library system</p>
+        </div>
+
+        @if (!isAdmin)
+        {
+            <div class="access-denied">
+                <div class="access-denied-icon">🚫</div>
+                <h2>Admin Access Required</h2>
+                <p>You need administrator privileges to delete authors from the library system.</p>
+                <a href="/Account/Login" class="btn btn-danger">
+                    <i class="fas fa-sign-in-alt"></i> Login as Admin
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="warning-alert">
+                <div class="warning-icon">⚠️</div>
+                <h3>Critical Action Required</h3>
+                <p>You are about to permanently delete this author from the system. This action cannot be undone.</p>
+                
+                <div class="warning-features">
+                    <div class="warning-feature">
+                        <i class="fas fa-ban"></i>
+                        <span>Permanent Deletion</span>
+                    </div>
+                    <div class="warning-feature">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Cannot Be Undone</span>
+                    </div>
+                    <div class="warning-feature">
+                        <i class="fas fa-books"></i>
+                        <span>Affects Book Records</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="author-card">
+                <div class="card-header">
+                    <div class="author-avatar">
+                        @Model.Author.FirstName?.Substring(0, 1).ToUpper()@Model.Author.LastName?.Substring(0, 1).ToUpper()
+                    </div>
+                    <div class="author-title">
+                        <h2>@Model.Author.FirstName @Model.Author.LastName</h2>
+                        <div class="author-id">Author ID: #@Model.Author.AuthorId</div>
+                    </div>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-fingerprint"></i>
+                            Author ID
+                        </div>
+                        <div class="detail-value">#@Model.Author.AuthorId</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-user"></i>
+                            First Name
+                        </div>
+                        <div class="detail-value">@Model.Author.FirstName</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-user"></i>
+                            Last Name
+                        </div>
+                        <div class="detail-value">@Model.Author.LastName</div>
+                    </div>
+                    
+                    <div class="detail-item biography-item">
+                        <div class="detail-label">
+                            <i class="fas fa-book-open"></i>
+                            Biography
+                        </div>
+                        <div class="detail-value">
+                            @if (!string.IsNullOrEmpty(Model.Author.Biography))
+                            {
+                                @Model.Author.Biography
+                            }
+                            else
+                            {
+                                <span class="empty-biography">No biography provided</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" id="deleteForm">
+                <input type="hidden" name="id" value="@Model.Author.AuthorId" />
+                
+                <div class="confirmation-check">
+                    <div class="confirmation-label" onclick="toggleConfirmation()">
+                        <div class="confirmation-checkbox" id="confirmationCheckbox"></div>
+                        <span>I understand that this action cannot be undone</span>
+                    </div>
+                    <div class="confirmation-hint">
+                        You must confirm your understanding before proceeding with deletion.
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-danger" id="deleteButton" disabled>
+                        <i class="fas fa-trash"></i> Confirm Delete
+                    </button>
+                    <a href="/Authors/Index" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> Back to Authors
+                    </a>
+                    <a href="/Authors/Edit?id=@Model.Author.AuthorId" class="btn btn-secondary">
+                        <i class="fas fa-edit"></i> Edit Instead
+                    </a>
+                </div>
+            </form>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i> @Model.ErrorMessage
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit-code.js" crossorigin="anonymous"></script>
+    <script>
+        let isConfirmed = false;
+
+        function toggleConfirmation() {
+            isConfirmed = !isConfirmed;
+            const checkbox = document.getElementById('confirmationCheckbox');
+            const deleteButton = document.getElementById('deleteButton');
+            
+            if (isConfirmed) {
+                checkbox.classList.add('checked');
+                deleteButton.disabled = false;
+            } else {
+                checkbox.classList.remove('checked');
+                deleteButton.disabled = true;
+            }
+        }
+
+        document.getElementById('deleteForm').addEventListener('submit', function(e) {
+            if (!isConfirmed) {
+                e.preventDefault();
+                alert('Please confirm that you understand this action cannot be undone.');
+                return false;
+            }
+            
+            // Additional confirmation for critical action
+            const confirmed = confirm('Are you absolutely sure you want to permanently delete author "@Model.Author.FirstName @Model.Author.LastName"? This action cannot be reversed.');
+            if (!confirmed) {
+                e.preventDefault();
+            }
+        });
+
+        // Add keyboard shortcut prevention
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'Enter' || e.key === 'Return')) {
+                if (document.getElementById('deleteForm').contains(document.activeElement)) {
+                    e.preventDefault();
+                }
+            }
+        });
+
+        // Add visual feedback for buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+}

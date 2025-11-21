@@ -1,0 +1,238 @@
+@page
+@model BookBuddi.Pages.Authors.EditModel
+@{
+    ViewData["Title"] = "Edit Author";
+    var isAdmin = HttpContext.Session.GetString("UserRole") == "Admin";
+    var colorPrimary = "#641B2E";
+}
+
+<link rel="stylesheet" href="~/css/authors-edit.css" />
+
+
+<div class="page-wrapper" style="display: flex; gap: 20px; padding: 20px;">
+    @await Html.PartialAsync("_AdminNavigation")
+
+    <div class="page-container">
+        <div class="page-header">
+            <h1>Edit Author</h1>
+            <p>Update author information and biography to keep the BookBuddi database accurate and up-to-date.</p>
+        </div>
+
+        @if (!isAdmin)
+        {
+            <div class="access-denied">
+                <div class="access-denied-icon">🚫</div>
+                <h2>Admin Access Required</h2>
+                <p>You need administrator privileges to access the author management system.</p>
+                <a href="/Account/Login" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Login as Admin
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="form-container">
+                <form method="post" id="authorForm">
+                    <input type="hidden" asp-for="Author.AuthorId" />
+                    
+                    <div class="form-group">
+                        <label class="form-label" asp-for="Author.FirstName">
+                            <i class="fas fa-user"></i> First Name
+                            <span class="required-marker">*</span>
+                        </label>
+                        <input asp-for="Author.FirstName" class="form-control" placeholder="Enter author's first name" required 
+                               maxlength="50" oninput="updatePreview()" />
+                        <div class="form-hint">
+                            <i class="fas fa-info-circle"></i> Required field. Maximum 50 characters.
+                        </div>
+                        <div class="char-counter">
+                            <span id="firstNameCounter">@(Model.Author.FirstName?.Length ?? 0)</span>/50 characters
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" asp-for="Author.LastName">
+                            <i class="fas fa-user"></i> Last Name
+                            <span class="required-marker">*</span>
+                        </label>
+                        <input asp-for="Author.LastName" class="form-control" placeholder="Enter author's last name" required 
+                               maxlength="50" oninput="updatePreview()" />
+                        <div class="form-hint">
+                            <i class="fas fa-info-circle"></i> Required field. Maximum 50 characters.
+                        </div>
+                        <div class="char-counter">
+                            <span id="lastNameCounter">@(Model.Author.LastName?.Length ?? 0)</span>/50 characters
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" asp-for="Author.Biography">
+                            <i class="fas fa-book-open"></i> Biography
+                        </label>
+                        <textarea asp-for="Author.Biography" class="form-control" 
+                                  placeholder="Provide a brief biography of the author (education, notable works, awards, etc.)..." 
+                                  rows="5" maxlength="1000" oninput="updatePreview()"></textarea>
+                        <div class="form-hint">
+                            <i class="fas fa-lightbulb"></i> Optional but recommended for author profile completeness.
+                        </div>
+                        <div class="char-counter">
+                            <span id="bioCounter">@(Model.Author.Biography?.Length ?? 0)</span>/1000 characters
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Author
+                        </button>
+                        <a href="/Authors/Index" class="btn btn-outline">
+                            <i class="fas fa-arrow-left"></i> Back to Authors
+                        </a>
+                        <a href="/Authors/Delete?id=@Model.Author.AuthorId" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Delete Author
+                        </a>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Reset Changes
+                        </button>
+                    </div>
+                </form>
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i> @Model.ErrorMessage
+                    </div>
+                }
+
+                <!-- Author Preview Section -->
+                <div class="author-preview">
+                    <h3><i class="fas fa-eye"></i> Author Preview</h3>
+                    <div class="preview-content">
+                        <div class="preview-avatar" id="previewAvatar">
+                            @(Model.Author.FirstName?.Substring(0, 1).ToUpper() ?? "A")@(Model.Author.LastName?.Substring(0, 1).ToUpper() ?? "A")
+                        </div>
+                        <div class="preview-details">
+                            <h4 id="previewName">@Model.Author.FirstName @Model.Author.LastName</h4>
+                            <p id="previewBio">
+                                @if (!string.IsNullOrEmpty(Model.Author.Biography))
+                                {
+                                    @Model.Author.Biography
+                                }
+                                else
+                                {
+                                    <span style="color: #a0aec0; font-style: italic;">Author biography will appear here once entered.</span>
+                                }
+                            </p>
+                            <div class="preview-meta">
+                                <span><i class="fas fa-id-card"></i> Author ID: #@Model.Author.AuthorId</span>
+                                <span><i class="fas fa-sync-alt"></i> Updates in real-time</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit-code.js" crossorigin="anonymous"></script>
+    <script>
+        // Real-time preview functionality
+        function updatePreview() {
+            const firstName = document.getElementById('Author_FirstName').value || 'First';
+            const lastName = document.getElementById('Author_LastName').value || 'Last';
+            const bio = document.getElementById('Author_Biography').value || 'Author biography will appear here once entered.';
+            
+            // Update preview
+            document.getElementById('previewName').textContent = `${firstName} ${lastName}`;
+            document.getElementById('previewBio').textContent = bio;
+            document.getElementById('previewAvatar').textContent = 
+                firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
+            
+            // Update character counters
+            document.getElementById('firstNameCounter').textContent = firstName.length;
+            document.getElementById('lastNameCounter').textContent = lastName.length;
+            document.getElementById('bioCounter').textContent = bio.length;
+        }
+
+        // Enhanced form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('authorForm');
+            
+            form.addEventListener('submit', function(e) {
+                const firstName = document.getElementById('Author_FirstName').value.trim();
+                const lastName = document.getElementById('Author_LastName').value.trim();
+                
+                // Reset previous errors
+                document.querySelectorAll('.form-control').forEach(input => {
+                    input.classList.remove('error');
+                });
+                
+                let isValid = true;
+                
+                if (!firstName) {
+                    document.getElementById('Author_FirstName').classList.add('error');
+                    isValid = false;
+                }
+                
+                if (!lastName) {
+                    document.getElementById('Author_LastName').classList.add('error');
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    // Scroll to first error
+                    const firstError = document.querySelector('.form-control.error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.focus();
+                    }
+                } else {
+                    // Add loading state to submit button
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                    submitBtn.disabled = true;
+                }
+            });
+
+            // Reset form handler
+            const resetBtn = document.querySelector('button[type="reset"]');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    setTimeout(updatePreview, 10); // Small delay to ensure reset completes
+                });
+            }
+
+            // Initialize preview
+            updatePreview();
+
+            // Add input animations
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'translateY(-2px)';
+                });
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'translateY(0)';
+                });
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + S to save
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                document.getElementById('authorForm').dispatchEvent(new Event('submit'));
+            }
+            // Escape to reset
+            if (e.key === 'Escape') {
+                const resetBtn = document.querySelector('button[type="reset"]');
+                if (resetBtn) {
+                    resetBtn.click();
+                }
+            }
+        });
+    </script>
+}
