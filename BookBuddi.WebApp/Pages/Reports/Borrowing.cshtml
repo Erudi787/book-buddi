@@ -100,6 +100,11 @@
                     </tbody>
                 </table>
             </div>
+            <div class="action-buttons" style="justify-content: center; margin-top: 20px;">
+                <a href="/Reports/Index" class="return-back-btn">
+                    Return to Analytics
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -159,6 +164,34 @@ body { font-family: "Instrument Sans", Roboto, Arial; color: #333; }
 .status-returned { background:#eaf5ee;color:#1b7a3a; }
 .status-active { background:#fff4e6;color:#7a4e00; }
 .status-overdue { background:#fdecea;color:#a42b2b; }
+
+/* Back Button */
+.return-back-btn {
+    margin: 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #7d2e2e;
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(125, 46, 46, 0.18);
+    transition: all 0.2s ease-in-out;
+}
+
+.return-back-btn:hover {
+    background: #6b2626;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(125, 46, 46, 0.25);
+}
+
+.return-back-btn .material-icons {
+    font-size: 20px;
+}
+
 
 /* Responsive */
 @@media(max-width:1100px){.content-layout{padding:16px;gap:14px;}.summary-sidebar{width:260px;}}
