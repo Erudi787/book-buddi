@@ -71,6 +71,27 @@ namespace BookBuddi.Services.Services
                 }
             }
 
+            // Load rating statistics for each book
+            var ratings = _unitOfWork.Database.Set<Rating>()
+                .Where(r => bookIds.Contains(r.BookId))
+                .GroupBy(r => r.BookId)
+                .Select(g => new
+                {
+                    BookId = g.Key,
+                    AverageRating = Math.Round(g.Average(r => r.Score), 1),
+                    TotalRatings = g.Count()
+                })
+                .ToDictionary(r => r.BookId);
+
+            foreach (var bookViewModel in bookViewModels)
+            {
+                if (ratings.ContainsKey(bookViewModel.BookId))
+                {
+                    bookViewModel.AverageRating = ratings[bookViewModel.BookId].AverageRating;
+                    bookViewModel.TotalRatings = ratings[bookViewModel.BookId].TotalRatings;
+                }
+            }
+
             return bookViewModels;
         }
 

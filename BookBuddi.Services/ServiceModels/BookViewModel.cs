@@ -46,6 +46,10 @@ namespace BookBuddi.Services.ServiceModels
         public string? GenreName { get; set; }
         public string? AuthorNames { get; set; }
 
+        // Rating properties
+        public double AverageRating { get; set; }
+        public int TotalRatings { get; set; }
+
         // Audit fields
         public string CreatedBy { get; set; } = string.Empty;
         public DateTime CreatedTime { get; set; }

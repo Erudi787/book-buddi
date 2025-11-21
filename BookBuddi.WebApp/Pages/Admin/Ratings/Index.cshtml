@@ -1,0 +1,327 @@
+@page
+@model BookBuddi.WebApp.Pages.Admin.Ratings.IndexModel
+@{
+    ViewData["Title"] = "Manage Ratings - Admin";
+}
+
+<div class="container-fluid">
+    <div class="page-header">
+        <h1 class="page-title">Book Ratings</h1>
+        <p class="page-subtitle">View all user ratings across the library</p>
+    </div>
+
+    @if (Model.OverallStats != null && Model.OverallStats.TotalRatings > 0)
+    {
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Ratings</div>
+                    <div class="stat-value">@Model.OverallStats.TotalRatings</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-content">
+                    <div class="stat-label">Average Rating</div>
+                    <div class="stat-value">@Model.OverallStats.AverageRating.ToString("0.0")</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-content">
+                    <div class="stat-label">5-Star Ratings</div>
+                    <div class="stat-value">@Model.OverallStats.FiveStarCount <span class="stat-percent">(@Model.OverallStats.FiveStarPercent%)</span></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-content">
+                    <div class="stat-label">Books Rated</div>
+                    <div class="stat-value">@Model.AllRatings.Select(r => r.BookId).Distinct().Count()</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rating-distribution-section">
+            <h3>Rating Distribution</h3>
+            <div class="rating-distribution">
+                <div class="distribution-row">
+                    <span class="distribution-label">5★</span>
+                    <div class="distribution-bar">
+                        <div class="distribution-fill" style="width: @Model.OverallStats.FiveStarPercent%"></div>
+                    </div>
+                    <span class="distribution-percent">@Model.OverallStats.FiveStarCount (@Model.OverallStats.FiveStarPercent%)</span>
+                </div>
+                <div class="distribution-row">
+                    <span class="distribution-label">4★</span>
+                    <div class="distribution-bar">
+                        <div class="distribution-fill" style="width: @Model.OverallStats.FourStarPercent%"></div>
+                    </div>
+                    <span class="distribution-percent">@Model.OverallStats.FourStarCount (@Model.OverallStats.FourStarPercent%)</span>
+                </div>
+                <div class="distribution-row">
+                    <span class="distribution-label">3★</span>
+                    <div class="distribution-bar">
+                        <div class="distribution-fill" style="width: @Model.OverallStats.ThreeStarPercent%"></div>
+                    </div>
+                    <span class="distribution-percent">@Model.OverallStats.ThreeStarCount (@Model.OverallStats.ThreeStarPercent%)</span>
+                </div>
+                <div class="distribution-row">
+                    <span class="distribution-label">2★</span>
+                    <div class="distribution-bar">
+                        <div class="distribution-fill" style="width: @Model.OverallStats.TwoStarPercent%"></div>
+                    </div>
+                    <span class="distribution-percent">@Model.OverallStats.TwoStarCount (@Model.OverallStats.TwoStarPercent%)</span>
+                </div>
+                <div class="distribution-row">
+                    <span class="distribution-label">1★</span>
+                    <div class="distribution-bar">
+                        <div class="distribution-fill" style="width: @Model.OverallStats.OneStarPercent%"></div>
+                    </div>
+                    <span class="distribution-percent">@Model.OverallStats.OneStarCount (@Model.OverallStats.OneStarPercent%)</span>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Model.AllRatings.Any())
+    {
+        <div class="table-section">
+            <h3>All Ratings</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Member</th>
+                            <th>Rating</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var rating in Model.AllRatings.OrderByDescending(r => r.RatedDate))
+                        {
+                            <tr>
+                                <td>
+                                    <div class="book-info">
+                                        @if (!string.IsNullOrEmpty(rating.BookCoverUrl))
+                                        {
+                                            <img src="@rating.BookCoverUrl" alt="@rating.BookTitle" class="book-thumbnail" />
+                                        }
+                                        <a href="/Books/Details?id=@rating.BookId" class="book-title-link">@rating.BookTitle</a>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="/Members/Details?id=@rating.MemberId" class="member-link">@rating.MemberName</a>
+                                </td>
+                                <td>
+                                    <div class="rating-display">
+                                        <span class="rating-stars" data-rating="@rating.Score">
+                                            <div class="stars"></div>
+                                        </span>
+                                        <span class="rating-score">@rating.Score/5</span>
+                                    </div>
+                                </td>
+                                <td>@rating.RatedDate.ToString("MMM dd, yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">⭐</div>
+            <h2 class="empty-state-title">No Ratings Yet</h2>
+            <p class="empty-state-message">No members have rated books yet. Ratings will appear here as members start rating books.</p>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="~/css/star-rating.css" />
+    <script src="~/js/star-rating.js"></script>
+}
+
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-icon {
+        font-size: 48px;
+        opacity: 0.8;
+    }
+
+    .stat-content {
+        flex: 1;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #8B4049;
+    }
+
+    .stat-percent {
+        font-size: 16px;
+        color: #999;
+    }
+
+    .rating-distribution-section {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .rating-distribution-section h3 {
+        margin: 0 0 24px 0;
+        font-size: 20px;
+        color: #333;
+    }
+
+    .table-section {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-section h3 {
+        margin: 0 0 24px 0;
+        font-size: 20px;
+        color: #333;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #dee2e6;
+        padding: 16px;
+    }
+
+    .table tbody td {
+        padding: 16px;
+        vertical-align: middle;
+    }
+
+    .book-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .book-thumbnail {
+        width: 40px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .book-title-link {
+        color: #333;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .book-title-link:hover {
+        color: #8B4049;
+    }
+
+    .member-link {
+        color: #8B4049;
+        text-decoration: none;
+        font-weight: 500;
+        transition: opacity 0.2s;
+    }
+
+    .member-link:hover {
+        opacity: 0.7;
+    }
+
+    .rating-display {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .rating-score {
+        font-weight: 600;
+        color: #666;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+    }
+
+    .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 24px;
+        opacity: 0.5;
+    }
+
+    .empty-state-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 12px;
+    }
+
+    .empty-state-message {
+        font-size: 16px;
+        color: #666;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    @@media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stat-card {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>

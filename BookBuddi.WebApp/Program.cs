@@ -17,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddControllers();
 
 // Configure Settings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
@@ -104,6 +105,7 @@ builder.Services.AddScoped<IBookRequestRepository, BookRequestRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();
+builder.Services.AddScoped<IRatingRepository, RatingRepository>();
 
 // Register Managers
 builder.Services.AddScoped<PasswordManager>();
@@ -119,6 +121,7 @@ builder.Services.AddScoped<IBookRequestService, BookRequestService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IRatingService, RatingService>();
 
 // Register Email Service
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -195,6 +198,7 @@ RecurringJob.AddOrUpdate<EmailNotificationBackgroundService>(
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
+app.MapControllers();
 
 app.Run();
 
